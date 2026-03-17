@@ -44,7 +44,6 @@
             margin: 0 auto;
         }
 
-        /* Шапка */
         .header {
             text-align: center;
             margin-bottom: 20px;
@@ -66,7 +65,6 @@
             font-size: 14px;
         }
 
-        /* Карточка авторизации */
         .auth-card {
             background: var(--bg-secondary);
             border-radius: 12px;
@@ -236,7 +234,6 @@
             display: none;
         }
 
-        /* Основной контент */
         .main-content {
             display: none;
         }
@@ -245,7 +242,6 @@
             display: block;
         }
 
-        /* Верхнее меню */
         .top-menu {
             display: flex;
             gap: 10px;
@@ -276,7 +272,6 @@
             color: white;
         }
 
-        /* Карточки разделов */
         .section-card {
             background: var(--bg-secondary);
             border-radius: 12px;
@@ -296,7 +291,6 @@
             align-items: center;
         }
 
-        /* Модальное окно создания сводки */
         .summary-modal {
             display: none;
             position: fixed;
@@ -325,7 +319,6 @@
             color: var(--text-primary);
         }
 
-        /* Информационная строка */
         .info-row {
             display: grid;
             grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
@@ -355,7 +348,6 @@
             font-size: 14px;
         }
 
-        /* Таблица */
         .table-container {
             overflow-x: auto;
             margin-bottom: 20px;
@@ -406,16 +398,6 @@
             background: var(--bg-primary);
         }
 
-        .work-table select {
-            width: 100%;
-            background: var(--bg-primary);
-            border: 1px solid var(--border);
-            color: var(--text-primary);
-            padding: 2px;
-            border-radius: 4px;
-            font-size: 11px;
-        }
-
         .section-header {
             background: var(--accent) !important;
             color: white !important;
@@ -430,7 +412,6 @@
             font-weight: bold;
         }
 
-        /* Итоговые блоки */
         .totals-container {
             display: grid;
             grid-template-columns: repeat(4, 1fr);
@@ -501,7 +482,6 @@
             font-weight: bold;
         }
 
-        /* Кнопки действий */
         .action-buttons {
             display: flex;
             gap: 10px;
@@ -509,7 +489,6 @@
             margin-top: 20px;
         }
 
-        /* Список сводок */
         .summaries-grid {
             display: grid;
             grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
@@ -565,7 +544,6 @@
             font-size: 12px;
         }
 
-        /* Фильтры */
         .filters-bar {
             display: flex;
             gap: 10px;
@@ -582,7 +560,6 @@
             min-width: 200px;
         }
 
-        /* Пустое состояние */
         .empty-state {
             text-align: center;
             color: var(--text-secondary);
@@ -592,17 +569,6 @@
             border: 1px dashed var(--border);
         }
 
-        /* Демо-режим */
-        .demo-badge {
-            background: var(--admin);
-            color: white;
-            padding: 2px 8px;
-            border-radius: 12px;
-            font-size: 10px;
-            margin-left: 10px;
-        }
-
-        /* Поле для кода подтверждения */
         .verify-row {
             display: flex;
             gap: 10px;
@@ -619,24 +585,103 @@
             text-align: center;
             margin: 10px 0;
         }
+
+        .storage-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+            gap: 15px;
+            margin-bottom: 20px;
+        }
+
+        .storage-card {
+            background: var(--bg-card);
+            border-radius: 8px;
+            padding: 15px;
+            border-left: 4px solid var(--storage);
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .storage-card:hover {
+            transform: translateX(5px);
+        }
+
+        .storage-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 10px;
+        }
+
+        .storage-material {
+            font-weight: 600;
+            color: var(--text-primary);
+        }
+
+        .storage-piket {
+            color: var(--text-secondary);
+            font-size: 12px;
+        }
+
+        .storage-volume {
+            font-size: 16px;
+            font-weight: 600;
+            color: var(--storage);
+        }
+
+        .employees-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+            gap: 15px;
+            margin-top: 15px;
+        }
+
+        .employee-card {
+            background: var(--bg-card);
+            border-radius: 8px;
+            padding: 15px;
+            border: 1px solid var(--border);
+        }
+
+        .employee-name {
+            font-weight: 600;
+            color: var(--text-primary);
+            margin-bottom: 5px;
+        }
+
+        .employee-position {
+            color: var(--text-secondary);
+            font-size: 12px;
+            padding: 3px 8px;
+            background: var(--bg-primary);
+            border-radius: 12px;
+            display: inline-block;
+            margin-bottom: 8px;
+        }
+
+        .employee-contacts {
+            color: var(--text-secondary);
+            font-size: 12px;
+        }
+
+        .employee-contacts p {
+            margin: 3px 0;
+        }
     </style>
 </head>
 <body>
     <div class="container">
-        <!-- Шапка -->
         <div class="header">
             <h1>ЖУФР</h1>
             <p>Журнал учета работ · Система управления строительством</p>
         </div>
 
-        <!-- Карточка авторизации -->
         <div id="authCard" class="auth-card">
             <div class="auth-tabs">
                 <button class="auth-tab active" onclick="showAuthTab('login')">Вход</button>
                 <button class="auth-tab" onclick="showAuthTab('register')">Регистрация</button>
             </div>
 
-            <!-- Форма входа -->
             <div id="loginForm" class="auth-form active">
                 <div class="form-group">
                     <label>Email</label>
@@ -651,7 +696,6 @@
                 <button class="btn" onclick="demoLogin()" style="margin-top: 10px;">🔑 ДЕМО-ВХОД</button>
             </div>
 
-            <!-- Форма регистрации -->
             <div id="registerForm" class="auth-form">
                 <div class="form-group">
                     <label>ФИО</label>
@@ -679,7 +723,7 @@
                     <input type="tel" id="regPhone" placeholder="+7 (999) 123-45-67">
                 </div>
                 <div class="form-group">
-                    <label>Email (только mail.ru)</label>
+                    <label>Email</label>
                     <input type="email" id="regEmail" placeholder="example@mail.ru">
                 </div>
                 <div class="form-group">
@@ -691,7 +735,6 @@
                     <input type="password" id="regConfirmPassword" placeholder="••••••••">
                 </div>
                 
-                <!-- Блок подтверждения email -->
                 <div class="form-group" id="verificationBlock" style="display: none;">
                     <label>Подтверждение email</label>
                     <div class="verify-row">
@@ -710,9 +753,7 @@
             </div>
         </div>
 
-        <!-- Основной контент -->
         <div id="mainContent" class="main-content">
-            <!-- Верхнее меню -->
             <div class="top-menu">
                 <button class="menu-btn active" onclick="showMenu('summary')">📋 Сводки</button>
                 <button class="menu-btn" onclick="showMenu('storage')">📦 Склады</button>
@@ -721,14 +762,12 @@
                 <button class="menu-btn" onclick="logout()">🚪 Выйти</button>
             </div>
 
-            <!-- РАЗДЕЛ СВОДКИ -->
             <div id="summarySection" class="section-card" style="display: block;">
                 <div class="section-title">
                     <span>📋 Управление сводками</span>
                     <button class="btn btn-success" onclick="openSummaryModal()">➕ Новая сводка</button>
                 </div>
 
-                <!-- Фильтры -->
                 <div class="filters-bar">
                     <select class="filter-select" id="summaryMasterFilter" onchange="filterSummaries()">
                         <option value="all">Все мастера</option>
@@ -745,11 +784,9 @@
                     </select>
                 </div>
 
-                <!-- Список сводок -->
                 <div id="summariesGrid" class="summaries-grid"></div>
             </div>
 
-            <!-- РАЗДЕЛ СКЛАДЫ -->
             <div id="storageSection" class="section-card" style="display: none;">
                 <div class="section-title">
                     <span>📦 Склады материалов</span>
@@ -785,7 +822,6 @@
                 </div>
             </div>
 
-            <!-- РАЗДЕЛ СОТРУДНИКИ -->
             <div id="employeesSection" class="section-card" style="display: none;">
                 <div class="section-title">
                     <span>👥 Сотрудники</span>
@@ -811,7 +847,6 @@
                 <div id="employeesGrid" class="employees-grid"></div>
             </div>
 
-            <!-- РАЗДЕЛ ОТЧЕТЫ -->
             <div id="reportsSection" class="section-card" style="display: none;">
                 <div class="section-title">
                     <span>📊 Аналитические отчеты</span>
@@ -872,14 +907,12 @@
         </div>
     </div>
 
-    <!-- Модальное окно создания сводки -->
     <div id="summaryModal" class="summary-modal">
         <div class="modal-header">
             <h2>📋 Новая сводка</h2>
             <button class="btn" onclick="closeSummaryModal()">✕ Закрыть</button>
         </div>
 
-        <!-- Основная информация -->
         <div class="info-row">
             <div class="info-item">
                 <span class="info-label">Дата:</span>
@@ -902,7 +935,6 @@
             </div>
         </div>
 
-        <!-- Таблица работ -->
         <div class="table-container">
             <table class="work-table" id="workTable">
                 <thead>
@@ -925,15 +957,11 @@
                         <th>Маш-часы</th>
                     </tr>
                 </thead>
-                <tbody id="workBody">
-                    <!-- Строки будут добавлены через JavaScript -->
-                </tbody>
+                <tbody id="workBody"></tbody>
             </table>
         </div>
 
-        <!-- Итоговые блоки -->
         <div class="totals-container">
-            <!-- Люди -->
             <div class="total-block">
                 <div class="total-title">👥 ЛЮДИ</div>
                 <div class="total-row">
@@ -946,7 +974,6 @@
                 </div>
             </div>
 
-            <!-- Техника -->
             <div class="total-block">
                 <div class="total-title">🚜 ТЕХНИКА</div>
                 <div class="total-row">
@@ -959,7 +986,6 @@
                 </div>
             </div>
 
-            <!-- Приход материалов -->
             <div class="total-block">
                 <div class="total-title">📦 ПРИХОД МАТЕРИАЛОВ</div>
                 <div class="materials-list" id="incomeMaterialsList"></div>
@@ -970,7 +996,6 @@
                 <button class="btn btn-sm" onclick="addIncomeRow()" style="width:100%; margin-top:10px;">+ Добавить приход</button>
             </div>
 
-            <!-- Расход материалов -->
             <div class="total-block">
                 <div class="total-title">📤 РАСХОД МАТЕРИАЛОВ</div>
                 <div class="materials-list" id="outcomeMaterialsList"></div>
@@ -982,14 +1007,12 @@
             </div>
         </div>
 
-        <!-- Кнопки действий -->
         <div class="action-buttons">
             <button class="btn" onclick="closeSummaryModal()">Отмена</button>
             <button class="btn btn-success" onclick="saveSummary()">💾 СОХРАНИТЬ СВОДКУ</button>
         </div>
     </div>
 
-    <!-- Модальное окно для добавления прихода/расхода -->
     <div id="materialModal" style="display: none; position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%); background: var(--bg-secondary); border: 1px solid var(--border); border-radius: 12px; padding: 20px; z-index: 1100; max-width: 500px; width: 90%;">
         <h3 style="color: var(--text-primary); margin-bottom: 20px;" id="materialModalTitle">Добавить приход</h3>
         
@@ -1032,13 +1055,12 @@
     </div>
 
     <script>
-        // ========== ИНИЦИАЛИЗАЦИЯ EMAILJS ==========
+        // Инициализация EmailJS с вашим Public Key
         (function() {
-            // Ваш Public Key из EmailJS
             emailjs.init("voe5SwpouvWYzd4aG");
         })();
 
-        // ========== СПИСОК МАТЕРИАЛОВ ==========
+        // Список материалов
         const MATERIALS = [
             'ЩПС 0-80',
             'Щебень 20-40',
@@ -1051,8 +1073,7 @@
             'ПРС (плодородный слой)'
         ];
 
-        // ========== СИСТЕМА АВТОРИЗАЦИИ ==========
-        
+        // Система авторизации
         let users = JSON.parse(localStorage.getItem('users')) || {};
         let currentUser = null;
         let pendingRegistration = null;
@@ -1069,9 +1090,22 @@
         let workRows = [];
         let incomeMaterials = [];
         let outcomeMaterials = [];
+        let currentMaterialType = 'income';
 
-        // ========== ФУНКЦИИ АВТОРИЗАЦИИ ==========
+        // Проверка сохраненной сессии
+        const savedUser = localStorage.getItem('currentUser');
+        if (savedUser) {
+            try {
+                currentUser = JSON.parse(savedUser);
+                document.getElementById('authCard').style.display = 'none';
+                document.getElementById('mainContent').classList.add('visible');
+                updateAllSections();
+            } catch (e) {
+                localStorage.removeItem('currentUser');
+            }
+        }
 
+        // Функции авторизации
         function showAuthTab(tab) {
             document.querySelectorAll('.auth-tab').forEach(t => t.classList.remove('active'));
             document.querySelectorAll('.auth-form').forEach(f => f.classList.remove('active'));
@@ -1110,11 +1144,7 @@
                 return;
             }
 
-            if (!email.endsWith('@mail.ru')) {
-                showError('registerError', 'Используйте только почту @mail.ru');
-                return;
-            }
-
+            // Проверка на существующего пользователя
             if (users[email]) {
                 showError('registerError', 'Пользователь с таким email уже зарегистрирован');
                 return;
@@ -1130,31 +1160,25 @@
         }
 
         function sendVerificationCode() {
-            // Генерируем 6-значный код
             verificationCode = Math.floor(100000 + Math.random() * 900000).toString();
             
-            // Показываем информацию
             showInfo('registerInfo', `Отправляем код на ${pendingRegistration.email}...`);
 
-            // Параметры для EmailJS - СООТВЕТСТВУЮТ ШАБЛОНУ
             const templateParams = {
-                to_email: pendingRegistration.email,      // email получателя
-                verification_code: verificationCode,      // код подтверждения
-                user_name: pendingRegistration.fullName    // имя пользователя
+                to_email: pendingRegistration.email,
+                verification_code: verificationCode,
+                user_name: pendingRegistration.fullName
             };
 
-            // Отправка через EmailJS с вашими ID
             emailjs.send('service_hgvxlqp', 'template_2b8zm6h', templateParams)
                 .then(function(response) {
                     console.log('SUCCESS!', response.status, response.text);
                     
-                    // Показываем блок подтверждения
                     document.getElementById('verificationBlock').style.display = 'block';
                     document.getElementById('registerBtn').style.display = 'none';
                     
                     showSuccess('registerInfo', 'Код отправлен на вашу почту!');
                     
-                    // Запускаем таймер на 5 минут
                     startTimer(300);
                 }, function(error) {
                     console.log('FAILED...', error);
@@ -1194,7 +1218,6 @@
             }
 
             if (enteredCode === verificationCode) {
-                // Код верный - завершаем регистрацию
                 completeRegistration();
             } else {
                 showError('registerError', 'Неверный код подтверждения');
@@ -1202,7 +1225,6 @@
         }
 
         function completeRegistration() {
-            // Добавляем в базу сотрудников
             const newEmployee = {
                 id: Date.now(),
                 fullName: pendingRegistration.fullName,
@@ -1216,7 +1238,6 @@
             employees.push(newEmployee);
             localStorage.setItem('employees', JSON.stringify(employees));
 
-            // Создаем пользователя
             users[pendingRegistration.email] = {
                 email: pendingRegistration.email,
                 fullName: pendingRegistration.fullName,
@@ -1231,14 +1252,11 @@
             
             showSuccess('registerSuccess', 'Регистрация успешна! Теперь вы можете войти.');
             
-            // Очищаем таймер
             if (timerInterval) clearInterval(timerInterval);
             
-            // Скрываем блок подтверждения
             document.getElementById('verificationBlock').style.display = 'none';
             document.getElementById('registerBtn').style.display = 'block';
             
-            // Очищаем поля
             document.getElementById('regFullName').value = '';
             document.getElementById('regPhone').value = '';
             document.getElementById('regEmail').value = '';
@@ -1352,21 +1370,7 @@
             el.style.color = 'var(--shift)';
         }
 
-        // Проверяем сохраненную сессию
-        const savedUser = localStorage.getItem('currentUser');
-        if (savedUser) {
-            try {
-                currentUser = JSON.parse(savedUser);
-                document.getElementById('authCard').style.display = 'none';
-                document.getElementById('mainContent').classList.add('visible');
-                updateAllSections();
-            } catch (e) {
-                localStorage.removeItem('currentUser');
-            }
-        }
-
-        // ========== ФУНКЦИИ МЕНЮ ==========
-
+        // Функции меню
         function showMenu(menu) {
             document.querySelectorAll('.menu-btn').forEach(btn => btn.classList.remove('active'));
             document.querySelectorAll('.section-card').forEach(section => section.style.display = 'none');
@@ -1392,17 +1396,13 @@
             renderReports();
         }
 
-        // ========== ФУНКЦИИ ДЛЯ СВОДОК ==========
-
+        // Функции для сводок
         function openSummaryModal() {
-            // Очищаем данные
             workRows = [];
             incomeMaterials = [];
             outcomeMaterials = [];
             
-            // Создаем 4 участка работ
             for (let i = 1; i <= 4; i++) {
-                // В каждом участке по 6 составов работ
                 for (let j = 1; j <= 6; j++) {
                     workRows.push({
                         id: `row_${i}_${j}_${Date.now()}`,
@@ -1423,14 +1423,11 @@
                 }
             }
             
-            // Обновляем информацию о мастере
             document.getElementById('currentMaster').textContent = currentUser?.fullName || 'Мастер';
             document.getElementById('currentSection').textContent = `Участок ${currentUser?.section || '29'}`;
             
-            // Отрисовываем таблицу
             renderWorkTable();
             
-            // Показываем модальное окно
             document.getElementById('summaryModal').style.display = 'block';
         }
 
@@ -1445,8 +1442,7 @@
             let currentSection = '';
             let rowNumber = 1;
             
-            workRows.forEach((row, index) => {
-                // Если начался новый участок, добавляем заголовок
+            workRows.forEach((row) => {
                 if (row.section !== currentSection) {
                     currentSection = row.section;
                     const headerRow = tbody.insertRow();
@@ -1454,7 +1450,6 @@
                     headerRow.innerHTML = `<td colspan="13" style="text-align: left; background: var(--accent); color: white; font-weight: bold;">📍 ${row.section}</td>`;
                 }
                 
-                // Основная строка
                 const tr = tbody.insertRow();
                 tr.innerHTML = `
                     <td>${rowNumber++}</td>
@@ -1501,12 +1496,10 @@
             document.getElementById('totalEquipmentCount').textContent = totalEquipment;
             document.getElementById('totalEquipmentHours').textContent = totalEquipmentHours.toFixed(1);
             
-            // Обновляем списки материалов
             updateMaterialsLists();
         }
 
         function updateMaterialsLists() {
-            // Приход
             const incomeList = document.getElementById('incomeMaterialsList');
             incomeList.innerHTML = '';
             let totalIncome = 0;
@@ -1524,7 +1517,6 @@
             
             document.getElementById('totalIncome').textContent = totalIncome.toFixed(1);
             
-            // Расход
             const outcomeList = document.getElementById('outcomeMaterialsList');
             outcomeList.innerHTML = '';
             let totalOutcome = 0;
@@ -1543,9 +1535,6 @@
             document.getElementById('totalOutcome').textContent = totalOutcome.toFixed(1);
         }
 
-        // Материалы - приход
-        let currentMaterialType = 'income';
-        
         function addIncomeRow() {
             currentMaterialType = 'income';
             openMaterialModal('приход');
@@ -1559,14 +1548,12 @@
         function openMaterialModal(type) {
             document.getElementById('materialModalTitle').textContent = `Добавить ${type}`;
             
-            // Заполняем select материалами
             const select = document.getElementById('materialSelect');
             select.innerHTML = '<option value="">Выберите материал</option>';
             MATERIALS.forEach(m => {
                 select.innerHTML += `<option value="${m}">${m}</option>`;
             });
             
-            // Показываем нужные поля
             if (type === 'приход') {
                 document.getElementById('supplierField').style.display = 'block';
                 document.getElementById('destinationField').style.display = 'none';
@@ -1575,7 +1562,6 @@
                 document.getElementById('destinationField').style.display = 'block';
             }
             
-            // Очищаем поля
             document.getElementById('materialSelect').value = '';
             document.getElementById('materialUnit').value = 'м³';
             document.getElementById('materialVolume').value = '';
@@ -1621,7 +1607,6 @@
             updateMaterialsLists();
         }
 
-        // Сохранение сводки
         function saveSummary() {
             if (!currentUser) {
                 alert('Ошибка: пользователь не авторизован');
@@ -1656,7 +1641,6 @@
             summaries.unshift(summary);
             localStorage.setItem('summaries', JSON.stringify(summaries));
 
-            // Обновляем склад
             updateStorage(summary);
 
             alert('Сводка успешно сохранена!');
@@ -1664,9 +1648,7 @@
             renderSummaries();
         }
 
-        // Обновление склада
         function updateStorage(summary) {
-            // Приход
             summary.incomeMaterials.forEach(item => {
                 if (item.material && item.volume && item.piket) {
                     const key = `${item.material}|${item.piket}`;
@@ -1694,7 +1676,6 @@
                 }
             });
 
-            // Расход
             summary.outcomeMaterials.forEach(item => {
                 if (item.material && item.volume && item.piket) {
                     const key = `${item.material}|${item.piket}`;
@@ -1720,8 +1701,6 @@
             localStorage.setItem('storage', JSON.stringify(storage));
             localStorage.setItem('storageHistory', JSON.stringify(storageHistory));
         }
-
-        // ========== ОТОБРАЖЕНИЕ СВОДОК ==========
 
         function renderSummaries() {
             const masters = [...new Set(summaries.map(s => s.master))];
@@ -1784,8 +1763,6 @@
             alert(JSON.stringify(summary, null, 2));
         }
 
-        // ========== ОТОБРАЖЕНИЕ СКЛАДА ==========
-
         function renderStorage() {
             const materials = [...new Set(Object.values(storage).map(s => s.material))];
             const materialFilter = document.getElementById('storageMaterialFilter');
@@ -1847,8 +1824,6 @@
                 `;
             });
         }
-
-        // ========== ОТОБРАЖЕНИЕ СОТРУДНИКОВ ==========
 
         function renderEmployees() {
             filterEmployees();
@@ -1920,8 +1895,6 @@
             localStorage.setItem('employees', JSON.stringify(employees));
             renderEmployees();
         }
-
-        // ========== ОТОБРАЖЕНИЕ ОТЧЕТОВ ==========
 
         function renderReports() {
             document.getElementById('totalSummaries').textContent = summaries.length;
