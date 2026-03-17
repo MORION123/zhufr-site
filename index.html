@@ -1,0 +1,2137 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ЖУФР - Система учета строительных работ</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            --bg-primary: #1a1e24;
+            --bg-secondary: #252b33;
+            --bg-card: #2f3640;
+            --text-primary: #e0e0e0;
+            --text-secondary: #9aa4b3;
+            --accent: #5d6d7e;
+            --accent-hover: #4a5a6b;
+            --border: #3a424e;
+            --success: #3a6b4b;
+            --warning: #7a5d3a;
+            --danger: #6b3f3f;
+            --admin: #8e44ad;
+            --storage: #16a085;
+            --shift: #2980b9;
+        }
+
+        body {
+            font-family: 'Segoe UI', Roboto, sans-serif;
+            background: var(--bg-primary);
+            color: var(--text-primary);
+            padding: 12px;
+            line-height: 1.4;
+            min-height: 100vh;
+        }
+
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+
+        /* Шапка */
+        .header {
+            text-align: center;
+            margin-bottom: 20px;
+            padding: 15px;
+            background: var(--bg-secondary);
+            border-radius: 10px;
+            border: 1px solid var(--border);
+        }
+
+        .header h1 {
+            font-size: 32px;
+            letter-spacing: 2px;
+            color: var(--text-primary);
+            margin-bottom: 5px;
+        }
+
+        .header p {
+            color: var(--text-secondary);
+            font-size: 14px;
+        }
+
+        /* Статус системы */
+        .system-status {
+            background: var(--bg-secondary);
+            border-radius: 8px;
+            padding: 10px;
+            margin-bottom: 20px;
+            text-align: center;
+            color: var(--text-secondary);
+            border: 1px solid var(--border);
+            font-size: 14px;
+        }
+
+        /* Карточка авторизации */
+        .auth-card {
+            background: var(--bg-secondary);
+            border-radius: 12px;
+            padding: 30px;
+            margin-bottom: 20px;
+            border: 1px solid var(--border);
+            max-width: 600px;
+            margin: 0 auto 20px;
+        }
+
+        .auth-tabs {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 30px;
+        }
+
+        .auth-tab {
+            flex: 1;
+            padding: 12px;
+            background: transparent;
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            color: var(--text-secondary);
+            font-size: 16px;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .auth-tab.active {
+            background: var(--accent);
+            color: white;
+            border-color: var(--accent);
+        }
+
+        .auth-form {
+            display: none;
+        }
+
+        .auth-form.active {
+            display: block;
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 8px;
+            color: var(--text-secondary);
+            font-size: 13px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .form-group input,
+        .form-group select,
+        .form-group textarea {
+            width: 100%;
+            padding: 12px 15px;
+            background: var(--bg-primary);
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            color: var(--text-primary);
+            font-size: 15px;
+            transition: all 0.3s;
+        }
+
+        .form-group input:focus,
+        .form-group select:focus,
+        .form-group textarea:focus {
+            outline: none;
+            border-color: var(--accent);
+        }
+
+        .form-group textarea {
+            min-height: 80px;
+            resize: vertical;
+        }
+
+        .form-group select:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+
+        .btn-primary {
+            width: 100%;
+            padding: 15px;
+            background: var(--accent);
+            border: none;
+            border-radius: 8px;
+            color: white;
+            font-size: 16px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: background 0.3s;
+            margin-top: 10px;
+        }
+
+        .btn-primary:hover {
+            background: var(--accent-hover);
+        }
+
+        .btn-primary:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+
+        .btn {
+            padding: 10px 16px;
+            background: var(--bg-card);
+            border: 1px solid var(--border);
+            border-radius: 6px;
+            color: var(--text-secondary);
+            font-size: 14px;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .btn:hover {
+            background: var(--accent);
+            color: white;
+            border-color: var(--accent);
+        }
+
+        .btn-success {
+            background: var(--success);
+            color: white;
+            border-color: var(--success);
+        }
+
+        .btn-success:hover {
+            opacity: 0.9;
+        }
+
+        .btn-sm {
+            padding: 6px 12px;
+            font-size: 13px;
+        }
+
+        .error-message {
+            color: var(--danger);
+            font-size: 14px;
+            margin-top: 5px;
+            margin-bottom: 10px;
+            display: none;
+        }
+
+        .success-message {
+            color: var(--success);
+            font-size: 14px;
+            margin-top: 5px;
+            margin-bottom: 10px;
+            display: none;
+        }
+
+        /* Основной контент */
+        .main-content {
+            display: none;
+        }
+
+        .main-content.visible {
+            display: block;
+        }
+
+        /* Верхнее меню */
+        .top-menu {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 20px;
+            flex-wrap: wrap;
+        }
+
+        .menu-btn {
+            padding: 12px 20px;
+            background: var(--bg-secondary);
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            color: var(--text-secondary);
+            cursor: pointer;
+            transition: all 0.3s;
+            flex: 1;
+            min-width: 120px;
+            font-size: 14px;
+        }
+
+        .menu-btn:hover {
+            background: var(--accent);
+            color: white;
+        }
+
+        .menu-btn.active {
+            background: var(--accent);
+            color: white;
+        }
+
+        /* Карточки разделов */
+        .section-card {
+            background: var(--bg-secondary);
+            border-radius: 12px;
+            padding: 20px;
+            margin-bottom: 20px;
+            border: 1px solid var(--border);
+        }
+
+        .section-title {
+            color: var(--text-primary);
+            font-size: 20px;
+            margin-bottom: 20px;
+            padding-bottom: 10px;
+            border-bottom: 1px solid var(--border);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        /* Прогресс-бар */
+        .progress-bar {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 30px;
+            position: relative;
+        }
+
+        .progress-bar::before {
+            content: '';
+            position: absolute;
+            top: 20px;
+            left: 0;
+            right: 0;
+            height: 2px;
+            background: var(--border);
+            z-index: 1;
+        }
+
+        .progress-step {
+            position: relative;
+            z-index: 2;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            flex: 1;
+        }
+
+        .step-number {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background: var(--bg-card);
+            border: 2px solid var(--border);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+            margin-bottom: 8px;
+            transition: all 0.3s;
+        }
+
+        .progress-step.active .step-number {
+            background: var(--accent);
+            border-color: var(--accent);
+            color: white;
+        }
+
+        .progress-step.completed .step-number {
+            background: var(--success);
+            border-color: var(--success);
+            color: white;
+        }
+
+        .step-label {
+            font-size: 12px;
+            color: var(--text-secondary);
+            text-align: center;
+        }
+
+        .progress-step.active .step-label {
+            color: var(--text-primary);
+            font-weight: 600;
+        }
+
+        /* Шаги */
+        .step-content {
+            display: none;
+            background: var(--bg-card);
+            border-radius: 10px;
+            padding: 20px;
+            margin-bottom: 20px;
+            border: 1px solid var(--border);
+        }
+
+        .step-content.active {
+            display: block;
+        }
+
+        .step-title {
+            color: var(--text-primary);
+            font-size: 18px;
+            margin-bottom: 20px;
+            padding-bottom: 10px;
+            border-bottom: 1px solid var(--border);
+        }
+
+        .step-buttons {
+            display: flex;
+            gap: 10px;
+            justify-content: flex-end;
+            margin-top: 20px;
+        }
+
+        /* Таблица */
+        .table-container {
+            overflow-x: auto;
+            margin-bottom: 20px;
+        }
+
+        .summary-table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 13px;
+            background: var(--bg-secondary);
+            border-radius: 8px;
+            overflow: hidden;
+        }
+
+        .summary-table th {
+            background: var(--bg-primary);
+            color: var(--text-secondary);
+            font-weight: 600;
+            padding: 8px 4px;
+            text-align: center;
+            font-size: 11px;
+            border: 1px solid var(--border);
+            white-space: nowrap;
+        }
+
+        .summary-table td {
+            padding: 6px 4px;
+            border: 1px solid var(--border);
+            color: var(--text-primary);
+            text-align: center;
+        }
+
+        .summary-table input {
+            width: 100%;
+            background: transparent;
+            border: none;
+            color: var(--text-primary);
+            text-align: center;
+            font-size: 12px;
+            padding: 4px;
+        }
+
+        .summary-table input:focus {
+            outline: 1px solid var(--accent);
+            background: var(--bg-primary);
+        }
+
+        .summary-table select {
+            width: 100%;
+            background: var(--bg-primary);
+            border: 1px solid var(--border);
+            color: var(--text-primary);
+            padding: 4px;
+            border-radius: 4px;
+        }
+
+        .summary-table .shift-badge {
+            padding: 2px 6px;
+            border-radius: 12px;
+            font-size: 10px;
+            background: var(--shift);
+            color: white;
+        }
+
+        /* Список участков работ */
+        .work-sections {
+            margin-bottom: 20px;
+        }
+
+        .section-item {
+            display: flex;
+            gap: 10px;
+            align-items: center;
+            margin-bottom: 10px;
+            background: var(--bg-secondary);
+            padding: 10px;
+            border-radius: 6px;
+        }
+
+        .section-item input {
+            flex: 1;
+            background: var(--bg-primary);
+            border: 1px solid var(--border);
+            color: var(--text-primary);
+            padding: 8px;
+            border-radius: 4px;
+        }
+
+        .section-item button {
+            background: var(--danger);
+            color: white;
+            border: none;
+            padding: 8px 12px;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+
+        .add-section-btn {
+            width: 100%;
+            padding: 10px;
+            background: var(--accent);
+            color: white;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            margin-bottom: 15px;
+        }
+
+        /* Информационная строка */
+        .info-row {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 15px;
+            margin-bottom: 20px;
+            padding: 15px;
+            background: var(--bg-card);
+            border-radius: 8px;
+            border: 1px solid var(--border);
+        }
+
+        .info-item {
+            display: flex;
+            flex-direction: column;
+            gap: 5px;
+        }
+
+        .info-label {
+            color: var(--text-secondary);
+            font-size: 11px;
+            text-transform: uppercase;
+        }
+
+        .info-value {
+            color: var(--text-primary);
+            font-weight: 600;
+            font-size: 14px;
+        }
+
+        /* Итоговые блоки */
+        .totals-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 15px;
+            margin-top: 20px;
+        }
+
+        .total-card {
+            background: var(--bg-card);
+            border-radius: 8px;
+            padding: 15px;
+            border-left: 4px solid var(--accent);
+        }
+
+        .total-title {
+            color: var(--text-secondary);
+            font-size: 11px;
+            margin-bottom: 5px;
+            text-transform: uppercase;
+        }
+
+        .total-value {
+            color: var(--text-primary);
+            font-size: 16px;
+            font-weight: 600;
+        }
+
+        .total-sub {
+            color: var(--text-secondary);
+            font-size: 10px;
+            margin-top: 5px;
+        }
+
+        /* Карточка склада */
+        .storage-card {
+            background: var(--bg-card);
+            border-radius: 8px;
+            padding: 15px;
+            margin-bottom: 15px;
+            border-left: 4px solid var(--storage);
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .storage-card:hover {
+            transform: translateX(5px);
+        }
+
+        .storage-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 10px;
+        }
+
+        .storage-material {
+            font-weight: 600;
+            color: var(--text-primary);
+        }
+
+        .storage-piket {
+            color: var(--text-secondary);
+            font-size: 12px;
+        }
+
+        .storage-volume {
+            font-size: 16px;
+            font-weight: 600;
+            color: var(--storage);
+        }
+
+        .storage-details {
+            color: var(--text-secondary);
+            font-size: 12px;
+            margin-top: 5px;
+        }
+
+        /* Список сотрудников */
+        .employees-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+            gap: 15px;
+            margin-top: 15px;
+        }
+
+        .employee-card {
+            background: var(--bg-card);
+            border-radius: 8px;
+            padding: 15px;
+            border: 1px solid var(--border);
+        }
+
+        .employee-name {
+            font-weight: 600;
+            color: var(--text-primary);
+            margin-bottom: 5px;
+        }
+
+        .employee-position {
+            color: var(--text-secondary);
+            font-size: 12px;
+            padding: 3px 8px;
+            background: var(--bg-primary);
+            border-radius: 12px;
+            display: inline-block;
+            margin-bottom: 8px;
+        }
+
+        .employee-contacts {
+            color: var(--text-secondary);
+            font-size: 12px;
+        }
+
+        .employee-contacts p {
+            margin: 3px 0;
+        }
+
+        /* Список сводок */
+        .summaries-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+            gap: 15px;
+            margin-top: 15px;
+        }
+
+        .summary-card {
+            background: var(--bg-card);
+            border-radius: 8px;
+            padding: 15px;
+            border: 1px solid var(--border);
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .summary-card:hover {
+            transform: translateX(5px);
+            border-color: var(--accent);
+        }
+
+        .summary-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 10px;
+        }
+
+        .summary-date {
+            color: var(--text-primary);
+            font-weight: 600;
+        }
+
+        .summary-shift {
+            padding: 3px 8px;
+            border-radius: 12px;
+            font-size: 11px;
+            background: var(--shift);
+            color: white;
+        }
+
+        .summary-master {
+            color: var(--text-secondary);
+            font-size: 13px;
+            margin-bottom: 8px;
+        }
+
+        .summary-preview {
+            color: var(--text-secondary);
+            font-size: 12px;
+        }
+
+        .summary-stats {
+            display: flex;
+            gap: 15px;
+            margin-top: 10px;
+            color: var(--text-secondary);
+            font-size: 12px;
+        }
+
+        /* Фильтры */
+        .filters-bar {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 20px;
+            flex-wrap: wrap;
+        }
+
+        .filter-select {
+            padding: 8px 12px;
+            background: var(--bg-primary);
+            border: 1px solid var(--border);
+            border-radius: 6px;
+            color: var(--text-primary);
+            min-width: 200px;
+        }
+
+        /* Кнопки действий */
+        .action-buttons {
+            display: flex;
+            gap: 10px;
+            margin-top: 20px;
+            flex-wrap: wrap;
+        }
+
+        /* Пустое состояние */
+        .empty-state {
+            text-align: center;
+            color: var(--text-secondary);
+            padding: 40px;
+            background: var(--bg-card);
+            border-radius: 8px;
+            border: 1px dashed var(--border);
+        }
+
+        /* Демо-режим */
+        .demo-badge {
+            background: var(--admin);
+            color: white;
+            padding: 2px 8px;
+            border-radius: 12px;
+            font-size: 10px;
+            margin-left: 10px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <!-- Шапка -->
+        <div class="header">
+            <h1>ЖУФР</h1>
+            <p>Журнал учета работ · Система управления строительством</p>
+        </div>
+
+        <!-- Статус системы -->
+        <div class="system-status" id="systemStatus">
+            ✅ Веб-версия · Данные сохраняются в браузере
+        </div>
+
+        <!-- Карточка авторизации -->
+        <div id="authCard" class="auth-card">
+            <div class="auth-tabs">
+                <button class="auth-tab active" onclick="showAuthTab('login')">Вход</button>
+                <button class="auth-tab" onclick="showAuthTab('register')">Регистрация</button>
+            </div>
+
+            <!-- Форма входа -->
+            <div id="loginForm" class="auth-form active">
+                <div class="form-group">
+                    <label>Email</label>
+                    <input type="email" id="loginEmail" placeholder="example@mail.com">
+                </div>
+                <div class="form-group">
+                    <label>Пароль</label>
+                    <input type="password" id="loginPassword" placeholder="••••••••">
+                </div>
+                <div class="error-message" id="loginError"></div>
+                <button class="btn-primary" onclick="login()">ВОЙТИ</button>
+                <button class="btn" onclick="demoLogin()" style="margin-top: 10px;">🔑 ДЕМО-ВХОД</button>
+            </div>
+
+            <!-- Форма регистрации -->
+            <div id="registerForm" class="auth-form">
+                <div class="form-group">
+                    <label>ФИО</label>
+                    <input type="text" id="regFullName" placeholder="Иванов Иван Иванович">
+                </div>
+                <div class="form-group">
+                    <label>Должность</label>
+                    <select id="regPosition">
+                        <option value="Дорожный рабочий">Дорожный рабочий</option>
+                        <option value="Мастер">Мастер</option>
+                        <option value="Прораб">Прораб</option>
+                        <option value="Старший прораб">Старший прораб</option>
+                        <option value="Начальник участка">Начальник участка</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label>Номер участка</label>
+                    <select id="regSection">
+                        <option value="29">Участок 29</option>
+                        <option value="51">Участок 51</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label>Телефон</label>
+                    <input type="tel" id="regPhone" placeholder="+7 (999) 123-45-67">
+                </div>
+                <div class="form-group">
+                    <label>Email</label>
+                    <input type="email" id="regEmail" placeholder="example@mail.com">
+                </div>
+                <div class="form-group">
+                    <label>Пароль</label>
+                    <input type="password" id="regPassword" placeholder="••••••••">
+                </div>
+                <div class="form-group">
+                    <label>Подтверждение пароля</label>
+                    <input type="password" id="regConfirmPassword" placeholder="••••••••">
+                </div>
+                <div class="error-message" id="registerError"></div>
+                <div class="success-message" id="registerSuccess"></div>
+                <button class="btn-primary" onclick="register()">ЗАРЕГИСТРИРОВАТЬСЯ</button>
+            </div>
+        </div>
+
+        <!-- Основной контент (остается без изменений) -->
+        <div id="mainContent" class="main-content">
+            <!-- Верхнее меню -->
+            <div class="top-menu">
+                <button class="menu-btn active" onclick="showMenu('summary')">📋 Сводки</button>
+                <button class="menu-btn" onclick="showMenu('storage')">📦 Склады</button>
+                <button class="menu-btn" onclick="showMenu('employees')">👥 Сотрудники</button>
+                <button class="menu-btn" onclick="showMenu('reports')">📊 Отчеты</button>
+                <button class="menu-btn" onclick="logout()">🚪 Выйти</button>
+            </div>
+
+            <!-- РАЗДЕЛ СВОДКИ -->
+            <div id="summarySection" class="section-card" style="display: block;">
+                <div class="section-title">
+                    <span>📋 Управление сводками</span>
+                    <button class="btn btn-success" onclick="startNewSummary()">➕ Новая сводка</button>
+                </div>
+
+                <!-- Фильтры -->
+                <div class="filters-bar">
+                    <select class="filter-select" id="summaryMasterFilter" onchange="filterSummaries()">
+                        <option value="all">Все мастера</option>
+                    </select>
+                    <select class="filter-select" id="summarySectionFilter" onchange="filterSummaries()">
+                        <option value="all">Все участки</option>
+                        <option value="29">Участок 29</option>
+                        <option value="51">Участок 51</option>
+                    </select>
+                    <select class="filter-select" id="summaryShiftFilter" onchange="filterSummaries()">
+                        <option value="all">Все смены</option>
+                        <option value="день">День</option>
+                        <option value="ночь">Ночь</option>
+                    </select>
+                </div>
+
+                <!-- Список сводок -->
+                <div id="summariesGrid" class="summaries-grid"></div>
+            </div>
+
+            <!-- РАЗДЕЛ СКЛАДЫ -->
+            <div id="storageSection" class="section-card" style="display: none;">
+                <div class="section-title">
+                    <span>📦 Склады материалов</span>
+                </div>
+
+                <!-- Фильтры склада -->
+                <div class="filters-bar">
+                    <select class="filter-select" id="storageMaterialFilter" onchange="filterStorage()">
+                        <option value="all">Все материалы</option>
+                    </select>
+                    <input type="text" class="filter-select" id="storagePiketFilter" placeholder="Пикет склада" onchange="filterStorage()">
+                </div>
+
+                <!-- Список складов -->
+                <div id="storageGrid" class="storage-grid"></div>
+
+                <!-- История движений -->
+                <div style="margin-top: 30px;">
+                    <h3 style="color: var(--text-primary); margin-bottom: 15px;">История движений</h3>
+                    <div class="table-container">
+                        <table class="summary-table">
+                            <thead>
+                                <tr>
+                                    <th>Дата</th>
+                                    <th>Материал</th>
+                                    <th>Тип</th>
+                                    <th>Объем</th>
+                                    <th>Пикет</th>
+                                    <th>Мастер</th>
+                                    <th>Смена</th>
+                                </tr>
+                            </thead>
+                            <tbody id="storageHistoryBody"></tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+
+            <!-- РАЗДЕЛ СОТРУДНИКИ -->
+            <div id="employeesSection" class="section-card" style="display: none;">
+                <div class="section-title">
+                    <span>👥 Сотрудники</span>
+                    <button class="btn btn-success" onclick="showAddEmployee()">➕ Добавить</button>
+                </div>
+
+                <!-- Фильтры сотрудников -->
+                <div class="filters-bar">
+                    <select class="filter-select" id="employeePositionFilter" onchange="filterEmployees()">
+                        <option value="all">Все должности</option>
+                        <option value="Дорожный рабочий">Дорожный рабочий</option>
+                        <option value="Мастер">Мастер</option>
+                        <option value="Прораб">Прораб</option>
+                        <option value="Старший прораб">Старший прораб</option>
+                        <option value="Начальник участка">Начальник участка</option>
+                    </select>
+                    <select class="filter-select" id="employeeSectionFilter" onchange="filterEmployees()">
+                        <option value="all">Все участки</option>
+                        <option value="29">Участок 29</option>
+                        <option value="51">Участок 51</option>
+                    </select>
+                </div>
+
+                <!-- Список сотрудников -->
+                <div id="employeesGrid" class="employees-grid"></div>
+            </div>
+
+            <!-- РАЗДЕЛ ОТЧЕТЫ -->
+            <div id="reportsSection" class="section-card" style="display: none;">
+                <div class="section-title">
+                    <span>📊 Аналитические отчеты</span>
+                </div>
+
+                <div class="totals-grid">
+                    <div class="total-card">
+                        <div class="total-title">Всего сводок</div>
+                        <div class="total-value" id="totalSummaries">0</div>
+                    </div>
+                    <div class="total-card">
+                        <div class="total-title">Общий объем работ</div>
+                        <div class="total-value" id="totalWorkVolume">0</div>
+                    </div>
+                    <div class="total-card">
+                        <div class="total-title">Материалов на складе</div>
+                        <div class="total-value" id="totalStorageValue">0</div>
+                    </div>
+                    <div class="total-card">
+                        <div class="total-title">Всего сотрудников</div>
+                        <div class="total-value" id="totalEmployees">0</div>
+                    </div>
+                </div>
+
+                <!-- Статистика по мастерам -->
+                <div style="margin-top: 20px;">
+                    <h3 style="color: var(--text-primary); margin-bottom: 15px;">Статистика по мастерам</h3>
+                    <div class="table-container">
+                        <table class="summary-table">
+                            <thead>
+                                <tr>
+                                    <th>Мастер</th>
+                                    <th>Кол-во сводок</th>
+                                    <th>Объем работ</th>
+                                    <th>Маш-часы</th>
+                                </tr>
+                            </thead>
+                            <tbody id="mastersStatsBody"></tbody>
+                        </table>
+                    </div>
+                </div>
+
+                <!-- Статистика по материалам -->
+                <div style="margin-top: 20px;">
+                    <h3 style="color: var(--text-primary); margin-bottom: 15px;">Остатки материалов по складам</h3>
+                    <div class="table-container">
+                        <table class="summary-table">
+                            <thead>
+                                <tr>
+                                    <th>Материал</th>
+                                    <th>Пикет</th>
+                                    <th>Остаток</th>
+                                </tr>
+                            </thead>
+                            <tbody id="materialsStatsBody"></tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Модальное окно создания сводки (остается без изменений) -->
+    <div id="summaryModal" style="display: none; position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0,0,0,0.9); z-index: 1000; overflow-y: auto; padding: 20px;">
+        <div style="max-width: 1200px; margin: 0 auto;">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
+                <h2 style="color: var(--text-primary);">Создание новой сводки</h2>
+                <button class="btn" onclick="closeSummaryModal()">✕ Закрыть</button>
+            </div>
+
+            <!-- Прогресс-бар -->
+            <div class="progress-bar">
+                <div class="progress-step active" id="step1">
+                    <div class="step-number">1</div>
+                    <div class="step-label">Дата и смена</div>
+                </div>
+                <div class="progress-step" id="step2">
+                    <div class="step-number">2</div>
+                    <div class="step-label">Участки работ</div>
+                </div>
+                <div class="progress-step" id="step3">
+                    <div class="step-number">3</div>
+                    <div class="step-label">Работы и техника</div>
+                </div>
+                <div class="progress-step" id="step4">
+                    <div class="step-number">4</div>
+                    <div class="step-label">Приход/Расход</div>
+                </div>
+                <div class="progress-step" id="step5">
+                    <div class="step-number">5</div>
+                    <div class="step-label">Итоги</div>
+                </div>
+            </div>
+
+            <!-- Шаг 1: Дата и смена -->
+            <div class="step-content active" id="step1-content">
+                <div class="step-title">📅 Шаг 1: Дата и смена</div>
+                
+                <div class="form-group">
+                    <label>Дата</label>
+                    <input type="text" id="reportDate" placeholder="28.10.2024">
+                </div>
+                
+                <div class="form-group">
+                    <label>Смена</label>
+                    <select id="reportShift">
+                        <option value="день">День</option>
+                        <option value="ночь">Ночь</option>
+                    </select>
+                </div>
+                
+                <div class="step-buttons">
+                    <button class="btn btn-success" onclick="nextStep(1)">Далее →</button>
+                </div>
+            </div>
+
+            <!-- Шаг 2: Участки работ -->
+            <div class="step-content" id="step2-content">
+                <div class="step-title">📍 Шаг 2: Участки работ</div>
+                
+                <div id="workSectionsList" class="work-sections"></div>
+                
+                <button class="add-section-btn" onclick="addWorkSection()">➕ Добавить участок работ</button>
+                
+                <div class="step-buttons">
+                    <button class="btn" onclick="prevStep(2)">← Назад</button>
+                    <button class="btn btn-success" onclick="nextStep(2)">Далее →</button>
+                </div>
+            </div>
+
+            <!-- Шаг 3: Работы и техника -->
+            <div class="step-content" id="step3-content">
+                <div class="step-title">🚜 Шаг 3: Работы и техника</div>
+                
+                <div class="table-container">
+                    <table class="summary-table" id="workTable">
+                        <thead>
+                            <tr>
+                                <th>Участок</th>
+                                <th>Вид работы</th>
+                                <th>Состав</th>
+                                <th>Ед.изм</th>
+                                <th>Объем</th>
+                                <th>Техника</th>
+                                <th>Кол-во</th>
+                                <th>Гос №</th>
+                                <th>м-ч</th>
+                                <th>Прим</th>
+                                <th></th>
+                            </tr>
+                        </thead>
+                        <tbody id="workBody"></tbody>
+                    </table>
+                </div>
+                
+                <button class="btn" onclick="addWorkRow()" style="width:100%;">➕ Добавить строку</button>
+                
+                <div class="step-buttons">
+                    <button class="btn" onclick="prevStep(3)">← Назад</button>
+                    <button class="btn btn-success" onclick="nextStep(3)">Далее →</button>
+                </div>
+            </div>
+
+            <!-- Шаг 4: Приход/Расход -->
+            <div class="step-content" id="step4-content">
+                <div class="step-title">📦 Шаг 4: Приход и расход материалов</div>
+                
+                <h3 style="color: var(--success); margin: 20px 0 10px;">ПРИХОД НА СКЛАД</h3>
+                <div class="table-container">
+                    <table class="summary-table" id="incomeTable">
+                        <thead>
+                            <tr>
+                                <th>Материал</th>
+                                <th>Ед.изм</th>
+                                <th>Объем</th>
+                                <th>Пикет</th>
+                                <th>Поставщик</th>
+                                <th></th>
+                            </tr>
+                        </thead>
+                        <tbody id="incomeBody"></tbody>
+                    </table>
+                </div>
+                <button class="btn" onclick="addIncomeRow()" style="width:100%; margin-bottom:30px;">➕ Добавить приход</button>
+
+                <h3 style="color: var(--danger); margin: 20px 0 10px;">РАСХОД СО СКЛАДА</h3>
+                <div class="table-container">
+                    <table class="summary-table" id="outcomeTable">
+                        <thead>
+                            <tr>
+                                <th>Материал</th>
+                                <th>Ед.изм</th>
+                                <th>Объем</th>
+                                <th>Пикет</th>
+                                <th>Куда</th>
+                                <th></th>
+                            </tr>
+                        </thead>
+                        <tbody id="outcomeBody"></tbody>
+                    </table>
+                </div>
+                <button class="btn" onclick="addOutcomeRow()" style="width:100%;">➕ Добавить расход</button>
+                
+                <div class="step-buttons">
+                    <button class="btn" onclick="prevStep(4)">← Назад</button>
+                    <button class="btn btn-success" onclick="nextStep(4)">Далее →</button>
+                </div>
+            </div>
+
+            <!-- Шаг 5: Итоги -->
+            <div class="step-content" id="step5-content">
+                <div class="step-title">📊 Шаг 5: Итоговая сводка</div>
+
+                <div class="info-row">
+                    <div class="info-item">
+                        <span class="info-label">Дата:</span>
+                        <span class="info-value" id="finalDate">—</span>
+                    </div>
+                    <div class="info-item">
+                        <span class="info-label">Смена:</span>
+                        <span class="info-value" id="finalShift">—</span>
+                    </div>
+                    <div class="info-item">
+                        <span class="info-label">Мастер:</span>
+                        <span class="info-value" id="finalMaster">—</span>
+                    </div>
+                    <div class="info-item">
+                        <span class="info-label">Участок:</span>
+                        <span class="info-value" id="finalSection">—</span>
+                    </div>
+                </div>
+
+                <div class="table-container">
+                    <table class="summary-table" id="finalTable">
+                        <thead>
+                            <tr>
+                                <th>Участок</th>
+                                <th>Вид работ</th>
+                                <th>Состав</th>
+                                <th>Ед.изм</th>
+                                <th>Объем</th>
+                                <th>Техника</th>
+                            </tr>
+                        </thead>
+                        <tbody id="finalBody"></tbody>
+                    </table>
+                </div>
+
+                <div class="totals-grid">
+                    <div class="total-card">
+                        <div class="total-title">Всего техники</div>
+                        <div class="total-value" id="finalTotalEquipment">0</div>
+                    </div>
+                    <div class="total-card">
+                        <div class="total-title">Машино-часы</div>
+                        <div class="total-value" id="finalTotalHours">0</div>
+                    </div>
+                    <div class="total-card">
+                        <div class="total-title">Приход</div>
+                        <div class="total-value" id="finalTotalIncome">0</div>
+                    </div>
+                    <div class="total-card">
+                        <div class="total-title">Расход</div>
+                        <div class="total-value" id="finalTotalOutcome">0</div>
+                    </div>
+                </div>
+
+                <div class="step-buttons">
+                    <button class="btn" onclick="prevStep(5)">← Назад</button>
+                    <button class="btn btn-success" onclick="saveSummary()">💾 СОХРАНИТЬ СВОДКУ</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // ========== ИНИЦИАЛИЗАЦИЯ ==========
+        // Убираем Telegram, оставляем чистый веб
+
+        // ========== СПИСОК МАТЕРИАЛОВ ==========
+        const MATERIALS = [
+            'ЩПС 0-80',
+            'Щебень 20-40',
+            'Щебень 40-70',
+            'Щебень 5-20',
+            'Бутовый камень',
+            'ПГС',
+            'Песок',
+            'Грунт',
+            'ПРС (плодородный слой)'
+        ];
+
+        // ========== СИСТЕМА АВТОРИЗАЦИИ ==========
+        
+        let users = JSON.parse(localStorage.getItem('users')) || {};
+        let currentUser = null;
+
+        // Данные системы
+        let summaries = JSON.parse(localStorage.getItem('summaries')) || [];
+        let storage = JSON.parse(localStorage.getItem('storage')) || {};
+        let storageHistory = JSON.parse(localStorage.getItem('storageHistory')) || [];
+        let employees = JSON.parse(localStorage.getItem('employees')) || [];
+
+        // Временные данные для новой сводки
+        let workSections = [];
+        let workRows = [];
+        let incomeRows = [];
+        let outcomeRows = [];
+
+        // ========== ФУНКЦИИ АВТОРИЗАЦИИ ==========
+
+        function showAuthTab(tab) {
+            document.querySelectorAll('.auth-tab').forEach(t => t.classList.remove('active'));
+            document.querySelectorAll('.auth-form').forEach(f => f.classList.remove('active'));
+            
+            document.querySelector(`.auth-tab[onclick="showAuthTab('${tab}')"]`).classList.add('active');
+            document.getElementById(`${tab}Form`).classList.add('active');
+            
+            document.getElementById('loginError').style.display = 'none';
+            document.getElementById('registerError').style.display = 'none';
+            document.getElementById('registerSuccess').style.display = 'none';
+        }
+
+        function demoLogin() {
+            // Создаем демо-пользователя для быстрого входа
+            const demoUser = {
+                email: 'demo@zhufr.ru',
+                fullName: 'Демо Пользователь',
+                position: 'Мастер',
+                section: '29',
+                phone: '+7 (999) 123-45-67'
+            };
+            
+            currentUser = demoUser;
+            localStorage.setItem('currentUser', JSON.stringify(demoUser));
+            
+            // Создаем демо-данные если их нет
+            if (employees.length === 0) {
+                employees.push({
+                    id: 1,
+                    fullName: 'Демо Пользователь',
+                    position: 'Мастер',
+                    section: '29',
+                    phone: '+7 (999) 123-45-67',
+                    email: 'demo@zhufr.ru'
+                });
+                localStorage.setItem('employees', JSON.stringify(employees));
+            }
+            
+            document.getElementById('authCard').style.display = 'none';
+            document.getElementById('mainContent').classList.add('visible');
+            
+            updateAllSections();
+        }
+
+        function register() {
+            const fullName = document.getElementById('regFullName').value.trim();
+            const position = document.getElementById('regPosition').value;
+            const section = document.getElementById('regSection').value;
+            const phone = document.getElementById('regPhone').value.trim();
+            const email = document.getElementById('regEmail').value.trim();
+            const password = document.getElementById('regPassword').value;
+            const confirmPassword = document.getElementById('regConfirmPassword').value;
+
+            if (!fullName || !phone || !email || !password || !confirmPassword) {
+                showError('registerError', 'Заполните все поля');
+                return;
+            }
+
+            if (password !== confirmPassword) {
+                showError('registerError', 'Пароли не совпадают');
+                return;
+            }
+
+            if (password.length < 6) {
+                showError('registerError', 'Пароль должен быть не менее 6 символов');
+                return;
+            }
+
+            if (!email.includes('@') || !email.includes('.')) {
+                showError('registerError', 'Введите корректный email');
+                return;
+            }
+
+            if (users[email]) {
+                showError('registerError', 'Пользователь с таким email уже зарегистрирован');
+                return;
+            }
+
+            // Добавляем в базу сотрудников
+            const newEmployee = {
+                id: Date.now(),
+                fullName: fullName,
+                position: position,
+                section: section,
+                phone: phone,
+                email: email,
+                registeredAt: new Date().toISOString()
+            };
+            
+            employees.push(newEmployee);
+            localStorage.setItem('employees', JSON.stringify(employees));
+
+            // Создаем пользователя
+            users[email] = {
+                email: email,
+                fullName: fullName,
+                position: position,
+                section: section,
+                phone: phone,
+                password: password,
+                registeredAt: new Date().toISOString()
+            };
+
+            localStorage.setItem('users', JSON.stringify(users));
+            
+            showSuccess('registerSuccess', 'Регистрация успешна! Теперь вы можете войти.');
+            
+            setTimeout(() => {
+                showAuthTab('login');
+            }, 2000);
+        }
+
+        function login() {
+            const email = document.getElementById('loginEmail').value.trim();
+            const password = document.getElementById('loginPassword').value;
+
+            if (!email || !password) {
+                showError('loginError', 'Введите email и пароль');
+                return;
+            }
+
+            const user = users[email];
+            
+            if (!user) {
+                showError('loginError', 'Пользователь не найден');
+                return;
+            }
+            
+            if (user.password !== password) {
+                showError('loginError', 'Неверный пароль');
+                return;
+            }
+
+            currentUser = user;
+            localStorage.setItem('currentUser', JSON.stringify(user));
+            
+            document.getElementById('authCard').style.display = 'none';
+            document.getElementById('mainContent').classList.add('visible');
+            
+            updateAllSections();
+        }
+
+        function logout() {
+            if (confirm('Выйти из системы?')) {
+                localStorage.removeItem('currentUser');
+                currentUser = null;
+                document.getElementById('authCard').style.display = 'block';
+                document.getElementById('mainContent').classList.remove('visible');
+            }
+        }
+
+        function showError(elementId, message) {
+            const el = document.getElementById(elementId);
+            el.textContent = message;
+            el.style.display = 'block';
+            el.style.color = 'var(--danger)';
+            
+            setTimeout(() => {
+                el.style.display = 'none';
+            }, 3000);
+        }
+
+        function showSuccess(elementId, message) {
+            const el = document.getElementById(elementId);
+            el.textContent = message;
+            el.style.display = 'block';
+            el.style.color = 'var(--success)';
+            
+            setTimeout(() => {
+                el.style.display = 'none';
+            }, 3000);
+        }
+
+        // Проверяем сохраненную сессию
+        const savedUser = localStorage.getItem('currentUser');
+        if (savedUser) {
+            try {
+                currentUser = JSON.parse(savedUser);
+                document.getElementById('authCard').style.display = 'none';
+                document.getElementById('mainContent').classList.add('visible');
+                updateAllSections();
+            } catch (e) {
+                localStorage.removeItem('currentUser');
+            }
+        }
+
+        // ========== ФУНКЦИИ МЕНЮ ==========
+
+        function showMenu(menu) {
+            document.querySelectorAll('.menu-btn').forEach(btn => btn.classList.remove('active'));
+            document.querySelectorAll('.section-card').forEach(section => section.style.display = 'none');
+            
+            document.querySelector(`.menu-btn[onclick="showMenu('${menu}')"]`).classList.add('active');
+            document.getElementById(`${menu}Section`).style.display = 'block';
+            
+            if (menu === 'summary') {
+                renderSummaries();
+            } else if (menu === 'storage') {
+                renderStorage();
+            } else if (menu === 'employees') {
+                renderEmployees();
+            } else if (menu === 'reports') {
+                renderReports();
+            }
+        }
+
+        function updateAllSections() {
+            renderSummaries();
+            renderStorage();
+            renderEmployees();
+            renderReports();
+        }
+
+        // ========== ФУНКЦИИ ДЛЯ СВОДОК ==========
+
+        function startNewSummary() {
+            // Очищаем временные данные
+            workSections = [{ id: Date.now(), name: '' }];
+            workRows = [];
+            incomeRows = [];
+            outcomeRows = [];
+            
+            // Сбрасываем прогресс
+            currentStep = 1;
+            for (let i = 1; i <= 5; i++) {
+                document.getElementById(`step${i}`).classList.remove('active', 'completed');
+                document.getElementById(`step${i}-content`).classList.remove('active');
+            }
+            document.getElementById('step1').classList.add('active');
+            document.getElementById('step1-content').classList.add('active');
+            
+            // Отображаем модальное окно
+            document.getElementById('summaryModal').style.display = 'block';
+            
+            // Отрисовываем таблицы
+            renderWorkSections();
+            renderWorkTable();
+            renderIncomeTable();
+            renderOutcomeTable();
+        }
+
+        function closeSummaryModal() {
+            document.getElementById('summaryModal').style.display = 'none';
+        }
+
+        // Прогресс шагов
+        let currentStep = 1;
+
+        function nextStep(current) {
+            if (current === 1) {
+                const date = document.getElementById('reportDate').value;
+                if (!date) {
+                    alert('Введите дату');
+                    return;
+                }
+            }
+            if (current === 2) {
+                if (workSections.length === 0 || !workSections[0].name) {
+                    alert('Добавьте хотя бы один участок работ');
+                    return;
+                }
+            }
+            
+            for (let i = 1; i <= 5; i++) {
+                const stepEl = document.getElementById(`step${i}`);
+                const contentEl = document.getElementById(`step${i}-content`);
+                
+                if (i < current + 1) {
+                    stepEl.classList.add('completed');
+                    stepEl.classList.remove('active');
+                } else if (i === current + 1) {
+                    stepEl.classList.add('active');
+                    stepEl.classList.remove('completed');
+                    contentEl.classList.add('active');
+                } else {
+                    stepEl.classList.remove('active', 'completed');
+                    contentEl.classList.remove('active');
+                }
+            }
+            currentStep = current + 1;
+            
+            if (currentStep === 5) {
+                generateFinalReport();
+            }
+        }
+
+        function prevStep(current) {
+            for (let i = 1; i <= 5; i++) {
+                const stepEl = document.getElementById(`step${i}`);
+                const contentEl = document.getElementById(`step${i}-content`);
+                
+                if (i < current) {
+                    stepEl.classList.add('completed');
+                    stepEl.classList.remove('active');
+                } else if (i === current) {
+                    stepEl.classList.add('active');
+                    stepEl.classList.remove('completed');
+                    contentEl.classList.add('active');
+                } else {
+                    stepEl.classList.remove('active', 'completed');
+                    contentEl.classList.remove('active');
+                }
+            }
+            currentStep = current;
+        }
+
+        // Участки работ
+        function renderWorkSections() {
+            const container = document.getElementById('workSectionsList');
+            container.innerHTML = '';
+            
+            workSections.forEach((section, index) => {
+                const div = document.createElement('div');
+                div.className = 'section-item';
+                div.innerHTML = `
+                    <input type="text" value="${section.name}" placeholder="ПК 1260-1276" onchange="updateWorkSection(${index}, this.value)">
+                    ${workSections.length > 1 ? `<button onclick="removeWorkSection(${index})">✕</button>` : ''}
+                `;
+                container.appendChild(div);
+            });
+        }
+
+        function addWorkSection() {
+            workSections.push({ id: Date.now(), name: '' });
+            renderWorkSections();
+        }
+
+        function updateWorkSection(index, value) {
+            workSections[index].name = value;
+        }
+
+        function removeWorkSection(index) {
+            workSections.splice(index, 1);
+            renderWorkSections();
+        }
+
+        // Работы
+        function addWorkRow() {
+            workRows.push({
+                id: Date.now() + Math.random(),
+                section: '',
+                workType: '',
+                workDescription: '',
+                unit: 'м³',
+                volume: '',
+                equipmentType: '',
+                equipmentCount: '1',
+                equipmentNumber: '',
+                machineHours: '',
+                note: ''
+            });
+            renderWorkTable();
+        }
+
+        function renderWorkTable() {
+            const tbody = document.getElementById('workBody');
+            tbody.innerHTML = '';
+            
+            workRows.forEach(row => {
+                const tr = document.createElement('tr');
+                
+                let sectionSelect = '<select onchange="updateWorkRow(\'' + row.id + '\', \'section\', this.value)">';
+                sectionSelect += '<option value="">Выберите</option>';
+                workSections.forEach(s => {
+                    if (s.name) {
+                        sectionSelect += `<option value="${s.name}" ${row.section === s.name ? 'selected' : ''}>${s.name}</option>`;
+                    }
+                });
+                sectionSelect += '</select>';
+                
+                tr.innerHTML = `
+                    <td>${sectionSelect}</td>
+                    <td><input type="text" value="${row.workType || ''}" onchange="updateWorkRow('${row.id}', 'workType', this.value)"></td>
+                    <td><input type="text" value="${row.workDescription || ''}" onchange="updateWorkRow('${row.id}', 'workDescription', this.value)"></td>
+                    <td><input type="text" value="${row.unit || 'м³'}" onchange="updateWorkRow('${row.id}', 'unit', this.value)"></td>
+                    <td><input type="text" value="${row.volume || ''}" onchange="updateWorkRow('${row.id}', 'volume', this.value)"></td>
+                    <td><input type="text" value="${row.equipmentType || ''}" onchange="updateWorkRow('${row.id}', 'equipmentType', this.value)"></td>
+                    <td><input type="text" value="${row.equipmentCount || '1'}" onchange="updateWorkRow('${row.id}', 'equipmentCount', this.value)"></td>
+                    <td><input type="text" value="${row.equipmentNumber || ''}" onchange="updateWorkRow('${row.id}', 'equipmentNumber', this.value)"></td>
+                    <td><input type="text" value="${row.machineHours || ''}" onchange="updateWorkRow('${row.id}', 'machineHours', this.value)"></td>
+                    <td><input type="text" value="${row.note || ''}" onchange="updateWorkRow('${row.id}', 'note', this.value)"></td>
+                    <td><button class="btn-sm" onclick="deleteWorkRow('${row.id}')" style="background:var(--danger);">🗑️</button></td>
+                `;
+                tbody.appendChild(tr);
+            });
+        }
+
+        function updateWorkRow(id, field, value) {
+            const row = workRows.find(r => r.id == id);
+            if (row) row[field] = value;
+        }
+
+        function deleteWorkRow(id) {
+            workRows = workRows.filter(r => r.id != id);
+            renderWorkTable();
+        }
+
+        // Приход
+        function addIncomeRow() {
+            incomeRows.push({
+                id: Date.now() + Math.random(),
+                material: '',
+                unit: 'м³',
+                volume: '',
+                piket: '',
+                supplier: ''
+            });
+            renderIncomeTable();
+        }
+
+        function renderIncomeTable() {
+            const tbody = document.getElementById('incomeBody');
+            tbody.innerHTML = '';
+            
+            incomeRows.forEach(row => {
+                const tr = document.createElement('tr');
+                
+                let materialSelect = '<select onchange="updateIncomeRow(\'' + row.id + '\', \'material\', this.value)">';
+                materialSelect += '<option value="">Выберите</option>';
+                MATERIALS.forEach(m => {
+                    materialSelect += `<option value="${m}" ${row.material === m ? 'selected' : ''}>${m}</option>`;
+                });
+                materialSelect += '</select>';
+                
+                tr.innerHTML = `
+                    <td>${materialSelect}</td>
+                    <td><input type="text" value="${row.unit || 'м³'}" onchange="updateIncomeRow('${row.id}', 'unit', this.value)"></td>
+                    <td><input type="text" value="${row.volume || ''}" onchange="updateIncomeRow('${row.id}', 'volume', this.value)"></td>
+                    <td><input type="text" value="${row.piket || ''}" onchange="updateIncomeRow('${row.id}', 'piket', this.value)"></td>
+                    <td><input type="text" value="${row.supplier || ''}" onchange="updateIncomeRow('${row.id}', 'supplier', this.value)"></td>
+                    <td><button class="btn-sm" onclick="deleteIncomeRow('${row.id}')" style="background:var(--danger);">🗑️</button></td>
+                `;
+                tbody.appendChild(tr);
+            });
+        }
+
+        function updateIncomeRow(id, field, value) {
+            const row = incomeRows.find(r => r.id == id);
+            if (row) row[field] = value;
+        }
+
+        function deleteIncomeRow(id) {
+            incomeRows = incomeRows.filter(r => r.id != id);
+            renderIncomeTable();
+        }
+
+        // Расход
+        function addOutcomeRow() {
+            outcomeRows.push({
+                id: Date.now() + Math.random(),
+                material: '',
+                unit: 'м³',
+                volume: '',
+                piket: '',
+                destination: ''
+            });
+            renderOutcomeTable();
+        }
+
+        function renderOutcomeTable() {
+            const tbody = document.getElementById('outcomeBody');
+            tbody.innerHTML = '';
+            
+            outcomeRows.forEach(row => {
+                const tr = document.createElement('tr');
+                
+                let materialSelect = '<select onchange="updateOutcomeRow(\'' + row.id + '\', \'material\', this.value)">';
+                materialSelect += '<option value="">Выберите</option>';
+                MATERIALS.forEach(m => {
+                    materialSelect += `<option value="${m}" ${row.material === m ? 'selected' : ''}>${m}</option>`;
+                });
+                materialSelect += '</select>';
+                
+                tr.innerHTML = `
+                    <td>${materialSelect}</td>
+                    <td><input type="text" value="${row.unit || 'м³'}" onchange="updateOutcomeRow('${row.id}', 'unit', this.value)"></td>
+                    <td><input type="text" value="${row.volume || ''}" onchange="updateOutcomeRow('${row.id}', 'volume', this.value)"></td>
+                    <td><input type="text" value="${row.piket || ''}" onchange="updateOutcomeRow('${row.id}', 'piket', this.value)"></td>
+                    <td><input type="text" value="${row.destination || ''}" onchange="updateOutcomeRow('${row.id}', 'destination', this.value)"></td>
+                    <td><button class="btn-sm" onclick="deleteOutcomeRow('${row.id}')" style="background:var(--danger);">🗑️</button></td>
+                `;
+                tbody.appendChild(tr);
+            });
+        }
+
+        function updateOutcomeRow(id, field, value) {
+            const row = outcomeRows.find(r => r.id == id);
+            if (row) row[field] = value;
+        }
+
+        function deleteOutcomeRow(id) {
+            outcomeRows = outcomeRows.filter(r => r.id != id);
+            renderOutcomeTable();
+        }
+
+        // Итоговый отчет
+        function generateFinalReport() {
+            document.getElementById('finalDate').textContent = document.getElementById('reportDate').value;
+            document.getElementById('finalShift').textContent = document.getElementById('reportShift').value;
+            document.getElementById('finalMaster').textContent = currentUser?.fullName || 'Мастер';
+            document.getElementById('finalSection').textContent = `Участок ${currentUser?.section || '29'}`;
+
+            const tbody = document.getElementById('finalBody');
+            tbody.innerHTML = '';
+
+            let totalEquipment = 0;
+            let totalHours = 0;
+            
+            workRows.forEach(work => {
+                const row = tbody.insertRow();
+                row.innerHTML = `
+                    <td>${work.section || ''}</td>
+                    <td>${work.workType || ''}</td>
+                    <td>${work.workDescription || ''}</td>
+                    <td>${work.unit || ''}</td>
+                    <td>${work.volume || ''}</td>
+                    <td>${work.equipmentType || ''} (${work.equipmentCount || '0'} ед., гос №${work.equipmentNumber || '—'}, ${work.machineHours || '0'} ч)</td>
+                `;
+                
+                totalEquipment += parseInt(work.equipmentCount) || 0;
+                totalHours += parseFloat(work.machineHours) || 0;
+            });
+
+            let totalIncome = incomeRows.reduce((sum, r) => sum + (parseFloat(r.volume) || 0), 0);
+            let totalOutcome = outcomeRows.reduce((sum, r) => sum + (parseFloat(r.volume) || 0), 0);
+
+            document.getElementById('finalTotalEquipment').textContent = totalEquipment;
+            document.getElementById('finalTotalHours').textContent = totalHours.toFixed(1);
+            document.getElementById('finalTotalIncome').textContent = totalIncome.toFixed(1);
+            document.getElementById('finalTotalOutcome').textContent = totalOutcome.toFixed(1);
+        }
+
+        // Сохранение сводки
+        function saveSummary() {
+            if (!currentUser) {
+                alert('Ошибка: пользователь не авторизован');
+                return;
+            }
+
+            const summary = {
+                id: Date.now(),
+                date: document.getElementById('reportDate').value,
+                shift: document.getElementById('reportShift').value,
+                master: currentUser.fullName,
+                masterEmail: currentUser.email,
+                section: currentUser.section,
+                workSections: [...workSections],
+                workRows: [...workRows],
+                incomeRows: [...incomeRows],
+                outcomeRows: [...outcomeRows],
+                totalEquipment: document.getElementById('finalTotalEquipment').textContent,
+                totalHours: document.getElementById('finalTotalHours').textContent,
+                totalIncome: document.getElementById('finalTotalIncome').textContent,
+                totalOutcome: document.getElementById('finalTotalOutcome').textContent,
+                createdAt: new Date().toISOString()
+            };
+
+            summaries.unshift(summary);
+            localStorage.setItem('summaries', JSON.stringify(summaries));
+
+            // Обновляем склад
+            updateStorage(summary);
+
+            alert('Сводка успешно сохранена!');
+            closeSummaryModal();
+            renderSummaries();
+        }
+
+        // Обновление склада
+        function updateStorage(summary) {
+            // Приход
+            summary.incomeRows.forEach(row => {
+                if (row.material && row.volume && row.piket) {
+                    const key = `${row.material}|${row.piket}`;
+                    if (!storage[key]) {
+                        storage[key] = {
+                            material: row.material,
+                            piket: row.piket,
+                            volume: 0,
+                            unit: row.unit
+                        };
+                    }
+                    storage[key].volume += parseFloat(row.volume) || 0;
+                    
+                    storageHistory.unshift({
+                        date: summary.date,
+                        material: row.material,
+                        type: 'приход',
+                        volume: row.volume,
+                        unit: row.unit,
+                        piket: row.piket,
+                        master: summary.master,
+                        shift: summary.shift,
+                        timestamp: Date.now()
+                    });
+                }
+            });
+
+            // Расход
+            summary.outcomeRows.forEach(row => {
+                if (row.material && row.volume && row.piket) {
+                    const key = `${row.material}|${row.piket}`;
+                    if (storage[key]) {
+                        storage[key].volume -= parseFloat(row.volume) || 0;
+                        
+                        storageHistory.unshift({
+                            date: summary.date,
+                            material: row.material,
+                            type: 'расход',
+                            volume: row.volume,
+                            unit: row.unit,
+                            piket: row.piket,
+                            destination: row.destination,
+                            master: summary.master,
+                            shift: summary.shift,
+                            timestamp: Date.now()
+                        });
+                    }
+                }
+            });
+
+            localStorage.setItem('storage', JSON.stringify(storage));
+            localStorage.setItem('storageHistory', JSON.stringify(storageHistory));
+        }
+
+        // ========== ОТОБРАЖЕНИЕ СВОДОК ==========
+
+        function renderSummaries() {
+            // Заполняем фильтры
+            const masters = [...new Set(summaries.map(s => s.master))];
+            const filterSelect = document.getElementById('summaryMasterFilter');
+            filterSelect.innerHTML = '<option value="all">Все мастера</option>';
+            masters.forEach(m => {
+                filterSelect.innerHTML += `<option value="${m}">${m}</option>`;
+            });
+
+            filterSummaries();
+        }
+
+        function filterSummaries() {
+            const master = document.getElementById('summaryMasterFilter').value;
+            const section = document.getElementById('summarySectionFilter').value;
+            const shift = document.getElementById('summaryShiftFilter').value;
+
+            let filtered = summaries;
+            
+            if (master !== 'all') {
+                filtered = filtered.filter(s => s.master === master);
+            }
+            if (section !== 'all') {
+                filtered = filtered.filter(s => s.section === section);
+            }
+            if (shift !== 'all') {
+                filtered = filtered.filter(s => s.shift === shift);
+            }
+
+            const grid = document.getElementById('summariesGrid');
+            grid.innerHTML = '';
+
+            if (filtered.length === 0) {
+                grid.innerHTML = '<div class="empty-state">📭 Нет сводок</div>';
+                return;
+            }
+
+            filtered.forEach(s => {
+                const card = document.createElement('div');
+                card.className = 'summary-card';
+                card.onclick = () => viewSummary(s.id);
+                card.innerHTML = `
+                    <div class="summary-header">
+                        <span class="summary-date">${s.date}</span>
+                        <span class="summary-shift">${s.shift}</span>
+                    </div>
+                    <div class="summary-master">${s.master}</div>
+                    <div class="summary-preview">Участок ${s.section} · ${s.workRows.length} работ</div>
+                    <div class="summary-stats">
+                        <span>📦 ${s.totalIncome}</span>
+                        <span>🚜 ${s.totalOutcome}</span>
+                        <span>⏱️ ${s.totalHours} ч</span>
+                    </div>
+                `;
+                grid.appendChild(card);
+            });
+        }
+
+        function viewSummary(id) {
+            const summary = summaries.find(s => s.id === id);
+            // Простой просмотр через alert (можно улучшить)
+            alert(JSON.stringify(summary, null, 2));
+        }
+
+        // ========== ОТОБРАЖЕНИЕ СКЛАДА ==========
+
+        function renderStorage() {
+            // Фильтры
+            const materials = [...new Set(Object.values(storage).map(s => s.material))];
+            const materialFilter = document.getElementById('storageMaterialFilter');
+            materialFilter.innerHTML = '<option value="all">Все материалы</option>';
+            materials.forEach(m => {
+                materialFilter.innerHTML += `<option value="${m}">${m}</option>`;
+            });
+
+            filterStorage();
+        }
+
+        function filterStorage() {
+            const material = document.getElementById('storageMaterialFilter').value;
+            const piket = document.getElementById('storagePiketFilter').value.toLowerCase();
+
+            let items = Object.values(storage);
+            
+            if (material !== 'all') {
+                items = items.filter(i => i.material === material);
+            }
+            if (piket) {
+                items = items.filter(i => i.piket.toLowerCase().includes(piket));
+            }
+
+            const grid = document.getElementById('storageGrid');
+            grid.innerHTML = '';
+
+            if (items.length === 0) {
+                grid.innerHTML = '<div class="empty-state">📭 Нет материалов</div>';
+                return;
+            }
+
+            items.forEach(item => {
+                const card = document.createElement('div');
+                card.className = 'storage-card';
+                card.innerHTML = `
+                    <div class="storage-header">
+                        <span class="storage-material">${item.material}</span>
+                        <span class="storage-piket">ПК ${item.piket}</span>
+                    </div>
+                    <div class="storage-volume">${item.volume.toFixed(1)} ${item.unit}</div>
+                `;
+                grid.appendChild(card);
+            });
+
+            // История
+            const historyBody = document.getElementById('storageHistoryBody');
+            historyBody.innerHTML = '';
+            
+            storageHistory.slice(0, 20).forEach(item => {
+                const row = historyBody.insertRow();
+                row.innerHTML = `
+                    <td>${item.date}</td>
+                    <td>${item.material}</td>
+                    <td style="color: ${item.type === 'приход' ? 'var(--success)' : 'var(--danger)'}">${item.type}</td>
+                    <td>${item.volume} ${item.unit}</td>
+                    <td>ПК ${item.piket}</td>
+                    <td>${item.master}</td>
+                    <td>${item.shift}</td>
+                `;
+            });
+        }
+
+        // ========== ОТОБРАЖЕНИЕ СОТРУДНИКОВ ==========
+
+        function renderEmployees() {
+            filterEmployees();
+        }
+
+        function filterEmployees() {
+            const position = document.getElementById('employeePositionFilter').value;
+            const section = document.getElementById('employeeSectionFilter').value;
+
+            let filtered = employees;
+            
+            if (position !== 'all') {
+                filtered = filtered.filter(e => e.position === position);
+            }
+            if (section !== 'all') {
+                filtered = filtered.filter(e => e.section === section);
+            }
+
+            const grid = document.getElementById('employeesGrid');
+            grid.innerHTML = '';
+
+            if (filtered.length === 0) {
+                grid.innerHTML = '<div class="empty-state">👥 Нет сотрудников</div>';
+                return;
+            }
+
+            filtered.forEach(e => {
+                const card = document.createElement('div');
+                card.className = 'employee-card';
+                card.innerHTML = `
+                    <div class="employee-name">${e.fullName}</div>
+                    <div class="employee-position">${e.position}</div>
+                    <div class="employee-contacts">
+                        <p>📞 ${e.phone}</p>
+                        <p>📧 ${e.email}</p>
+                        <p>🏗️ Участок ${e.section}</p>
+                    </div>
+                `;
+                grid.appendChild(card);
+            });
+        }
+
+        function showAddEmployee() {
+            const name = prompt('Введите ФИО сотрудника:');
+            if (!name) return;
+            
+            const position = prompt('Введите должность (Дорожный рабочий/Мастер/Прораб/Старший прораб/Начальник участка):');
+            if (!position) return;
+            
+            const section = prompt('Введите номер участка (29/51):');
+            if (!section || !['29', '51'].includes(section)) return;
+            
+            const phone = prompt('Введите телефон:');
+            if (!phone) return;
+            
+            const email = prompt('Введите email:');
+            if (!email) return;
+
+            employees.push({
+                id: Date.now(),
+                fullName: name,
+                position: position,
+                section: section,
+                phone: phone,
+                email: email,
+                addedAt: new Date().toISOString()
+            });
+
+            localStorage.setItem('employees', JSON.stringify(employees));
+            renderEmployees();
+        }
+
+        // ========== ОТОБРАЖЕНИЕ ОТЧЕТОВ ==========
+
+        function renderReports() {
+            // Общие итоги
+            document.getElementById('totalSummaries').textContent = summaries.length;
+            
+            const totalWorkVolume = summaries.reduce((sum, s) => 
+                sum + s.workRows.reduce((sSum, r) => sSum + (parseFloat(r.volume) || 0), 0), 0
+            );
+            document.getElementById('totalWorkVolume').textContent = totalWorkVolume.toFixed(1);
+            
+            const totalStorageValue = Object.values(storage).reduce((sum, s) => sum + s.volume, 0);
+            document.getElementById('totalStorageValue').textContent = totalStorageValue.toFixed(1);
+            
+            document.getElementById('totalEmployees').textContent = employees.length;
+
+            // Статистика по мастерам
+            const mastersStats = {};
+            summaries.forEach(s => {
+                if (!mastersStats[s.master]) {
+                    mastersStats[s.master] = { count: 0, volume: 0, hours: 0 };
+                }
+                mastersStats[s.master].count++;
+                mastersStats[s.master].volume += s.workRows.reduce((sum, r) => sum + (parseFloat(r.volume) || 0), 0);
+                mastersStats[s.master].hours += parseFloat(s.totalHours) || 0;
+            });
+
+            const mastersBody = document.getElementById('mastersStatsBody');
+            mastersBody.innerHTML = '';
+            
+            Object.entries(mastersStats).forEach(([master, stats]) => {
+                const row = mastersBody.insertRow();
+                row.innerHTML = `
+                    <td>${master}</td>
+                    <td>${stats.count}</td>
+                    <td>${stats.volume.toFixed(1)}</td>
+                    <td>${stats.hours.toFixed(1)}</td>
+                `;
+            });
+
+            // Статистика по материалам
+            const materialsBody = document.getElementById('materialsStatsBody');
+            materialsBody.innerHTML = '';
+            
+            Object.values(storage).forEach(item => {
+                const row = materialsBody.insertRow();
+                row.innerHTML = `
+                    <td>${item.material}</td>
+                    <td>ПК ${item.piket}</td>
+                    <td>${item.volume.toFixed(1)} ${item.unit}</td>
+                `;
+            });
+        }
+    </script>
+</body>
+</html>
