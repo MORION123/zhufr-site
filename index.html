@@ -748,11 +748,12 @@
                     <input type="password" id="regConfirmPassword" placeholder="••••••••">
                 </div>
                 
+                <!-- Блок для ввода кода подтверждения -->
                 <div class="form-group" id="verificationBlock" style="display: none;">
-                    <label>Подтверждение email</label>
+                    <label>Код подтверждения</label>
                     <div class="verify-row">
-                        <input type="text" id="verificationCode" placeholder="Введите код из письма">
-                        <button class="btn-verify" onclick="verifyCode()" id="verifyBtn">Проверить</button>
+                        <input type="text" id="verificationCode" placeholder="Введите 6-значный код из письма">
+                        <button class="btn-verify" onclick="verifyCode()">Проверить</button>
                     </div>
                     <div class="timer" id="timer"></div>
                     <button class="btn" onclick="sendVerificationCode()" id="resendBtn" style="width:100%; margin-top:10px;">Отправить код повторно</button>
@@ -1081,21 +1082,17 @@
             'ПРС (плодородный слой)'
         ];
 
-        // ========== СИСТЕМА АВТОРИЗАЦИИ (БЕЗ СОХРАНЕНИЯ) ==========
-        
-        // ТОЛЬКО В ПАМЯТИ - не сохраняется в localStorage!
-        let users = {};
-        let currentUser = null;
-        let pendingRegistration = null;
-        let verificationCode = null;
-        let timerInterval = null;
+        // ========== СИСТЕМА АВТОРИЗАЦИИ (В ПАМЯТИ) ==========
+        let users = {};              // Хранилище пользователей
+        let currentUser = null;      // Текущий пользователь
+        let pendingRegistration = null; // Данные регистрации
+        let verificationCode = null; // Код подтверждения
+        let timerInterval = null;    // Таймер
 
-        // Данные системы (сохраняются только сводки и склад)
+        // Данные системы (сохраняются)
         let summaries = JSON.parse(localStorage.getItem('summaries')) || [];
         let storage = JSON.parse(localStorage.getItem('storage')) || {};
         let storageHistory = JSON.parse(localStorage.getItem('storageHistory')) || [];
-        
-        // Сотрудники - только в памяти, не сохраняются
         let employees = [];
 
         // Данные для новой сводки
@@ -1113,6 +1110,7 @@
             document.querySelector(`.auth-tab[onclick="showAuthTab('${tab}')"]`).classList.add('active');
             document.getElementById(`${tab}Form`).classList.add('active');
             
+            // Скрываем все сообщения
             document.getElementById('loginError').style.display = 'none';
             document.getElementById('registerError').style.display = 'none';
             document.getElementById('registerSuccess').style.display = 'none';
@@ -1144,9 +1142,9 @@
                 return;
             }
 
-            // Проверка на существующего пользователя (только в памяти)
+            // Проверка на существующего пользователя
             if (users[email]) {
-                showError('registerError', 'Пользователь с таким email уже зарегистрирован в этой сессии');
+                showError('registerError', 'Пользователь с таким email уже зарегистрирован');
                 return;
             }
 
@@ -1159,18 +1157,15 @@
             sendVerificationCode();
         }
 
-        // ========== ФУНКЦИЯ ОТПРАВКИ КОДА ЧЕРЕЗ FORMSPREE ==========
         function sendVerificationCode() {
             // Генерируем 6-значный код
             verificationCode = Math.floor(100000 + Math.random() * 900000).toString();
             
-            // Показываем информацию
             showInfo('registerInfo', `Отправляем код на ${pendingRegistration.email}...`);
 
-            // Ваш Formspree endpoint
+            // Formspree endpoint
             const formspreeEndpoint = 'https://formspree.io/f/xlgpowrl';
             
-            // Отправляем через Formspree
             fetch(formspreeEndpoint, {
                 method: 'POST',
                 headers: {
@@ -1181,25 +1176,22 @@
                     email: pendingRegistration.email,
                     code: verificationCode,
                     name: pendingRegistration.fullName,
-                    _subject: 'Код подтверждения ЖУФР' // Тема письма
+                    _subject: 'Код подтверждения ЖУФР'
                 })
             })
             .then(response => {
                 if (response.ok) {
                     console.log('Письмо отправлено успешно');
                     
-                    // Показываем блок подтверждения
+                    // Показываем поле для ввода кода
                     document.getElementById('verificationBlock').style.display = 'block';
                     document.getElementById('registerBtn').style.display = 'none';
                     
                     showSuccess('registerInfo', 'Код отправлен на вашу почту! Проверьте папку "Спам".');
                     
-                    // Запускаем таймер на 5 минут
-                    startTimer(300);
+                    startTimer(300); // 5 минут
                 } else {
-                    return response.json().then(data => {
-                        throw new Error(data.error || 'Ошибка отправки');
-                    });
+                    throw new Error('Ошибка отправки');
                 }
             })
             .catch(error => {
@@ -1232,7 +1224,12 @@
         }
 
         function verifyCode() {
-            const enteredCode = document.getElementById('verificationCode').value;
+            const enteredCode = document.getElementById('verificationCode').value.trim();
+            
+            if (!enteredCode) {
+                showError('registerError', 'Введите код подтверждения');
+                return;
+            }
             
             if (!verificationCode) {
                 showError('registerError', 'Код подтверждения истек. Запросите новый.');
@@ -1247,20 +1244,7 @@
         }
 
         function completeRegistration() {
-            // Добавляем в базу сотрудников (только в память)
-            const newEmployee = {
-                id: Date.now(),
-                fullName: pendingRegistration.fullName,
-                position: pendingRegistration.position,
-                section: pendingRegistration.section,
-                phone: pendingRegistration.phone,
-                email: pendingRegistration.email,
-                registeredAt: new Date().toISOString()
-            };
-            
-            employees.push(newEmployee);
-
-            // Создаем пользователя (только в память)
+            // Создаем пользователя
             users[pendingRegistration.email] = {
                 email: pendingRegistration.email,
                 fullName: pendingRegistration.fullName,
@@ -1271,13 +1255,15 @@
                 registeredAt: new Date().toISOString()
             };
             
-            showSuccess('registerSuccess', 'Регистрация успешна! Теперь вы можете войти.');
+            showSuccess('registerSuccess', 'Регистрация успешна! Сейчас вы будете перенаправлены на вход.');
             
             if (timerInterval) clearInterval(timerInterval);
             
+            // Скрываем блок подтверждения
             document.getElementById('verificationBlock').style.display = 'none';
             document.getElementById('registerBtn').style.display = 'block';
             
+            // Очищаем поля
             document.getElementById('regFullName').value = '';
             document.getElementById('regPhone').value = '';
             document.getElementById('regEmail').value = '';
@@ -1288,38 +1274,11 @@
             pendingRegistration = null;
             verificationCode = null;
             
+            // Переключаем на вкладку входа через 2 секунды
             setTimeout(() => {
                 showAuthTab('login');
+                showSuccess('loginError', 'Теперь вы можете войти с вашим email и паролем');
             }, 2000);
-        }
-
-        function demoLogin() {
-            const demoUser = {
-                email: 'demo@mail.ru',
-                fullName: 'Демо Пользователь',
-                position: 'Мастер',
-                section: '29',
-                phone: '+7 (999) 123-45-67'
-            };
-            
-            currentUser = demoUser;
-            
-            // Добавляем демо-сотрудника если список пуст
-            if (employees.length === 0) {
-                employees.push({
-                    id: 1,
-                    fullName: 'Демо Пользователь',
-                    position: 'Мастер',
-                    section: '29',
-                    phone: '+7 (999) 123-45-67',
-                    email: 'demo@mail.ru'
-                });
-            }
-            
-            document.getElementById('authCard').style.display = 'none';
-            document.getElementById('mainContent').classList.add('visible');
-            
-            updateAllSections();
         }
 
         function login() {
@@ -1334,7 +1293,7 @@
             const user = users[email];
             
             if (!user) {
-                showError('loginError', 'Пользователь не найден');
+                showError('loginError', 'Пользователь не найден. Зарегистрируйтесь сначала.');
                 return;
             }
             
@@ -1344,6 +1303,23 @@
             }
 
             currentUser = user;
+            
+            document.getElementById('authCard').style.display = 'none';
+            document.getElementById('mainContent').classList.add('visible');
+            
+            updateAllSections();
+        }
+
+        function demoLogin() {
+            const demoUser = {
+                email: 'demo@mail.ru',
+                fullName: 'Демо Пользователь',
+                position: 'Мастер',
+                section: '29',
+                phone: '+7 (999) 123-45-67'
+            };
+            
+            currentUser = demoUser;
             
             document.getElementById('authCard').style.display = 'none';
             document.getElementById('mainContent').classList.add('visible');
@@ -1386,6 +1362,10 @@
             el.textContent = message;
             el.style.display = 'block';
             el.style.color = 'var(--shift)';
+            
+            setTimeout(() => {
+                el.style.display = 'none';
+            }, 3000);
         }
 
         // ========== ФУНКЦИИ МЕНЮ ==========
@@ -1397,15 +1377,10 @@
             document.querySelector(`.menu-btn[onclick="showMenu('${menu}')"]`).classList.add('active');
             document.getElementById(`${menu}Section`).style.display = 'block';
             
-            if (menu === 'summary') {
-                renderSummaries();
-            } else if (menu === 'storage') {
-                renderStorage();
-            } else if (menu === 'employees') {
-                renderEmployees();
-            } else if (menu === 'reports') {
-                renderReports();
-            }
+            if (menu === 'summary') renderSummaries();
+            else if (menu === 'storage') renderStorage();
+            else if (menu === 'employees') renderEmployees();
+            else if (menu === 'reports') renderReports();
         }
 
         function updateAllSections() {
@@ -1447,7 +1422,6 @@
             document.getElementById('currentSection').textContent = `Участок ${currentUser?.section || '29'}`;
             
             renderWorkTable();
-            
             document.getElementById('summaryModal').style.display = 'block';
         }
 
@@ -1499,10 +1473,7 @@
         }
 
         function updateTotals() {
-            let totalPeople = 0;
-            let totalPeopleHours = 0;
-            let totalEquipment = 0;
-            let totalEquipmentHours = 0;
+            let totalPeople = 0, totalPeopleHours = 0, totalEquipment = 0, totalEquipmentHours = 0;
             
             workRows.forEach(row => {
                 totalPeople += parseInt(row.peopleCount) || 0;
@@ -1527,14 +1498,8 @@
             incomeMaterials.forEach(item => {
                 const volume = parseFloat(item.volume) || 0;
                 totalIncome += volume;
-                incomeList.innerHTML += `
-                    <div class="material-item">
-                        <span class="material-name">${item.material}</span>
-                        <span class="material-volume">${volume.toFixed(1)} ${item.unit}</span>
-                    </div>
-                `;
+                incomeList.innerHTML += `<div class="material-item"><span class="material-name">${item.material}</span><span class="material-volume">${volume.toFixed(1)} ${item.unit}</span></div>`;
             });
-            
             document.getElementById('totalIncome').textContent = totalIncome.toFixed(1);
             
             const outcomeList = document.getElementById('outcomeMaterialsList');
@@ -1544,14 +1509,8 @@
             outcomeMaterials.forEach(item => {
                 const volume = parseFloat(item.volume) || 0;
                 totalOutcome += volume;
-                outcomeList.innerHTML += `
-                    <div class="material-item">
-                        <span class="material-name">${item.material}</span>
-                        <span class="material-volume">${volume.toFixed(1)} ${item.unit}</span>
-                    </div>
-                `;
+                outcomeList.innerHTML += `<div class="material-item"><span class="material-name">${item.material}</span><span class="material-volume">${volume.toFixed(1)} ${item.unit}</span></div>`;
             });
-            
             document.getElementById('totalOutcome').textContent = totalOutcome.toFixed(1);
         }
 
@@ -1607,13 +1566,7 @@
                 return;
             }
             
-            const item = {
-                id: Date.now() + Math.random(),
-                material,
-                unit,
-                volume,
-                piket
-            };
+            const item = { id: Date.now() + Math.random(), material, unit, volume, piket };
             
             if (currentMaterialType === 'income') {
                 item.supplier = document.getElementById('materialSupplier').value;
@@ -1660,7 +1613,6 @@
 
             summaries.unshift(summary);
             localStorage.setItem('summaries', JSON.stringify(summaries));
-
             updateStorage(summary);
 
             alert('Сводка успешно сохранена!');
@@ -1672,26 +1624,12 @@
             summary.incomeMaterials.forEach(item => {
                 if (item.material && item.volume && item.piket) {
                     const key = `${item.material}|${item.piket}`;
-                    if (!storage[key]) {
-                        storage[key] = {
-                            material: item.material,
-                            piket: item.piket,
-                            volume: 0,
-                            unit: item.unit
-                        };
-                    }
+                    if (!storage[key]) storage[key] = { material: item.material, piket: item.piket, volume: 0, unit: item.unit };
                     storage[key].volume += parseFloat(item.volume) || 0;
                     
                     storageHistory.unshift({
-                        date: summary.date,
-                        material: item.material,
-                        type: 'приход',
-                        volume: item.volume,
-                        unit: item.unit,
-                        piket: item.piket,
-                        master: summary.master,
-                        shift: summary.shift,
-                        timestamp: Date.now()
+                        date: summary.date, material: item.material, type: 'приход', volume: item.volume,
+                        unit: item.unit, piket: item.piket, master: summary.master, shift: summary.shift, timestamp: Date.now()
                     });
                 }
             });
@@ -1701,18 +1639,10 @@
                     const key = `${item.material}|${item.piket}`;
                     if (storage[key]) {
                         storage[key].volume -= parseFloat(item.volume) || 0;
-                        
                         storageHistory.unshift({
-                            date: summary.date,
-                            material: item.material,
-                            type: 'расход',
-                            volume: item.volume,
-                            unit: item.unit,
-                            piket: item.piket,
-                            destination: item.destination,
-                            master: summary.master,
-                            shift: summary.shift,
-                            timestamp: Date.now()
+                            date: summary.date, material: item.material, type: 'расход', volume: item.volume,
+                            unit: item.unit, piket: item.piket, destination: item.destination,
+                            master: summary.master, shift: summary.shift, timestamp: Date.now()
                         });
                     }
                 }
@@ -1726,10 +1656,7 @@
             const masters = [...new Set(summaries.map(s => s.master))];
             const filterSelect = document.getElementById('summaryMasterFilter');
             filterSelect.innerHTML = '<option value="all">Все мастера</option>';
-            masters.forEach(m => {
-                filterSelect.innerHTML += `<option value="${m}">${m}</option>`;
-            });
-
+            masters.forEach(m => filterSelect.innerHTML += `<option value="${m}">${m}</option>`);
             filterSummaries();
         }
 
@@ -1739,58 +1666,31 @@
             const shift = document.getElementById('summaryShiftFilter').value;
 
             let filtered = summaries;
-            
-            if (master !== 'all') {
-                filtered = filtered.filter(s => s.master === master);
-            }
-            if (section !== 'all') {
-                filtered = filtered.filter(s => s.section === section);
-            }
-            if (shift !== 'all') {
-                filtered = filtered.filter(s => s.shift === shift);
-            }
+            if (master !== 'all') filtered = filtered.filter(s => s.master === master);
+            if (section !== 'all') filtered = filtered.filter(s => s.section === section);
+            if (shift !== 'all') filtered = filtered.filter(s => s.shift === shift);
 
             const grid = document.getElementById('summariesGrid');
-            grid.innerHTML = '';
-
-            if (filtered.length === 0) {
-                grid.innerHTML = '<div class="empty-state">📭 Нет сводок</div>';
-                return;
-            }
-
+            grid.innerHTML = filtered.length === 0 ? '<div class="empty-state">📭 Нет сводок</div>' : '';
+            
             filtered.forEach(s => {
                 const card = document.createElement('div');
                 card.className = 'summary-card';
-                card.onclick = () => viewSummary(s.id);
+                card.onclick = () => alert(JSON.stringify(s, null, 2));
                 card.innerHTML = `
-                    <div class="summary-header">
-                        <span class="summary-date">${s.date}</span>
-                        <span class="summary-shift">${s.shift}</span>
-                    </div>
+                    <div class="summary-header"><span class="summary-date">${s.date}</span><span class="summary-shift">${s.shift}</span></div>
                     <div class="summary-master">${s.master}</div>
-                    <div class="summary-stats">
-                        <span>👥 ${s.totalPeople} чел</span>
-                        <span>🚜 ${s.totalEquipment} тех</span>
-                        <span>⏱️ ${s.totalHours} ч</span>
-                    </div>
+                    <div class="summary-stats"><span>👥 ${s.totalPeople} чел</span><span>🚜 ${s.totalEquipment} тех</span><span>⏱️ ${s.totalHours} ч</span></div>
                 `;
                 grid.appendChild(card);
             });
-        }
-
-        function viewSummary(id) {
-            const summary = summaries.find(s => s.id === id);
-            alert(JSON.stringify(summary, null, 2));
         }
 
         function renderStorage() {
             const materials = [...new Set(Object.values(storage).map(s => s.material))];
             const materialFilter = document.getElementById('storageMaterialFilter');
             materialFilter.innerHTML = '<option value="all">Все материалы</option>';
-            materials.forEach(m => {
-                materialFilter.innerHTML += `<option value="${m}">${m}</option>`;
-            });
-
+            materials.forEach(m => materialFilter.innerHTML += `<option value="${m}">${m}</option>`);
             filterStorage();
         }
 
@@ -1799,49 +1699,24 @@
             const piket = document.getElementById('storagePiketFilter').value.toLowerCase();
 
             let items = Object.values(storage);
-            
-            if (material !== 'all') {
-                items = items.filter(i => i.material === material);
-            }
-            if (piket) {
-                items = items.filter(i => i.piket.toLowerCase().includes(piket));
-            }
+            if (material !== 'all') items = items.filter(i => i.material === material);
+            if (piket) items = items.filter(i => i.piket.toLowerCase().includes(piket));
 
             const grid = document.getElementById('storageGrid');
-            grid.innerHTML = '';
-
-            if (items.length === 0) {
-                grid.innerHTML = '<div class="empty-state">📭 Нет материалов</div>';
-                return;
-            }
-
+            grid.innerHTML = items.length === 0 ? '<div class="empty-state">📭 Нет материалов</div>' : '';
+            
             items.forEach(item => {
                 const card = document.createElement('div');
                 card.className = 'storage-card';
-                card.innerHTML = `
-                    <div class="storage-header">
-                        <span class="storage-material">${item.material}</span>
-                        <span class="storage-piket">ПК ${item.piket}</span>
-                    </div>
-                    <div class="storage-volume">${item.volume.toFixed(1)} ${item.unit}</div>
-                `;
+                card.innerHTML = `<div class="storage-header"><span class="storage-material">${item.material}</span><span class="storage-piket">ПК ${item.piket}</span></div><div class="storage-volume">${item.volume.toFixed(1)} ${item.unit}</div>`;
                 grid.appendChild(card);
             });
 
             const historyBody = document.getElementById('storageHistoryBody');
             historyBody.innerHTML = '';
-            
             storageHistory.slice(0, 20).forEach(item => {
                 const row = historyBody.insertRow();
-                row.innerHTML = `
-                    <td>${item.date}</td>
-                    <td>${item.material}</td>
-                    <td style="color: ${item.type === 'приход' ? 'var(--success)' : 'var(--danger)'}">${item.type}</td>
-                    <td>${item.volume} ${item.unit}</td>
-                    <td>ПК ${item.piket}</td>
-                    <td>${item.master}</td>
-                    <td>${item.shift}</td>
-                `;
+                row.innerHTML = `<td>${item.date}</td><td>${item.material}</td><td style="color: ${item.type === 'приход' ? 'var(--success)' : 'var(--danger)'}">${item.type}</td><td>${item.volume} ${item.unit}</td><td>ПК ${item.piket}</td><td>${item.master}</td><td>${item.shift}</td>`;
             });
         }
 
@@ -1854,34 +1729,16 @@
             const section = document.getElementById('employeeSectionFilter').value;
 
             let filtered = employees;
-            
-            if (position !== 'all') {
-                filtered = filtered.filter(e => e.position === position);
-            }
-            if (section !== 'all') {
-                filtered = filtered.filter(e => e.section === section);
-            }
+            if (position !== 'all') filtered = filtered.filter(e => e.position === position);
+            if (section !== 'all') filtered = filtered.filter(e => e.section === section);
 
             const grid = document.getElementById('employeesGrid');
-            grid.innerHTML = '';
-
-            if (filtered.length === 0) {
-                grid.innerHTML = '<div class="empty-state">👥 Нет сотрудников</div>';
-                return;
-            }
-
+            grid.innerHTML = filtered.length === 0 ? '<div class="empty-state">👥 Нет сотрудников</div>' : '';
+            
             filtered.forEach(e => {
                 const card = document.createElement('div');
                 card.className = 'employee-card';
-                card.innerHTML = `
-                    <div class="employee-name">${e.fullName}</div>
-                    <div class="employee-position">${e.position}</div>
-                    <div class="employee-contacts">
-                        <p>📞 ${e.phone}</p>
-                        <p>📧 ${e.email}</p>
-                        <p>🏗️ Участок ${e.section}</p>
-                    </div>
-                `;
+                card.innerHTML = `<div class="employee-name">${e.fullName}</div><div class="employee-position">${e.position}</div><div class="employee-contacts"><p>📞 ${e.phone}</p><p>📧 ${e.email}</p><p>🏗️ Участок ${e.section}</p></div>`;
                 grid.appendChild(card);
             });
         }
@@ -1889,38 +1746,23 @@
         function showAddEmployee() {
             const name = prompt('Введите ФИО сотрудника:');
             if (!name) return;
-            
-            const position = prompt('Введите должность (Дорожный рабочий/Мастер/Прораб/Старший прораб/Начальник участка):');
+            const position = prompt('Введите должность:');
             if (!position) return;
-            
             const section = prompt('Введите номер участка (29/51):');
             if (!section || !['29', '51'].includes(section)) return;
-            
             const phone = prompt('Введите телефон:');
             if (!phone) return;
-            
             const email = prompt('Введите email:');
             if (!email) return;
 
-            employees.push({
-                id: Date.now(),
-                fullName: name,
-                position: position,
-                section: section,
-                phone: phone,
-                email: email,
-                addedAt: new Date().toISOString()
-            });
-
+            employees.push({ id: Date.now(), fullName: name, position, section, phone, email, addedAt: new Date().toISOString() });
             renderEmployees();
         }
 
         function renderReports() {
             document.getElementById('totalSummaries').textContent = summaries.length;
             
-            const totalWorkVolume = summaries.reduce((sum, s) => 
-                sum + s.workRows.reduce((sSum, r) => sSum + (parseFloat(r.workVolume) || 0), 0), 0
-            );
+            const totalWorkVolume = summaries.reduce((sum, s) => sum + s.workRows.reduce((sSum, r) => sSum + (parseFloat(r.workVolume) || 0), 0), 0);
             document.getElementById('totalWorkVolume').textContent = totalWorkVolume.toFixed(1);
             
             const totalStorageValue = Object.values(storage).reduce((sum, s) => sum + s.volume, 0);
@@ -1930,9 +1772,7 @@
 
             const mastersStats = {};
             summaries.forEach(s => {
-                if (!mastersStats[s.master]) {
-                    mastersStats[s.master] = { count: 0, volume: 0, hours: 0 };
-                }
+                if (!mastersStats[s.master]) mastersStats[s.master] = { count: 0, volume: 0, hours: 0 };
                 mastersStats[s.master].count++;
                 mastersStats[s.master].volume += s.workRows.reduce((sum, r) => sum + (parseFloat(r.workVolume) || 0), 0);
                 mastersStats[s.master].hours += parseFloat(s.totalHours) || 0;
@@ -1940,44 +1780,16 @@
 
             const mastersBody = document.getElementById('mastersStatsBody');
             mastersBody.innerHTML = '';
-            
             Object.entries(mastersStats).forEach(([master, stats]) => {
-                const row = mastersBody.insertRow();
-                row.innerHTML = `
-                    <td>${master}</td>
-                    <td>${stats.count}</td>
-                    <td>${stats.volume.toFixed(1)}</td>
-                    <td>${stats.hours.toFixed(1)}</td>
-                `;
+                mastersBody.innerHTML += `<tr><td>${master}</td><td>${stats.count}</td><td>${stats.volume.toFixed(1)}</td><td>${stats.hours.toFixed(1)}</td></tr>`;
             });
 
             const materialsBody = document.getElementById('materialsStatsBody');
             materialsBody.innerHTML = '';
-            
             Object.values(storage).forEach(item => {
-                const row = materialsBody.insertRow();
-                row.innerHTML = `
-                    <td>${item.material}</td>
-                    <td>ПК ${item.piket}</td>
-                    <td>${item.volume.toFixed(1)} ${item.unit}</td>
-                `;
+                materialsBody.innerHTML += `<tr><td>${item.material}</td><td>ПК ${item.piket}</td><td>${item.volume.toFixed(1)} ${item.unit}</td></tr>`;
             });
         }
-
-        // Функция для очистки всех данных (можно вызвать из консоли)
-        window.clearAllData = function() {
-            if (confirm('Очистить все данные?')) {
-                users = {};
-                currentUser = null;
-                pendingRegistration = null;
-                employees = [];
-                summaries = [];
-                storage = {};
-                storageHistory = [];
-                localStorage.clear();
-                window.location.reload();
-            }
-        };
     </script>
 </body>
 </html>
