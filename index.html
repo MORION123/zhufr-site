@@ -65,6 +65,17 @@
             font-size: 14px;
         }
 
+        .system-status {
+            background: var(--bg-secondary);
+            border-radius: 8px;
+            padding: 10px;
+            margin-bottom: 20px;
+            text-align: center;
+            color: var(--text-secondary);
+            border: 1px solid var(--border);
+            font-size: 14px;
+        }
+
         .auth-card {
             background: var(--bg-secondary);
             border-radius: 12px;
@@ -676,6 +687,10 @@
             <p>Журнал учета работ · Система управления строительством</p>
         </div>
 
+        <div class="system-status">
+            ✅ Режим тестирования · Пользователи не сохраняются
+        </div>
+
         <div id="authCard" class="auth-card">
             <div class="auth-tabs">
                 <button class="auth-tab active" onclick="showAuthTab('login')">Вход</button>
@@ -1055,12 +1070,12 @@
     </div>
 
     <script>
-        // Инициализация EmailJS с вашим Public Key
+        // ========== ИНИЦИАЛИЗАЦИЯ EMAILJS ==========
         (function() {
             emailjs.init("voe5SwpouvWYzd4aG");
         })();
 
-        // Список материалов
+        // ========== СПИСОК МАТЕРИАЛОВ ==========
         const MATERIALS = [
             'ЩПС 0-80',
             'Щебень 20-40',
@@ -1073,18 +1088,22 @@
             'ПРС (плодородный слой)'
         ];
 
-        // Система авторизации
-        let users = JSON.parse(localStorage.getItem('users')) || {};
+        // ========== СИСТЕМА АВТОРИЗАЦИИ (БЕЗ СОХРАНЕНИЯ) ==========
+        
+        // ТОЛЬКО В ПАМЯТИ - не сохраняется в localStorage!
+        let users = {};
         let currentUser = null;
         let pendingRegistration = null;
         let verificationCode = null;
         let timerInterval = null;
 
-        // Данные системы
+        // Данные системы (сохраняются только сводки и склад)
         let summaries = JSON.parse(localStorage.getItem('summaries')) || [];
         let storage = JSON.parse(localStorage.getItem('storage')) || {};
         let storageHistory = JSON.parse(localStorage.getItem('storageHistory')) || [];
-        let employees = JSON.parse(localStorage.getItem('employees')) || [];
+        
+        // Сотрудники - только в памяти, не сохраняются
+        let employees = [];
 
         // Данные для новой сводки
         let workRows = [];
@@ -1092,20 +1111,10 @@
         let outcomeMaterials = [];
         let currentMaterialType = 'income';
 
-        // Проверка сохраненной сессии
-        const savedUser = localStorage.getItem('currentUser');
-        if (savedUser) {
-            try {
-                currentUser = JSON.parse(savedUser);
-                document.getElementById('authCard').style.display = 'none';
-                document.getElementById('mainContent').classList.add('visible');
-                updateAllSections();
-            } catch (e) {
-                localStorage.removeItem('currentUser');
-            }
-        }
+        // НЕТ проверки сохраненной сессии - всегда начинаем с чистого листа
 
-        // Функции авторизации
+        // ========== ФУНКЦИИ АВТОРИЗАЦИИ ==========
+
         function showAuthTab(tab) {
             document.querySelectorAll('.auth-tab').forEach(t => t.classList.remove('active'));
             document.querySelectorAll('.auth-form').forEach(f => f.classList.remove('active'));
@@ -1144,9 +1153,9 @@
                 return;
             }
 
-            // Проверка на существующего пользователя
+            // Проверка на существующего пользователя (только в памяти)
             if (users[email]) {
-                showError('registerError', 'Пользователь с таким email уже зарегистрирован');
+                showError('registerError', 'Пользователь с таким email уже зарегистрирован в этой сессии');
                 return;
             }
 
@@ -1225,6 +1234,7 @@
         }
 
         function completeRegistration() {
+            // Добавляем в базу сотрудников (только в память)
             const newEmployee = {
                 id: Date.now(),
                 fullName: pendingRegistration.fullName,
@@ -1236,8 +1246,9 @@
             };
             
             employees.push(newEmployee);
-            localStorage.setItem('employees', JSON.stringify(employees));
+            // НЕ сохраняем в localStorage!
 
+            // Создаем пользователя (только в память)
             users[pendingRegistration.email] = {
                 email: pendingRegistration.email,
                 fullName: pendingRegistration.fullName,
@@ -1248,7 +1259,7 @@
                 registeredAt: new Date().toISOString()
             };
 
-            localStorage.setItem('users', JSON.stringify(users));
+            // НЕ сохраняем в localStorage!
             
             showSuccess('registerSuccess', 'Регистрация успешна! Теперь вы можете войти.');
             
@@ -1282,8 +1293,9 @@
             };
             
             currentUser = demoUser;
-            localStorage.setItem('currentUser', JSON.stringify(demoUser));
+            // НЕ сохраняем в localStorage!
             
+            // Добавляем демо-сотрудника если список пуст
             if (employees.length === 0) {
                 employees.push({
                     id: 1,
@@ -1293,7 +1305,7 @@
                     phone: '+7 (999) 123-45-67',
                     email: 'demo@mail.ru'
                 });
-                localStorage.setItem('employees', JSON.stringify(employees));
+                // НЕ сохраняем в localStorage!
             }
             
             document.getElementById('authCard').style.display = 'none';
@@ -1324,7 +1336,7 @@
             }
 
             currentUser = user;
-            localStorage.setItem('currentUser', JSON.stringify(user));
+            // НЕ сохраняем в localStorage!
             
             document.getElementById('authCard').style.display = 'none';
             document.getElementById('mainContent').classList.add('visible');
@@ -1334,7 +1346,6 @@
 
         function logout() {
             if (confirm('Выйти из системы?')) {
-                localStorage.removeItem('currentUser');
                 currentUser = null;
                 document.getElementById('authCard').style.display = 'block';
                 document.getElementById('mainContent').classList.remove('visible');
@@ -1370,7 +1381,8 @@
             el.style.color = 'var(--shift)';
         }
 
-        // Функции меню
+        // ========== ФУНКЦИИ МЕНЮ ==========
+
         function showMenu(menu) {
             document.querySelectorAll('.menu-btn').forEach(btn => btn.classList.remove('active'));
             document.querySelectorAll('.section-card').forEach(section => section.style.display = 'none');
@@ -1396,7 +1408,8 @@
             renderReports();
         }
 
-        // Функции для сводок
+        // ========== ФУНКЦИИ ДЛЯ СВОДОК ==========
+
         function openSummaryModal() {
             workRows = [];
             incomeMaterials = [];
@@ -1892,7 +1905,7 @@
                 addedAt: new Date().toISOString()
             });
 
-            localStorage.setItem('employees', JSON.stringify(employees));
+            // НЕ сохраняем в localStorage!
             renderEmployees();
         }
 
@@ -1944,6 +1957,21 @@
                 `;
             });
         }
+
+        // Функция для очистки всех данных (можно вызвать из консоли)
+        window.clearAllData = function() {
+            if (confirm('Очистить все данные?')) {
+                users = {};
+                currentUser = null;
+                pendingRegistration = null;
+                employees = [];
+                summaries = [];
+                storage = {};
+                storageHistory = [];
+                localStorage.clear();
+                window.location.reload();
+            }
+        };
     </script>
 </body>
 </html>
