@@ -1073,6 +1073,7 @@
         // ========== ИНИЦИАЛИЗАЦИЯ EMAILJS ==========
         (function() {
             emailjs.init("voe5SwpouvWYzd4aG");
+            console.log("EmailJS инициализирован");
         })();
 
         // ========== СПИСОК МАТЕРИАЛОВ ==========
@@ -1110,8 +1111,6 @@
         let incomeMaterials = [];
         let outcomeMaterials = [];
         let currentMaterialType = 'income';
-
-        // НЕТ проверки сохраненной сессии - всегда начинаем с чистого листа
 
         // ========== ФУНКЦИИ АВТОРИЗАЦИИ ==========
 
@@ -1168,30 +1167,46 @@
             sendVerificationCode();
         }
 
+        // ========== ИСПРАВЛЕННАЯ ФУНКЦИЯ ОТПРАВКИ КОДА ==========
         function sendVerificationCode() {
+            // Генерируем 6-значный код
             verificationCode = Math.floor(100000 + Math.random() * 900000).toString();
             
+            // Показываем информацию
             showInfo('registerInfo', `Отправляем код на ${pendingRegistration.email}...`);
 
+            // ВАЖНО: Параметры соответствуют вашему шаблону EmailJS
             const templateParams = {
-                to_email: pendingRegistration.email,
-                verification_code: verificationCode,
-                user_name: pendingRegistration.fullName
+                email: pendingRegistration.email,        // для поля {{email}} в шаблоне
+                passcode: verificationCode,              // для поля {{passcode}} в шаблоне
+                user_name: pendingRegistration.fullName  // для поля {{user_name}} в шаблоне
             };
 
+            console.log('Отправляем параметры:', templateParams); // Для отладки
+
+            // Отправка через EmailJS с вашими ID
             emailjs.send('service_hgvxlqp', 'template_2b8zm6h', templateParams)
                 .then(function(response) {
                     console.log('SUCCESS!', response.status, response.text);
                     
+                    // Показываем блок подтверждения
                     document.getElementById('verificationBlock').style.display = 'block';
                     document.getElementById('registerBtn').style.display = 'none';
                     
-                    showSuccess('registerInfo', 'Код отправлен на вашу почту!');
+                    showSuccess('registerInfo', 'Код отправлен на вашу почту! Проверьте папку "Спам".');
                     
+                    // Запускаем таймер на 5 минут
                     startTimer(300);
                 }, function(error) {
-                    console.log('FAILED...', error);
-                    showError('registerError', 'Ошибка отправки кода. Попробуйте еще раз.');
+                    console.log('FAILED!', error);
+                    // Показываем детальную ошибку
+                    let errorMessage = 'Ошибка отправки кода. ';
+                    if (error.text) {
+                        errorMessage += error.text;
+                    } else {
+                        errorMessage += 'Проверьте консоль (F12) для деталей.';
+                    }
+                    showError('registerError', errorMessage);
                 });
         }
 
@@ -1246,7 +1261,6 @@
             };
             
             employees.push(newEmployee);
-            // НЕ сохраняем в localStorage!
 
             // Создаем пользователя (только в память)
             users[pendingRegistration.email] = {
@@ -1258,8 +1272,6 @@
                 password: pendingRegistration.password,
                 registeredAt: new Date().toISOString()
             };
-
-            // НЕ сохраняем в localStorage!
             
             showSuccess('registerSuccess', 'Регистрация успешна! Теперь вы можете войти.');
             
@@ -1293,7 +1305,6 @@
             };
             
             currentUser = demoUser;
-            // НЕ сохраняем в localStorage!
             
             // Добавляем демо-сотрудника если список пуст
             if (employees.length === 0) {
@@ -1305,7 +1316,6 @@
                     phone: '+7 (999) 123-45-67',
                     email: 'demo@mail.ru'
                 });
-                // НЕ сохраняем в localStorage!
             }
             
             document.getElementById('authCard').style.display = 'none';
@@ -1336,7 +1346,6 @@
             }
 
             currentUser = user;
-            // НЕ сохраняем в localStorage!
             
             document.getElementById('authCard').style.display = 'none';
             document.getElementById('mainContent').classList.add('visible');
@@ -1905,7 +1914,6 @@
                 addedAt: new Date().toISOString()
             });
 
-            // НЕ сохраняем в localStorage!
             renderEmployees();
         }
 
