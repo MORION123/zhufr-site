@@ -4,8 +4,6 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>ЖУФР - Система учета строительных работ</title>
-    <!-- EmailJS библиотека -->
-    <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/@emailjs/browser@4/dist/email.min.js"></script>
     <style>
         * {
             margin: 0;
@@ -688,7 +686,7 @@
         </div>
 
         <div class="system-status">
-            ✅ Режим тестирования · Пользователи не сохраняются
+            ✅ Отправка кода через Formspree · 50 писем в месяц бесплатно
         </div>
 
         <div id="authCard" class="auth-card">
@@ -1070,12 +1068,6 @@
     </div>
 
     <script>
-        // ========== ИНИЦИАЛИЗАЦИЯ EMAILJS ==========
-        (function() {
-            emailjs.init("voe5SwpouvWYzd4aG");
-            console.log("EmailJS инициализирован");
-        })();
-
         // ========== СПИСОК МАТЕРИАЛОВ ==========
         const MATERIALS = [
             'ЩПС 0-80',
@@ -1167,7 +1159,7 @@
             sendVerificationCode();
         }
 
-        // ========== ИСПРАВЛЕННАЯ ФУНКЦИЯ ОТПРАВКИ КОДА ==========
+        // ========== ФУНКЦИЯ ОТПРАВКИ КОДА ЧЕРЕЗ FORMSPREE ==========
         function sendVerificationCode() {
             // Генерируем 6-значный код
             verificationCode = Math.floor(100000 + Math.random() * 900000).toString();
@@ -1175,19 +1167,26 @@
             // Показываем информацию
             showInfo('registerInfo', `Отправляем код на ${pendingRegistration.email}...`);
 
-            // ВАЖНО: Параметры соответствуют вашему шаблону EmailJS
-            const templateParams = {
-                email: pendingRegistration.email,        // для поля {{email}} в шаблоне
-                passcode: verificationCode,              // для поля {{passcode}} в шаблоне
-                user_name: pendingRegistration.fullName  // для поля {{user_name}} в шаблоне
-            };
-
-            console.log('Отправляем параметры:', templateParams); // Для отладки
-
-            // Отправка через EmailJS с вашими ID
-            emailjs.send('service_hgvxlqp', 'template_2b8zm6h', templateParams)
-                .then(function(response) {
-                    console.log('SUCCESS!', response.status, response.text);
+            // Ваш Formspree endpoint
+            const formspreeEndpoint = 'https://formspree.io/f/xlgpowrl';
+            
+            // Отправляем через Formspree
+            fetch(formspreeEndpoint, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Accept': 'application/json'
+                },
+                body: JSON.stringify({
+                    email: pendingRegistration.email,
+                    code: verificationCode,
+                    name: pendingRegistration.fullName,
+                    _subject: 'Код подтверждения ЖУФР' // Тема письма
+                })
+            })
+            .then(response => {
+                if (response.ok) {
+                    console.log('Письмо отправлено успешно');
                     
                     // Показываем блок подтверждения
                     document.getElementById('verificationBlock').style.display = 'block';
@@ -1197,17 +1196,16 @@
                     
                     // Запускаем таймер на 5 минут
                     startTimer(300);
-                }, function(error) {
-                    console.log('FAILED!', error);
-                    // Показываем детальную ошибку
-                    let errorMessage = 'Ошибка отправки кода. ';
-                    if (error.text) {
-                        errorMessage += error.text;
-                    } else {
-                        errorMessage += 'Проверьте консоль (F12) для деталей.';
-                    }
-                    showError('registerError', errorMessage);
-                });
+                } else {
+                    return response.json().then(data => {
+                        throw new Error(data.error || 'Ошибка отправки');
+                    });
+                }
+            })
+            .catch(error => {
+                console.error('Ошибка:', error);
+                showError('registerError', 'Ошибка отправки кода. Попробуйте еще раз.');
+            });
         }
 
         function startTimer(seconds) {
