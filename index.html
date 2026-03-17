@@ -396,7 +396,7 @@
         .summary-table {
             width: 100%;
             border-collapse: collapse;
-            font-size: 13px;
+            font-size: 12px;
             background: var(--bg-secondary);
             border-radius: 8px;
             overflow: hidden;
@@ -414,10 +414,11 @@
         }
 
         .summary-table td {
-            padding: 6px 4px;
+            padding: 4px;
             border: 1px solid var(--border);
             color: var(--text-primary);
             text-align: center;
+            vertical-align: middle;
         }
 
         .summary-table input {
@@ -426,8 +427,8 @@
             border: none;
             color: var(--text-primary);
             text-align: center;
-            font-size: 12px;
-            padding: 4px;
+            font-size: 11px;
+            padding: 2px;
         }
 
         .summary-table input:focus {
@@ -440,8 +441,9 @@
             background: var(--bg-primary);
             border: 1px solid var(--border);
             color: var(--text-primary);
-            padding: 4px;
+            padding: 2px;
             border-radius: 4px;
+            font-size: 11px;
         }
 
         .summary-table .shift-badge {
@@ -749,6 +751,58 @@
             font-size: 10px;
             margin-left: 10px;
         }
+
+        /* Итоговые блоки внизу таблицы */
+        .summary-footer {
+            margin-top: 20px;
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 15px;
+        }
+
+        .footer-block {
+            background: var(--bg-primary);
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            padding: 15px;
+        }
+
+        .footer-title {
+            color: var(--text-secondary);
+            font-size: 12px;
+            margin-bottom: 10px;
+            text-transform: uppercase;
+            border-bottom: 1px solid var(--border);
+            padding-bottom: 5px;
+        }
+
+        .footer-row {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 8px;
+            font-size: 13px;
+        }
+
+        .footer-label {
+            color: var(--text-secondary);
+        }
+
+        .footer-value {
+            color: var(--text-primary);
+            font-weight: 600;
+        }
+
+        .footer-subtable {
+            width: 100%;
+            margin-top: 10px;
+            border-collapse: collapse;
+            font-size: 12px;
+        }
+
+        .footer-subtable td {
+            padding: 4px;
+            border: 1px solid var(--border);
+        }
     </style>
 </head>
 <body>
@@ -831,7 +885,7 @@
             </div>
         </div>
 
-        <!-- Основной контент (остается без изменений) -->
+        <!-- Основной контент -->
         <div id="mainContent" class="main-content">
             <!-- Верхнее меню -->
             <div class="top-menu">
@@ -1000,9 +1054,9 @@
         </div>
     </div>
 
-    <!-- Модальное окно создания сводки (остается без изменений) -->
+    <!-- Модальное окно создания сводки -->
     <div id="summaryModal" style="display: none; position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0,0,0,0.9); z-index: 1000; overflow-y: auto; padding: 20px;">
-        <div style="max-width: 1200px; margin: 0 auto;">
+        <div style="max-width: 1400px; margin: 0 auto;">
             <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
                 <h2 style="color: var(--text-primary);">Создание новой сводки</h2>
                 <button class="btn" onclick="closeSummaryModal()">✕ Закрыть</button>
@@ -1020,7 +1074,7 @@
                 </div>
                 <div class="progress-step" id="step3">
                     <div class="step-number">3</div>
-                    <div class="step-label">Работы и техника</div>
+                    <div class="step-label">Основная таблица</div>
                 </div>
                 <div class="progress-step" id="step4">
                     <div class="step-number">4</div>
@@ -1068,7 +1122,7 @@
                 </div>
             </div>
 
-            <!-- Шаг 3: Работы и техника -->
+            <!-- Шаг 3: Основная таблица работ и техники -->
             <div class="step-content" id="step3-content">
                 <div class="step-title">🚜 Шаг 3: Работы и техника</div>
                 
@@ -1076,24 +1130,72 @@
                     <table class="summary-table" id="workTable">
                         <thead>
                             <tr>
-                                <th>Участок</th>
-                                <th>Вид работы</th>
-                                <th>Состав</th>
-                                <th>Ед.изм</th>
+                                <th rowspan="2">№</th>
+                                <th rowspan="2">Участок работ</th>
+                                <th colspan="3">Выполненные работы</th>
+                                <th colspan="6">Машины, механизмы, автотранспорт</th>
+                                <th rowspan="2">Примечание</th>
+                            </tr>
+                            <tr>
+                                <th>Наименование работ</th>
+                                <th>Ед. изм.</th>
                                 <th>Объем</th>
-                                <th>Техника</th>
+                                <th>Тип техники</th>
                                 <th>Кол-во</th>
-                                <th>Гос №</th>
-                                <th>м-ч</th>
-                                <th>Прим</th>
-                                <th></th>
+                                <th>Гос. номер</th>
+                                <th>Маш-часы</th>
+                                <th>Кол-во чел.</th>
+                                <th>Чел-часы</th>
                             </tr>
                         </thead>
-                        <tbody id="workBody"></tbody>
+                        <tbody id="workBody">
+                            <!-- Строки будут добавлены через JavaScript -->
+                        </tbody>
                     </table>
                 </div>
                 
-                <button class="btn" onclick="addWorkRow()" style="width:100%;">➕ Добавить строку</button>
+                <button class="btn" onclick="addWorkRow()" style="width:100%; margin-bottom:20px;">➕ Добавить строку</button>
+
+                <!-- Блок итогов по людям и технике -->
+                <div class="summary-footer">
+                    <div class="footer-block">
+                        <div class="footer-title">👥 Люди</div>
+                        <div class="footer-row">
+                            <span class="footer-label">Количество человек (по табелю):</span>
+                            <span class="footer-value" id="totalPeopleCount">0</span>
+                        </div>
+                        <div class="footer-row">
+                            <span class="footer-label">Человеко-часы:</span>
+                            <span class="footer-value" id="totalPeopleHours">0</span>
+                        </div>
+                    </div>
+                    
+                    <div class="footer-block">
+                        <div class="footer-title">🚜 Техника</div>
+                        <div class="footer-row">
+                            <span class="footer-label">Количество техники:</span>
+                            <span class="footer-value" id="totalEquipmentCount">0</span>
+                        </div>
+                        <div class="footer-row">
+                            <span class="footer-label">Машино-часы:</span>
+                            <span class="footer-value" id="totalEquipmentHours">0</span>
+                        </div>
+                    </div>
+                    
+                    <div class="footer-block">
+                        <div class="footer-title">📦 Приход материалов</div>
+                        <div id="incomeMaterialsSummary">
+                            <!-- Сюда будут добавляться строки прихода -->
+                        </div>
+                    </div>
+                    
+                    <div class="footer-block">
+                        <div class="footer-title">📤 Расход материалов</div>
+                        <div id="outcomeMaterialsSummary">
+                            <!-- Сюда будут добавляться строки расхода -->
+                        </div>
+                    </div>
+                </div>
                 
                 <div class="step-buttons">
                     <button class="btn" onclick="prevStep(3)">← Назад</button>
@@ -1101,7 +1203,7 @@
                 </div>
             </div>
 
-            <!-- Шаг 4: Приход/Расход -->
+            <!-- Шаг 4: Приход/Расход материалов (детальная таблица) -->
             <div class="step-content" id="step4-content">
                 <div class="step-title">📦 Шаг 4: Приход и расход материалов</div>
                 
@@ -1110,8 +1212,8 @@
                     <table class="summary-table" id="incomeTable">
                         <thead>
                             <tr>
-                                <th>Материал</th>
-                                <th>Ед.изм</th>
+                                <th>Наименование</th>
+                                <th>Ед. изм.</th>
                                 <th>Объем</th>
                                 <th>Пикет</th>
                                 <th>Поставщик</th>
@@ -1128,8 +1230,8 @@
                     <table class="summary-table" id="outcomeTable">
                         <thead>
                             <tr>
-                                <th>Материал</th>
-                                <th>Ед.изм</th>
+                                <th>Наименование</th>
+                                <th>Ед. изм.</th>
                                 <th>Объем</th>
                                 <th>Пикет</th>
                                 <th>Куда</th>
@@ -1174,34 +1276,61 @@
                     <table class="summary-table" id="finalTable">
                         <thead>
                             <tr>
+                                <th>№</th>
                                 <th>Участок</th>
                                 <th>Вид работ</th>
-                                <th>Состав</th>
                                 <th>Ед.изм</th>
                                 <th>Объем</th>
                                 <th>Техника</th>
+                                <th>Кол-во</th>
+                                <th>Маш-часы</th>
                             </tr>
                         </thead>
                         <tbody id="finalBody"></tbody>
                     </table>
                 </div>
 
-                <div class="totals-grid">
-                    <div class="total-card">
-                        <div class="total-title">Всего техники</div>
-                        <div class="total-value" id="finalTotalEquipment">0</div>
+                <div class="summary-footer">
+                    <div class="footer-block">
+                        <div class="footer-title">👥 Люди</div>
+                        <div class="footer-row">
+                            <span class="footer-label">Всего человек:</span>
+                            <span class="footer-value" id="finalTotalPeople">0</span>
+                        </div>
+                        <div class="footer-row">
+                            <span class="footer-label">Всего чел-часы:</span>
+                            <span class="footer-value" id="finalTotalPeopleHours">0</span>
+                        </div>
                     </div>
-                    <div class="total-card">
-                        <div class="total-title">Машино-часы</div>
-                        <div class="total-value" id="finalTotalHours">0</div>
+                    
+                    <div class="footer-block">
+                        <div class="footer-title">🚜 Техника</div>
+                        <div class="footer-row">
+                            <span class="footer-label">Всего техники:</span>
+                            <span class="footer-value" id="finalTotalEquipment">0</span>
+                        </div>
+                        <div class="footer-row">
+                            <span class="footer-label">Всего маш-часы:</span>
+                            <span class="footer-value" id="finalTotalHours">0</span>
+                        </div>
                     </div>
-                    <div class="total-card">
-                        <div class="total-title">Приход</div>
-                        <div class="total-value" id="finalTotalIncome">0</div>
+                    
+                    <div class="footer-block">
+                        <div class="footer-title">📦 Приход</div>
+                        <div id="finalIncomeSummary"></div>
+                        <div class="footer-row" style="margin-top:10px;">
+                            <span class="footer-label">Итого приход:</span>
+                            <span class="footer-value" id="finalTotalIncome">0</span>
+                        </div>
                     </div>
-                    <div class="total-card">
-                        <div class="total-title">Расход</div>
-                        <div class="total-value" id="finalTotalOutcome">0</div>
+                    
+                    <div class="footer-block">
+                        <div class="footer-title">📤 Расход</div>
+                        <div id="finalOutcomeSummary"></div>
+                        <div class="footer-row" style="margin-top:10px;">
+                            <span class="footer-label">Итого расход:</span>
+                            <span class="footer-value" id="finalTotalOutcome">0</span>
+                        </div>
                     </div>
                 </div>
 
@@ -1471,6 +1600,9 @@
             incomeRows = [];
             outcomeRows = [];
             
+            // Добавляем одну пустую строку для начала
+            addWorkRow();
+            
             // Сбрасываем прогресс
             currentStep = 1;
             for (let i = 1; i <= 5; i++) {
@@ -1585,19 +1717,21 @@
             renderWorkSections();
         }
 
-        // Работы
+        // Работы - обновленная функция для новой структуры
         function addWorkRow() {
             workRows.push({
                 id: Date.now() + Math.random(),
+                number: workRows.length + 1,
                 section: '',
-                workType: '',
-                workDescription: '',
-                unit: 'м³',
-                volume: '',
+                workName: '',
+                workUnit: 'м³',
+                workVolume: '',
                 equipmentType: '',
                 equipmentCount: '1',
                 equipmentNumber: '',
                 machineHours: '',
+                peopleCount: '',
+                peopleHours: '',
                 note: ''
             });
             renderWorkTable();
@@ -1607,7 +1741,7 @@
             const tbody = document.getElementById('workBody');
             tbody.innerHTML = '';
             
-            workRows.forEach(row => {
+            workRows.forEach((row, index) => {
                 const tr = document.createElement('tr');
                 
                 let sectionSelect = '<select onchange="updateWorkRow(\'' + row.id + '\', \'section\', this.value)">';
@@ -1620,30 +1754,94 @@
                 sectionSelect += '</select>';
                 
                 tr.innerHTML = `
+                    <td>${index + 1}</td>
                     <td>${sectionSelect}</td>
-                    <td><input type="text" value="${row.workType || ''}" onchange="updateWorkRow('${row.id}', 'workType', this.value)"></td>
-                    <td><input type="text" value="${row.workDescription || ''}" onchange="updateWorkRow('${row.id}', 'workDescription', this.value)"></td>
-                    <td><input type="text" value="${row.unit || 'м³'}" onchange="updateWorkRow('${row.id}', 'unit', this.value)"></td>
-                    <td><input type="text" value="${row.volume || ''}" onchange="updateWorkRow('${row.id}', 'volume', this.value)"></td>
-                    <td><input type="text" value="${row.equipmentType || ''}" onchange="updateWorkRow('${row.id}', 'equipmentType', this.value)"></td>
-                    <td><input type="text" value="${row.equipmentCount || '1'}" onchange="updateWorkRow('${row.id}', 'equipmentCount', this.value)"></td>
-                    <td><input type="text" value="${row.equipmentNumber || ''}" onchange="updateWorkRow('${row.id}', 'equipmentNumber', this.value)"></td>
-                    <td><input type="text" value="${row.machineHours || ''}" onchange="updateWorkRow('${row.id}', 'machineHours', this.value)"></td>
-                    <td><input type="text" value="${row.note || ''}" onchange="updateWorkRow('${row.id}', 'note', this.value)"></td>
-                    <td><button class="btn-sm" onclick="deleteWorkRow('${row.id}')" style="background:var(--danger);">🗑️</button></td>
+                    <td><input type="text" value="${row.workName || ''}" placeholder="Наименование работ" onchange="updateWorkRow('${row.id}', 'workName', this.value)"></td>
+                    <td><input type="text" value="${row.workUnit || 'м³'}" style="width:60px;" onchange="updateWorkRow('${row.id}', 'workUnit', this.value)"></td>
+                    <td><input type="text" value="${row.workVolume || ''}" style="width:70px;" onchange="updateWorkRow('${row.id}', 'workVolume', this.value)"></td>
+                    <td><input type="text" value="${row.equipmentType || ''}" placeholder="Тип техники" onchange="updateWorkRow('${row.id}', 'equipmentType', this.value)"></td>
+                    <td><input type="text" value="${row.equipmentCount || '1'}" style="width:50px;" onchange="updateWorkRow('${row.id}', 'equipmentCount', this.value)"></td>
+                    <td><input type="text" value="${row.equipmentNumber || ''}" placeholder="А123ВС" style="width:80px;" onchange="updateWorkRow('${row.id}', 'equipmentNumber', this.value)"></td>
+                    <td><input type="text" value="${row.machineHours || ''}" style="width:60px;" onchange="updateWorkRow('${row.id}', 'machineHours', this.value)"></td>
+                    <td><input type="text" value="${row.peopleCount || ''}" style="width:50px;" onchange="updateWorkRow('${row.id}', 'peopleCount', this.value)"></td>
+                    <td><input type="text" value="${row.peopleHours || ''}" style="width:60px;" onchange="updateWorkRow('${row.id}', 'peopleHours', this.value)"></td>
+                    <td><input type="text" value="${row.note || ''}" placeholder="Примечание" onchange="updateWorkRow('${row.id}', 'note', this.value)"></td>
                 `;
                 tbody.appendChild(tr);
             });
+            
+            updateTotals();
         }
 
         function updateWorkRow(id, field, value) {
             const row = workRows.find(r => r.id == id);
-            if (row) row[field] = value;
+            if (row) {
+                row[field] = value;
+                updateTotals();
+            }
         }
 
         function deleteWorkRow(id) {
             workRows = workRows.filter(r => r.id != id);
             renderWorkTable();
+        }
+
+        function updateTotals() {
+            let totalPeople = 0;
+            let totalPeopleHours = 0;
+            let totalEquipment = 0;
+            let totalEquipmentHours = 0;
+            
+            workRows.forEach(row => {
+                totalPeople += parseInt(row.peopleCount) || 0;
+                totalPeopleHours += parseFloat(row.peopleHours) || 0;
+                totalEquipment += parseInt(row.equipmentCount) || 0;
+                totalEquipmentHours += parseFloat(row.machineHours) || 0;
+            });
+            
+            document.getElementById('totalPeopleCount').textContent = totalPeople;
+            document.getElementById('totalPeopleHours').textContent = totalPeopleHours.toFixed(1);
+            document.getElementById('totalEquipmentCount').textContent = totalEquipment;
+            document.getElementById('totalEquipmentHours').textContent = totalEquipmentHours.toFixed(1);
+            
+            // Обновляем сводку материалов
+            updateMaterialsSummary();
+        }
+
+        function updateMaterialsSummary() {
+            // Группируем приход по материалам
+            const incomeSummary = {};
+            incomeRows.forEach(row => {
+                if (row.material && row.volume) {
+                    if (!incomeSummary[row.material]) {
+                        incomeSummary[row.material] = 0;
+                    }
+                    incomeSummary[row.material] += parseFloat(row.volume) || 0;
+                }
+            });
+            
+            const incomeDiv = document.getElementById('incomeMaterialsSummary');
+            incomeDiv.innerHTML = '';
+            Object.entries(incomeSummary).forEach(([material, volume]) => {
+                incomeDiv.innerHTML += `<div class="footer-row"><span class="footer-label">${material}:</span><span class="footer-value">${volume.toFixed(1)}</span></div>`;
+            });
+            
+            // Группируем расход по материалам
+            const outcomeSummary = {};
+            outcomeRows.forEach(row => {
+                if (row.material && row.volume) {
+                    if (!outcomeSummary[row.material]) {
+                        outcomeSummary[row.material] = 0;
+                    }
+                    outcomeSummary[row.material] += parseFloat(row.volume) || 0;
+                }
+            });
+            
+            const outcomeDiv = document.getElementById('outcomeMaterialsSummary');
+            outcomeDiv.innerHTML = '';
+            Object.entries(outcomeSummary).forEach(([material, volume]) => {
+                outcomeDiv.innerHTML += `<div class="footer-row"><span class="footer-label">${material}:</span><span class="footer-value">${volume.toFixed(1)}</span></div>`;
+            });
         }
 
         // Приход
@@ -1657,6 +1855,7 @@
                 supplier: ''
             });
             renderIncomeTable();
+            updateTotals();
         }
 
         function renderIncomeTable() {
@@ -1675,10 +1874,10 @@
                 
                 tr.innerHTML = `
                     <td>${materialSelect}</td>
-                    <td><input type="text" value="${row.unit || 'м³'}" onchange="updateIncomeRow('${row.id}', 'unit', this.value)"></td>
-                    <td><input type="text" value="${row.volume || ''}" onchange="updateIncomeRow('${row.id}', 'volume', this.value)"></td>
-                    <td><input type="text" value="${row.piket || ''}" onchange="updateIncomeRow('${row.id}', 'piket', this.value)"></td>
-                    <td><input type="text" value="${row.supplier || ''}" onchange="updateIncomeRow('${row.id}', 'supplier', this.value)"></td>
+                    <td><input type="text" value="${row.unit || 'м³'}" style="width:60px;" onchange="updateIncomeRow('${row.id}', 'unit', this.value)"></td>
+                    <td><input type="text" value="${row.volume || ''}" style="width:70px;" onchange="updateIncomeRow('${row.id}', 'volume', this.value)"></td>
+                    <td><input type="text" value="${row.piket || ''}" placeholder="ПК..." style="width:80px;" onchange="updateIncomeRow('${row.id}', 'piket', this.value)"></td>
+                    <td><input type="text" value="${row.supplier || ''}" placeholder="Поставщик" onchange="updateIncomeRow('${row.id}', 'supplier', this.value)"></td>
                     <td><button class="btn-sm" onclick="deleteIncomeRow('${row.id}')" style="background:var(--danger);">🗑️</button></td>
                 `;
                 tbody.appendChild(tr);
@@ -1687,12 +1886,16 @@
 
         function updateIncomeRow(id, field, value) {
             const row = incomeRows.find(r => r.id == id);
-            if (row) row[field] = value;
+            if (row) {
+                row[field] = value;
+                updateTotals();
+            }
         }
 
         function deleteIncomeRow(id) {
             incomeRows = incomeRows.filter(r => r.id != id);
             renderIncomeTable();
+            updateTotals();
         }
 
         // Расход
@@ -1706,6 +1909,7 @@
                 destination: ''
             });
             renderOutcomeTable();
+            updateTotals();
         }
 
         function renderOutcomeTable() {
@@ -1724,10 +1928,10 @@
                 
                 tr.innerHTML = `
                     <td>${materialSelect}</td>
-                    <td><input type="text" value="${row.unit || 'м³'}" onchange="updateOutcomeRow('${row.id}', 'unit', this.value)"></td>
-                    <td><input type="text" value="${row.volume || ''}" onchange="updateOutcomeRow('${row.id}', 'volume', this.value)"></td>
-                    <td><input type="text" value="${row.piket || ''}" onchange="updateOutcomeRow('${row.id}', 'piket', this.value)"></td>
-                    <td><input type="text" value="${row.destination || ''}" onchange="updateOutcomeRow('${row.id}', 'destination', this.value)"></td>
+                    <td><input type="text" value="${row.unit || 'м³'}" style="width:60px;" onchange="updateOutcomeRow('${row.id}', 'unit', this.value)"></td>
+                    <td><input type="text" value="${row.volume || ''}" style="width:70px;" onchange="updateOutcomeRow('${row.id}', 'volume', this.value)"></td>
+                    <td><input type="text" value="${row.piket || ''}" placeholder="ПК..." style="width:80px;" onchange="updateOutcomeRow('${row.id}', 'piket', this.value)"></td>
+                    <td><input type="text" value="${row.destination || ''}" placeholder="Куда" onchange="updateOutcomeRow('${row.id}', 'destination', this.value)"></td>
                     <td><button class="btn-sm" onclick="deleteOutcomeRow('${row.id}')" style="background:var(--danger);">🗑️</button></td>
                 `;
                 tbody.appendChild(tr);
@@ -1736,12 +1940,16 @@
 
         function updateOutcomeRow(id, field, value) {
             const row = outcomeRows.find(r => r.id == id);
-            if (row) row[field] = value;
+            if (row) {
+                row[field] = value;
+                updateTotals();
+            }
         }
 
         function deleteOutcomeRow(id) {
             outcomeRows = outcomeRows.filter(r => r.id != id);
             renderOutcomeTable();
+            updateTotals();
         }
 
         // Итоговый отчет
@@ -1754,30 +1962,75 @@
             const tbody = document.getElementById('finalBody');
             tbody.innerHTML = '';
 
+            let totalPeople = 0;
+            let totalPeopleHours = 0;
             let totalEquipment = 0;
             let totalHours = 0;
             
-            workRows.forEach(work => {
+            workRows.forEach((work, index) => {
                 const row = tbody.insertRow();
                 row.innerHTML = `
+                    <td>${index + 1}</td>
                     <td>${work.section || ''}</td>
-                    <td>${work.workType || ''}</td>
-                    <td>${work.workDescription || ''}</td>
-                    <td>${work.unit || ''}</td>
-                    <td>${work.volume || ''}</td>
-                    <td>${work.equipmentType || ''} (${work.equipmentCount || '0'} ед., гос №${work.equipmentNumber || '—'}, ${work.machineHours || '0'} ч)</td>
+                    <td>${work.workName || ''}</td>
+                    <td>${work.workUnit || ''}</td>
+                    <td>${work.workVolume || ''}</td>
+                    <td>${work.equipmentType || ''}</td>
+                    <td>${work.equipmentCount || '0'}</td>
+                    <td>${work.machineHours || '0'}</td>
                 `;
                 
+                totalPeople += parseInt(work.peopleCount) || 0;
+                totalPeopleHours += parseFloat(work.peopleHours) || 0;
                 totalEquipment += parseInt(work.equipmentCount) || 0;
                 totalHours += parseFloat(work.machineHours) || 0;
             });
 
-            let totalIncome = incomeRows.reduce((sum, r) => sum + (parseFloat(r.volume) || 0), 0);
-            let totalOutcome = outcomeRows.reduce((sum, r) => sum + (parseFloat(r.volume) || 0), 0);
-
+            document.getElementById('finalTotalPeople').textContent = totalPeople;
+            document.getElementById('finalTotalPeopleHours').textContent = totalPeopleHours.toFixed(1);
             document.getElementById('finalTotalEquipment').textContent = totalEquipment;
             document.getElementById('finalTotalHours').textContent = totalHours.toFixed(1);
+
+            // Итоги по приходу
+            const incomeSummary = {};
+            let totalIncome = 0;
+            incomeRows.forEach(row => {
+                if (row.material && row.volume) {
+                    const vol = parseFloat(row.volume) || 0;
+                    if (!incomeSummary[row.material]) {
+                        incomeSummary[row.material] = 0;
+                    }
+                    incomeSummary[row.material] += vol;
+                    totalIncome += vol;
+                }
+            });
+            
+            const finalIncomeDiv = document.getElementById('finalIncomeSummary');
+            finalIncomeDiv.innerHTML = '';
+            Object.entries(incomeSummary).forEach(([material, volume]) => {
+                finalIncomeDiv.innerHTML += `<div class="footer-row"><span class="footer-label">${material}:</span><span class="footer-value">${volume.toFixed(1)}</span></div>`;
+            });
             document.getElementById('finalTotalIncome').textContent = totalIncome.toFixed(1);
+
+            // Итоги по расходу
+            const outcomeSummary = {};
+            let totalOutcome = 0;
+            outcomeRows.forEach(row => {
+                if (row.material && row.volume) {
+                    const vol = parseFloat(row.volume) || 0;
+                    if (!outcomeSummary[row.material]) {
+                        outcomeSummary[row.material] = 0;
+                    }
+                    outcomeSummary[row.material] += vol;
+                    totalOutcome += vol;
+                }
+            });
+            
+            const finalOutcomeDiv = document.getElementById('finalOutcomeSummary');
+            finalOutcomeDiv.innerHTML = '';
+            Object.entries(outcomeSummary).forEach(([material, volume]) => {
+                finalOutcomeDiv.innerHTML += `<div class="footer-row"><span class="footer-label">${material}:</span><span class="footer-value">${volume.toFixed(1)}</span></div>`;
+            });
             document.getElementById('finalTotalOutcome').textContent = totalOutcome.toFixed(1);
         }
 
@@ -1799,8 +2052,10 @@
                 workRows: [...workRows],
                 incomeRows: [...incomeRows],
                 outcomeRows: [...outcomeRows],
-                totalEquipment: document.getElementById('finalTotalEquipment').textContent,
-                totalHours: document.getElementById('finalTotalHours').textContent,
+                totalPeople: document.getElementById('totalPeopleCount').textContent,
+                totalPeopleHours: document.getElementById('totalPeopleHours').textContent,
+                totalEquipment: document.getElementById('totalEquipmentCount').textContent,
+                totalHours: document.getElementById('totalEquipmentHours').textContent,
                 totalIncome: document.getElementById('finalTotalIncome').textContent,
                 totalOutcome: document.getElementById('finalTotalOutcome').textContent,
                 createdAt: new Date().toISOString()
@@ -1925,8 +2180,8 @@
                     <div class="summary-master">${s.master}</div>
                     <div class="summary-preview">Участок ${s.section} · ${s.workRows.length} работ</div>
                     <div class="summary-stats">
-                        <span>📦 ${s.totalIncome}</span>
-                        <span>🚜 ${s.totalOutcome}</span>
+                        <span>👥 ${s.totalPeople} чел</span>
+                        <span>🚜 ${s.totalEquipment} тех</span>
                         <span>⏱️ ${s.totalHours} ч</span>
                     </div>
                 `;
@@ -2086,7 +2341,7 @@
             document.getElementById('totalSummaries').textContent = summaries.length;
             
             const totalWorkVolume = summaries.reduce((sum, s) => 
-                sum + s.workRows.reduce((sSum, r) => sSum + (parseFloat(r.volume) || 0), 0), 0
+                sum + s.workRows.reduce((sSum, r) => sSum + (parseFloat(r.workVolume) || 0), 0), 0
             );
             document.getElementById('totalWorkVolume').textContent = totalWorkVolume.toFixed(1);
             
@@ -2099,11 +2354,12 @@
             const mastersStats = {};
             summaries.forEach(s => {
                 if (!mastersStats[s.master]) {
-                    mastersStats[s.master] = { count: 0, volume: 0, hours: 0 };
+                    mastersStats[s.master] = { count: 0, volume: 0, hours: 0, people: 0 };
                 }
                 mastersStats[s.master].count++;
-                mastersStats[s.master].volume += s.workRows.reduce((sum, r) => sum + (parseFloat(r.volume) || 0), 0);
+                mastersStats[s.master].volume += s.workRows.reduce((sum, r) => sum + (parseFloat(r.workVolume) || 0), 0);
                 mastersStats[s.master].hours += parseFloat(s.totalHours) || 0;
+                mastersStats[s.master].people += parseInt(s.totalPeople) || 0;
             });
 
             const mastersBody = document.getElementById('mastersStatsBody');
