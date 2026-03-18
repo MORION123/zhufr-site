@@ -341,8 +341,27 @@
 
         .section-header {
             background: var(--accent) !important;
-            color: white !important;
-            font-weight: bold;
+        }
+        
+        .section-header td {
+            background: var(--accent);
+            padding: 10px;
+        }
+        
+        .section-header input {
+            background: white;
+            color: black;
+            padding: 8px 15px;
+            border-radius: 5px;
+            border: none;
+            width: 300px;
+            font-size: 14px;
+            transition: all 0.3s;
+        }
+        
+        .section-header input:focus {
+            outline: 2px solid var(--success);
+            transform: scale(1.02);
         }
 
         .totals-container {
@@ -528,6 +547,16 @@
             #verificationBlock {
                 margin-top: 20px;
                 padding: 20px;
+            }
+            
+            .section-header td div {
+                flex-direction: column;
+                align-items: flex-start !important;
+                gap: 10px !important;
+            }
+            
+            .section-header input {
+                width: 100%;
             }
         }
     </style>
@@ -867,6 +896,12 @@
             'Бутовый камень', 'ПГС', 'Песок', 'Грунт', 'ПРС'
         ];
 
+        // Хранилище для пикетажа участков
+        window.picket_1 = '';
+        window.picket_2 = '';
+        window.picket_3 = '';
+        window.picket_4 = '';
+
         let users = {};
         let currentUser = null;
         let pendingUser = null;
@@ -1094,14 +1129,28 @@
             incomeMaterials = [];
             outcomeMaterials = [];
             
+            // Очищаем сохраненные пикетажи
+            window.picket_1 = '';
+            window.picket_2 = '';
+            window.picket_3 = '';
+            window.picket_4 = '';
+            
             for (let i = 1; i <= 4; i++) {
                 for (let j = 1; j <= 6; j++) {
                     workRows.push({
                         id: `row_${i}_${j}_${Date.now()}`,
                         section: `Участок ${i}`,
-                        workName: '', workUnit: 'м³', workVolume: '',
-                        equipmentType: '', equipmentCount: '', equipmentNumber: '',
-                        machineHours: '', peopleCount: '', peopleHours: '', note: ''
+                        sectionIndex: i,
+                        workName: '', 
+                        workUnit: 'м³', 
+                        workVolume: '',
+                        equipmentType: '', 
+                        equipmentCount: '', 
+                        equipmentNumber: '',
+                        machineHours: '', 
+                        peopleCount: '', 
+                        peopleHours: '', 
+                        note: ''
                     });
                 }
             }
@@ -1121,21 +1170,34 @@
             const tbody = document.getElementById('workBody');
             tbody.innerHTML = '';
             
-            let currentSection = '';
+            let renderedSections = [];
             let rowNumber = 1;
             
             workRows.forEach((row) => {
-                if (row.section !== currentSection) {
-                    currentSection = row.section;
+                if (!renderedSections.includes(row.section)) {
+                    renderedSections.push(row.section);
+                    
                     const headerRow = tbody.insertRow();
                     headerRow.className = 'section-header';
-                    headerRow.innerHTML = `<td colspan="13" style="background: var(--accent); color:white;">📍 ${row.section}</td>`;
+                    headerRow.innerHTML = `
+                        <td colspan="13">
+                            <div style="display: flex; align-items: center; gap: 20px; flex-wrap: wrap;">
+                                <span style="color: white; font-weight: bold; min-width: 150px;">📍 ${row.section}</span>
+                                <span style="color: white;">Участок работ (ПК-ПК):</span>
+                                <input type="text" 
+                                       id="picket_${row.sectionIndex}" 
+                                       placeholder="например: 1260-1276" 
+                                       value="${window['picket_' + row.sectionIndex] || ''}"
+                                       onchange="savePicket(${row.sectionIndex}, this.value)">
+                            </div>
+                        </td>
+                    `;
                 }
                 
                 const tr = tbody.insertRow();
                 tr.innerHTML = `
                     <td>${rowNumber++}</td>
-                    <td>${row.section}</td>
+                    <td style="background: var(--bg-secondary); color: var(--text-secondary);">${row.section}</td>
                     <td><input value="${row.workName}" onchange="updateRow('${row.id}','workName',this.value)"></td>
                     <td><input value="${row.workUnit}" style="width:50px;" onchange="updateRow('${row.id}','workUnit',this.value)"></td>
                     <td><input value="${row.workVolume}" style="width:60px;" onchange="updateRow('${row.id}','workVolume',this.value)"></td>
@@ -1150,6 +1212,11 @@
             });
             
             updateTotals();
+        }
+
+        function savePicket(sectionIndex, value) {
+            window['picket_' + sectionIndex] = value;
+            console.log(`Пикет участка ${sectionIndex} сохранен: ${value}`);
         }
 
         function updateRow(id, field, value) {
@@ -1268,12 +1335,21 @@
                 return;
             }
 
+            // Собираем пикетажи
+            const pickets = {
+                picket_1: window.picket_1,
+                picket_2: window.picket_2,
+                picket_3: window.picket_3,
+                picket_4: window.picket_4
+            };
+
             const summary = {
                 id: Date.now(),
                 date,
                 shift: document.getElementById('reportShift').value,
                 master: currentUser.fullName,
                 section: currentUser.section,
+                pickets: pickets,
                 workRows: [...workRows],
                 incomeMaterials: [...incomeMaterials],
                 outcomeMaterials: [...outcomeMaterials],
