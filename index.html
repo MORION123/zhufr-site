@@ -2,7 +2,7 @@
 <html lang="ru">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=yes">
     <title>ЖУФР - Система учета строительных работ</title>
     <style>
         * {
@@ -213,6 +213,7 @@
             cursor: pointer;
             font-size: 13px;
             margin-left: 10px;
+            white-space: nowrap;
         }
 
         .btn-verify:hover {
@@ -676,6 +677,106 @@
         .employee-contacts p {
             margin: 3px 0;
         }
+
+        /* Мобильные стили */
+        @media (max-width: 768px) {
+            body {
+                padding: 8px;
+            }
+
+            .auth-card {
+                padding: 20px;
+                margin: 5px;
+            }
+
+            .form-group input,
+            .form-group select {
+                font-size: 16px;
+                padding: 15px;
+            }
+
+            .auth-tabs {
+                gap: 5px;
+            }
+
+            .auth-tab {
+                padding: 12px 5px;
+                font-size: 14px;
+            }
+
+            .verify-row {
+                flex-direction: column;
+                gap: 15px;
+            }
+
+            .verify-row input {
+                width: 100%;
+                margin-bottom: 5px;
+                font-size: 16px;
+            }
+
+            .btn-verify {
+                width: 100%;
+                margin-left: 0;
+                padding: 15px;
+                font-size: 16px;
+            }
+
+            .timer {
+                font-size: 16px;
+                margin: 15px 0;
+            }
+
+            #verificationBlock {
+                display: none;
+                margin-top: 20px;
+                padding: 20px;
+                background: var(--bg-card);
+                border-radius: 12px;
+                border: 2px solid var(--accent);
+                animation: fadeIn 0.3s ease;
+            }
+
+            @keyframes fadeIn {
+                from { opacity: 0; transform: translateY(-10px); }
+                to { opacity: 1; transform: translateY(0); }
+            }
+
+            .btn-primary {
+                padding: 18px;
+                font-size: 18px;
+            }
+
+            .btn {
+                padding: 14px;
+                font-size: 16px;
+            }
+
+            .system-status {
+                font-size: 12px;
+                padding: 8px;
+            }
+        }
+
+        /* Для очень маленьких экранов */
+        @media (max-width: 480px) {
+            .header h1 {
+                font-size: 28px;
+            }
+
+            .header p {
+                font-size: 12px;
+            }
+
+            .form-group label {
+                font-size: 12px;
+            }
+
+            .totals-container {
+                grid-template-columns: 1fr;
+                gap: 10px;
+            }
+        }
     </style>
 </head>
 <body>
@@ -767,6 +868,7 @@
             </div>
         </div>
 
+        <!-- ОСНОВНОЙ КОНТЕНТ -->
         <div id="mainContent" class="main-content">
             <div class="top-menu">
                 <button class="menu-btn active" onclick="showMenu('summary')">📋 Сводки</button>
@@ -1083,11 +1185,11 @@
         ];
 
         // ========== СИСТЕМА АВТОРИЗАЦИИ (В ПАМЯТИ) ==========
-        let users = {};              // Хранилище пользователей
-        let currentUser = null;      // Текущий пользователь
-        let pendingRegistration = null; // Данные регистрации
-        let verificationCode = null; // Код подтверждения
-        let timerInterval = null;    // Таймер
+        let users = {};
+        let currentUser = null;
+        let pendingRegistration = null;
+        let verificationCode = null;
+        let timerInterval = null;
 
         // Данные системы (сохраняются)
         let summaries = JSON.parse(localStorage.getItem('summaries')) || [];
@@ -1110,7 +1212,6 @@
             document.querySelector(`.auth-tab[onclick="showAuthTab('${tab}')"]`).classList.add('active');
             document.getElementById(`${tab}Form`).classList.add('active');
             
-            // Скрываем все сообщения
             document.getElementById('loginError').style.display = 'none';
             document.getElementById('registerError').style.display = 'none';
             document.getElementById('registerSuccess').style.display = 'none';
@@ -1126,7 +1227,6 @@
             const password = document.getElementById('regPassword').value;
             const confirmPassword = document.getElementById('regConfirmPassword').value;
 
-            // Валидация
             if (!fullName || !phone || !email || !password || !confirmPassword) {
                 showError('registerError', 'Заполните все поля');
                 return;
@@ -1142,28 +1242,24 @@
                 return;
             }
 
-            // Проверка на существующего пользователя
             if (users[email]) {
                 showError('registerError', 'Пользователь с таким email уже зарегистрирован');
                 return;
             }
 
-            // Сохраняем данные для подтверждения
             pendingRegistration = {
                 fullName, position, section, phone, email, password
             };
 
-            // Отправляем код подтверждения
             sendVerificationCode();
         }
 
+        // ========== ИСПРАВЛЕННАЯ ФУНКЦИЯ ДЛЯ МОБИЛЬНЫХ ==========
         function sendVerificationCode() {
-            // Генерируем 6-значный код
             verificationCode = Math.floor(100000 + Math.random() * 900000).toString();
             
             showInfo('registerInfo', `Отправляем код на ${pendingRegistration.email}...`);
 
-            // Formspree endpoint
             const formspreeEndpoint = 'https://formspree.io/f/xlgpowrl';
             
             fetch(formspreeEndpoint, {
@@ -1183,20 +1279,46 @@
                 if (response.ok) {
                     console.log('Письмо отправлено успешно');
                     
-                    // Показываем поле для ввода кода
-                    document.getElementById('verificationBlock').style.display = 'block';
-                    document.getElementById('registerBtn').style.display = 'none';
+                    // Улучшенный код для мобильных
+                    const verificationBlock = document.getElementById('verificationBlock');
+                    const registerBtn = document.getElementById('registerBtn');
                     
-                    showSuccess('registerInfo', 'Код отправлен на вашу почту! Проверьте папку "Спам".');
+                    if (verificationBlock) {
+                        // Принудительно показываем блок
+                        verificationBlock.style.display = 'block';
+                        verificationBlock.style.visibility = 'visible';
+                        verificationBlock.style.opacity = '1';
+                        
+                        // Убираем возможные скрывающие атрибуты
+                        verificationBlock.removeAttribute('hidden');
+                        
+                        // Прокручиваем к блоку подтверждения
+                        setTimeout(() => {
+                            verificationBlock.scrollIntoView({ 
+                                behavior: 'smooth', 
+                                block: 'center',
+                                inline: 'center'
+                            });
+                        }, 300);
+                        
+                        // Фокусируемся на поле ввода
+                        setTimeout(() => {
+                            document.getElementById('verificationCode').focus();
+                        }, 500);
+                    }
                     
-                    startTimer(300); // 5 минут
+                    registerBtn.style.display = 'none';
+                    
+                    showSuccess('registerInfo', '✅ Код отправлен! Проверьте почту и папку "Спам".');
+                    
+                    startTimer(300);
                 } else {
                     throw new Error('Ошибка отправки');
                 }
             })
             .catch(error => {
                 console.error('Ошибка:', error);
-                showError('registerError', 'Ошибка отправки кода. Попробуйте еще раз.');
+                showError('registerError', '❌ Ошибка отправки кода. Попробуйте еще раз.');
             });
         }
 
@@ -1215,7 +1337,7 @@
                 
                 if (seconds <= 0) {
                     clearInterval(timerInterval);
-                    timerDisplay.textContent = 'Время истекло. Запросите код заново.';
+                    timerDisplay.textContent = '⏰ Время истекло. Запросите код заново.';
                     resendBtn.disabled = false;
                     verificationCode = null;
                 }
@@ -1239,12 +1361,11 @@
             if (enteredCode === verificationCode) {
                 completeRegistration();
             } else {
-                showError('registerError', 'Неверный код подтверждения');
+                showError('registerError', '❌ Неверный код подтверждения');
             }
         }
 
         function completeRegistration() {
-            // Создаем пользователя
             users[pendingRegistration.email] = {
                 email: pendingRegistration.email,
                 fullName: pendingRegistration.fullName,
@@ -1255,15 +1376,13 @@
                 registeredAt: new Date().toISOString()
             };
             
-            showSuccess('registerSuccess', 'Регистрация успешна! Сейчас вы будете перенаправлены на вход.');
+            showSuccess('registerSuccess', '✅ Регистрация успешна! Сейчас вы будете перенаправлены на вход.');
             
             if (timerInterval) clearInterval(timerInterval);
             
-            // Скрываем блок подтверждения
             document.getElementById('verificationBlock').style.display = 'none';
             document.getElementById('registerBtn').style.display = 'block';
             
-            // Очищаем поля
             document.getElementById('regFullName').value = '';
             document.getElementById('regPhone').value = '';
             document.getElementById('regEmail').value = '';
@@ -1274,10 +1393,9 @@
             pendingRegistration = null;
             verificationCode = null;
             
-            // Переключаем на вкладку входа через 2 секунды
             setTimeout(() => {
                 showAuthTab('login');
-                showSuccess('loginError', 'Теперь вы можете войти с вашим email и паролем');
+                showSuccess('loginError', '✨ Теперь вы можете войти с вашим email и паролем');
             }, 2000);
         }
 
@@ -1293,12 +1411,12 @@
             const user = users[email];
             
             if (!user) {
-                showError('loginError', 'Пользователь не найден. Зарегистрируйтесь сначала.');
+                showError('loginError', '❌ Пользователь не найден. Зарегистрируйтесь сначала.');
                 return;
             }
             
             if (user.password !== password) {
-                showError('loginError', 'Неверный пароль');
+                showError('loginError', '❌ Неверный пароль');
                 return;
             }
 
@@ -1402,8 +1520,6 @@
                     workRows.push({
                         id: `row_${i}_${j}_${Date.now()}`,
                         section: `Участок ${i}`,
-                        sectionIndex: i,
-                        rowIndex: j,
                         workName: '',
                         workUnit: 'м³',
                         workVolume: '',
@@ -1790,6 +1906,11 @@
                 materialsBody.innerHTML += `<tr><td>${item.material}</td><td>ПК ${item.piket}</td><td>${item.volume.toFixed(1)} ${item.unit}</td></tr>`;
             });
         }
+
+        // Функция для принудительного показа блока (для отладки)
+        window.showVerificationBlock = function() {
+            document.getElementById('verificationBlock').style.display = 'block';
+        };
     </script>
 </body>
 </html>
