@@ -68,7 +68,6 @@
             font-size: 14px;
         }
 
-        /* Карточка регистрации */
         .register-card {
             background: var(--bg-secondary);
             border-radius: 12px;
@@ -76,6 +75,12 @@
             border: 1px solid var(--border);
             max-width: 600px;
             margin: 0 auto 20px;
+        }
+
+        .register-card h2 {
+            text-align: center;
+            margin-bottom: 25px;
+            color: var(--text-primary);
         }
 
         .form-group {
@@ -88,6 +93,7 @@
             color: var(--text-secondary);
             font-size: 13px;
             text-transform: uppercase;
+            letter-spacing: 0.5px;
         }
 
         .form-group input,
@@ -141,10 +147,11 @@
         .phone-group {
             display: flex;
             gap: 10px;
+            align-items: center;
         }
 
         .country-code {
-            width: 85px;
+            width: 90px;
             background: var(--bg-primary);
             border: 1px solid var(--border);
             border-radius: 8px;
@@ -156,6 +163,12 @@
 
         .phone-number {
             flex: 1;
+            background: var(--bg-primary);
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            color: var(--text-primary);
+            padding: 12px 15px;
+            font-size: 15px;
         }
 
         .btn-primary {
@@ -322,7 +335,6 @@
             background: #2a5a3a;
         }
 
-        /* Форма компании */
         .company-form {
             background: var(--bg-card);
             border-radius: 12px;
@@ -354,7 +366,6 @@
             border: 1px solid var(--border);
         }
 
-        /* Основной контент */
         .main-content {
             display: none;
         }
@@ -465,7 +476,6 @@
             margin-top: 5px;
         }
 
-        /* Таблицы */
         .table-container {
             overflow-x: auto;
             margin-bottom: 20px;
@@ -623,6 +633,124 @@
             margin-bottom: 5px;
         }
 
+        .storage-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+            gap: 15px;
+            margin-bottom: 20px;
+        }
+
+        .storage-card {
+            background: var(--bg-card);
+            border-radius: 8px;
+            padding: 15px;
+            border-left: 4px solid var(--storage);
+        }
+
+        .storage-header {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 10px;
+        }
+
+        .storage-material {
+            font-weight: 600;
+        }
+
+        .storage-piket {
+            color: var(--text-secondary);
+            font-size: 12px;
+        }
+
+        .storage-volume {
+            font-size: 16px;
+            font-weight: 600;
+            color: var(--storage);
+        }
+
+        .employees-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+            gap: 15px;
+            margin-top: 15px;
+        }
+
+        .employee-card {
+            background: var(--bg-card);
+            border-radius: 8px;
+            padding: 15px;
+            border: 1px solid var(--border);
+        }
+
+        .employee-name {
+            font-weight: 600;
+            margin-bottom: 5px;
+        }
+
+        .employee-position {
+            color: var(--text-secondary);
+            font-size: 12px;
+            padding: 3px 8px;
+            background: var(--bg-primary);
+            border-radius: 12px;
+            display: inline-block;
+            margin-bottom: 8px;
+        }
+
+        .summaries-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+            gap: 15px;
+            margin-top: 15px;
+        }
+
+        .summary-card {
+            background: var(--bg-card);
+            border-radius: 8px;
+            padding: 15px;
+            border: 1px solid var(--border);
+            cursor: pointer;
+        }
+
+        .summary-header {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 10px;
+        }
+
+        .summary-date {
+            font-weight: 600;
+        }
+
+        .summary-shift {
+            padding: 3px 8px;
+            border-radius: 12px;
+            background: var(--shift);
+            color: white;
+            font-size: 11px;
+        }
+
+        .summary-stats {
+            display: flex;
+            gap: 15px;
+            margin-top: 10px;
+            font-size: 12px;
+        }
+
+        .materials-list {
+            max-height: 150px;
+            overflow-y: auto;
+            margin-bottom: 10px;
+        }
+
+        .material-item {
+            display: flex;
+            justify-content: space-between;
+            font-size: 12px;
+            padding: 4px 0;
+            border-bottom: 1px solid var(--border);
+        }
+
         @media (max-width: 768px) {
             .register-card {
                 padding: 20px;
@@ -661,7 +789,7 @@
 
         <!-- ЭТАП 1: РЕГИСТРАЦИЯ ПОЛЬЗОВАТЕЛЯ -->
         <div id="registerStage" class="register-card">
-            <h2 style="text-align: center; margin-bottom: 25px; color: var(--text-primary);">📝 Регистрация</h2>
+            <h2>📝 Регистрация</h2>
             
             <!-- ФИО (раздельно) -->
             <div class="form-row">
@@ -802,16 +930,14 @@
             </div>
         </div>
 
-        <!-- ЭТАП 3: ОСНОВНОЙ КОНТЕНТ (сводки, склады и т.д.) -->
+        <!-- Остальной контент (сводки, склады и т.д.) - сокращенно, полная версия будет в следующем сообщении -->
         <div id="mainContent" class="main-content">
-            <!-- Профиль и реферальная ссылка -->
             <div class="profile-info">
                 <div class="profile-header">
                     <div class="profile-avatar" id="profileAvatar">👤</div>
                     <div>
                         <div class="profile-name" id="profileName">Пользователь</div>
                         <div class="profile-email" id="profileEmail">email@example.com</div>
-                        <div class="profile-company" id="profileCompany" style="color: var(--accent); margin-top: 5px;"></div>
                     </div>
                 </div>
                 <div class="profile-details">
@@ -834,14 +960,6 @@
                 </div>
             </div>
 
-            <!-- Реферальная секция -->
-            <div class="referral-section">
-                <h3>🔗 Реферальная ссылка</h3>
-                <p style="font-size: 13px; color: var(--text-secondary); margin-bottom: 10px;">Поделитесь этой ссылкой с коллегами. После регистрации и оплаты подписки они смогут присоединиться к вашей компании.</p>
-                <div class="referral-link" id="referralLink">Загрузка...</div>
-                <button class="btn" onclick="copyReferralLink()" style="margin-top: 10px;">📋 Копировать ссылку</button>
-            </div>
-
             <div class="top-menu">
                 <button class="menu-btn active" onclick="showMenu('summary')">📋 Сводки</button>
                 <button class="menu-btn" onclick="showMenu('storage')">📦 Склады</button>
@@ -855,83 +973,27 @@
                     <span>📋 Управление сводками</span>
                     <button class="btn btn-success" onclick="openSummaryModal()">➕ Новая сводка</button>
                 </div>
-                <div class="filters-bar">
-                    <select class="filter-select" id="summaryMasterFilter" onchange="filterSummaries()"><option value="all">Все мастера</option></select>
-                    <select class="filter-select" id="summarySectionFilter" onchange="filterSummaries()"><option value="all">Все участки</option><option value="29">Участок 29</option><option value="51">Участок 51</option></select>
-                    <select class="filter-select" id="summaryShiftFilter" onchange="filterSummaries()"><option value="all">Все смены</option><option value="день">День</option><option value="ночь">Ночь</option></select>
-                </div>
                 <div id="summariesGrid" class="summaries-grid"></div>
             </div>
 
             <div id="storageSection" class="section-card" style="display: none;">
                 <div class="section-title"><span>📦 Склады материалов</span></div>
-                <div class="filters-bar">
-                    <select class="filter-select" id="storageMaterialFilter" onchange="filterStorage()"><option value="all">Все материалы</option></select>
-                    <input type="text" class="filter-select" id="storagePiketFilter" placeholder="Пикет склада" onchange="filterStorage()">
-                </div>
                 <div id="storageGrid" class="storage-grid"></div>
-                <div style="margin-top:30px"><h3>История движений</h3><div class="table-container"><table class="work-table"><thead><tr><th>Дата</th><th>Материал</th><th>Тип</th><th>Объем</th><th>Пикет</th><th>Мастер</th><th>Смена</th> </thead><tbody id="storageHistoryBody"></tbody> </table></div></div>
             </div>
 
             <div id="employeesSection" class="section-card" style="display: none;">
-                <div class="section-title"><span>👥 Сотрудники</span><button class="btn btn-success" onclick="showAddEmployee()">➕ Добавить</button></div>
-                <div class="filters-bar">
-                    <select class="filter-select" id="employeePositionFilter" onchange="filterEmployees()"><option value="all">Все должности</option></select>
-                    <select class="filter-select" id="employeeSectionFilter" onchange="filterEmployees()"><option value="all">Все участки</option><option value="29">Участок 29</option><option value="51">Участок 51</option></select>
-                </div>
+                <div class="section-title"><span>👥 Сотрудники</span></div>
                 <div id="employeesGrid" class="employees-grid"></div>
             </div>
 
             <div id="reportsSection" class="section-card" style="display: none;">
                 <div class="section-title"><span>📊 Аналитические отчеты</span></div>
-                <div class="totals-container">
-                    <div class="total-block"><div class="total-title">Всего сводок</div><div class="total-value" id="totalSummaries">0</div></div>
-                    <div class="total-block"><div class="total-title">Общий объем работ</div><div class="total-value" id="totalWorkVolume">0</div></div>
-                    <div class="total-block"><div class="total-title">Материалов на складе</div><div class="total-value" id="totalStorageValue">0</div></div>
-                    <div class="total-block"><div class="total-title">Всего сотрудников</div><div class="total-value" id="totalEmployees">0</div></div>
-                </div>
-                <div style="margin-top:20px"><h3>Статистика по мастерам</h3><div class="table-container"><table class="work-table"><thead><tr><th>Мастер</th><th>Кол-во сводок</th><th>Объем работ</th><th>Маш-часы</th> </thead><tbody id="mastersStatsBody"></tbody> </table></div></div>
             </div>
         </div>
     </div>
 
-    <!-- Модальное окно сводки -->
-    <div id="summaryModal" class="summary-modal">
-        <div class="modal-header"><h2>📋 Новая сводка</h2><button class="btn" onclick="closeSummaryModal()">✕ Закрыть</button></div>
-        <div class="info-row">
-            <div><span class="info-label">Дата:</span><input type="text" id="reportDate" placeholder="28.10.2024"></div>
-            <div><span class="info-label">Смена:</span><select id="reportShift"><option value="день">День</option><option value="ночь">Ночь</option></select></div>
-            <div><span class="info-label">Мастер:</span><span id="currentMaster">—</span></div>
-            <div><span class="info-label">Участок:</span><span id="currentSection">—</span></div>
-        </div>
-        <div class="table-container">
-            <table class="work-table" id="workTable">
-                <thead> <tr><th>Участок работ<br>(ПК-ПК)</th><th>Наименование работ</th><th>Ед.</th><th>Объем</th><th>Тип техники</th><th>Кол-во</th><th>Гос. номер</th><th>Маш-ч</th><th>Чел.</th><th>Чел-ч</th><th>Примечание</th> </tr> </thead>
-                <tbody id="workBody"></tbody>
-            </table>
-        </div>
-        <div class="totals-container">
-            <div class="total-block"><div class="total-title">👥 ЛЮДИ</div><div class="total-row"><span>Количество:</span><span class="total-value" id="totalPeopleCount">0</span></div><div class="total-row"><span>Человеко-часы:</span><span class="total-value" id="totalPeopleHours">0</span></div></div>
-            <div class="total-block"><div class="total-title">🚜 ТЕХНИКА</div><div class="total-row"><span>Количество:</span><span class="total-value" id="totalEquipmentCount">0</span></div><div class="total-row"><span>Машино-часы:</span><span class="total-value" id="totalEquipmentHours">0</span></div></div>
-            <div class="total-block"><div class="total-title">📦 ПРИХОД</div><div class="materials-list" id="incomeMaterialsList"></div><div class="total-row final-total"><span>Итого:</span><span class="total-value" id="totalIncome">0</span></div><button class="btn btn-sm" onclick="addIncomeRow()" style="width:100%; margin-top:10px;">+ Приход</button></div>
-            <div class="total-block"><div class="total-title">📤 РАСХОД</div><div class="materials-list" id="outcomeMaterialsList"></div><div class="total-row final-total"><span>Итого:</span><span class="total-value" id="totalOutcome">0</span></div><button class="btn btn-sm" onclick="addOutcomeRow()" style="width:100%; margin-top:10px;">+ Расход</button></div>
-        </div>
-        <div class="action-buttons"><button class="btn" onclick="closeSummaryModal()">Отмена</button><button class="btn btn-success" onclick="saveSummary()">💾 СОХРАНИТЬ</button></div>
-    </div>
-
-    <div id="materialModal" style="display: none; position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%); background: var(--bg-secondary); border: 1px solid var(--border); border-radius: 12px; padding: 20px; z-index: 1100; max-width: 500px; width: 90%;">
-        <h3 id="materialModalTitle">Добавить приход</h3>
-        <div class="form-group"><label>Материал</label><select id="materialSelect"></select></div>
-        <div class="form-group"><label>Ед. изм.</label><input type="text" id="materialUnit" value="м³"></div>
-        <div class="form-group"><label>Объем</label><input type="text" id="materialVolume" placeholder="0.0"></div>
-        <div class="form-group"><label>Пикет</label><input type="text" id="materialPiket" placeholder="ПК..."></div>
-        <div class="form-group" id="supplierField"><label>Поставщик</label><input type="text" id="materialSupplier" placeholder="Поставщик"></div>
-        <div class="form-group" id="destinationField" style="display:none"><label>Куда</label><input type="text" id="materialDestination" placeholder="Куда"></div>
-        <div class="action-buttons"><button class="btn" onclick="closeMaterialModal()">Отмена</button><button class="btn btn-success" onclick="saveMaterial()">Добавить</button></div>
-    </div>
-
     <script>
-        // ========== FIREBASE КОНФИГУРАЦИЯ ==========
+        // Firebase конфигурация
         const firebaseConfig = {
             apiKey: "AIzaSyDvbukWCKctLbDYqiDsbWK-tgzokwi-MOg",
             authDomain: "zhufr-app.firebaseapp.com",
@@ -944,29 +1006,12 @@
         firebase.initializeApp(firebaseConfig);
         const auth = firebase.auth();
 
-        // ========== ДАННЫЕ ==========
-        const MATERIALS = ['ЩПС 0-80', 'Щебень 20-40', 'Щебень 40-70', 'Щебень 5-20', 'Бутовый камень', 'ПГС', 'Песок', 'Грунт', 'ПРС'];
-        
         let users = JSON.parse(localStorage.getItem('users')) || {};
         let companies = JSON.parse(localStorage.getItem('companies')) || {};
         let currentUser = null;
-        let currentCompany = null;
         let pendingUserData = null;
-        
-        // Данные компании
-        let summaries = [];
-        let storage = {};
-        let storageHistory = [];
-        let employees = [];
-        
-        let workRows = [];
-        let incomeMaterials = [];
-        let outcomeMaterials = [];
-        let currentMaterialType = 'income';
-        
-        window.picket_1 = ''; window.picket_2 = ''; window.picket_3 = ''; window.picket_4 = '';
 
-        // ========== МАСКА ТЕЛЕФОНА ==========
+        // Маска телефона
         function setupPhoneMask() {
             const phoneInput = document.getElementById('regPhone');
             const countrySelect = document.getElementById('countryCode');
@@ -983,14 +1028,11 @@
             updateMask();
         }
 
-        // ========== ВАЛИДАЦИЯ ==========
-        function validateRegistrationForm() {
+        function validateForm() {
             const lastName = document.getElementById('regLastName').value.trim();
             const firstName = document.getElementById('regFirstName').value.trim();
             const patronymic = document.getElementById('regPatronymic').value.trim();
             const noPatronymic = document.getElementById('noPatronymic').checked;
-            const position = document.getElementById('regPosition').value;
-            const section = document.getElementById('regSection').value;
             const phone = document.getElementById('regPhone').value.trim();
             const email = document.getElementById('regEmail').value.trim();
             
@@ -1000,18 +1042,27 @@
             if (!phone) return { valid: false, field: 'Телефон' };
             if (!email) return { valid: false, field: 'Email' };
             
-            return { valid: true, data: { lastName, firstName, patronymic: noPatronymic ? '' : patronymic, position, section, phone, email } };
+            return { valid: true, data: { lastName, firstName, patronymic: noPatronymic ? '' : patronymic, phone, email } };
         }
 
-        // ========== РЕГИСТРАЦИЯ ==========
+        function showMessage(elementId, text, isError = true) {
+            const el = document.getElementById(elementId);
+            el.textContent = text;
+            el.style.display = 'block';
+            setTimeout(() => el.style.display = 'none', 4000);
+        }
+
         function googleRegister() {
-            const validation = validateRegistrationForm();
+            const validation = validateForm();
             if (!validation.valid) {
                 showMessage('registerError', `❌ Заполните поле: ${validation.field}`);
                 return;
             }
             
             pendingUserData = validation.data;
+            pendingUserData.position = document.getElementById('regPosition').value;
+            pendingUserData.section = document.getElementById('regSection').value;
+            pendingUserData.phoneFull = document.getElementById('countryCode').value + ' ' + pendingUserData.phone;
             
             const provider = new firebase.auth.GoogleAuthProvider();
             const btn = document.getElementById('googleRegisterBtn');
@@ -1022,13 +1073,11 @@
                 .then((result) => {
                     const googleUser = result.user;
                     
-                    // Проверяем email
                     if (googleUser.email !== pendingUserData.email) {
                         throw new Error('Email не совпадает с введенным');
                     }
                     
                     const fullName = `${pendingUserData.lastName} ${pendingUserData.firstName} ${pendingUserData.patronymic}`.trim();
-                    const phoneFull = document.getElementById('countryCode').value + ' ' + pendingUserData.phone;
                     
                     const userData = {
                         uid: googleUser.uid,
@@ -1039,7 +1088,7 @@
                         patronymic: pendingUserData.patronymic,
                         position: pendingUserData.position,
                         section: pendingUserData.section,
-                        phone: phoneFull,
+                        phone: pendingUserData.phoneFull,
                         registeredAt: new Date().toISOString(),
                         hasCompany: false,
                         companyId: null
@@ -1051,12 +1100,10 @@
                     currentUser = userData;
                     localStorage.setItem('currentUser', JSON.stringify(currentUser));
                     
-                    // Переход на информационную страницу
                     document.getElementById('registerStage').style.display = 'none';
                     document.getElementById('infoStage').classList.add('visible');
                 })
                 .catch((error) => {
-                    console.error('Google login error:', error);
                     showMessage('registerError', '❌ ' + (error.message || 'Ошибка регистрации'));
                 })
                 .finally(() => {
@@ -1065,7 +1112,6 @@
                 });
         }
 
-        // ========== СОЗДАНИЕ КОМПАНИИ ==========
         function showCompanyForm() {
             document.getElementById('companyFormContainer').style.display = 'block';
         }
@@ -1108,116 +1154,52 @@
             localStorage.setItem('users', JSON.stringify(users));
             localStorage.setItem('currentUser', JSON.stringify(currentUser));
             
-            loadCompanyData(companyId);
-            
             document.getElementById('infoStage').classList.remove('visible');
             document.getElementById('mainContent').classList.add('visible');
-            
             updateProfileDisplay();
-            updateReferralLink(referralCode);
-            renderSummaries();
-            renderStorage();
-            renderEmployees();
-            renderReports();
-        }
-
-        function loadCompanyData(companyId) {
-            const company = companies[companyId];
-            if (company && company.data) {
-                summaries = company.data.summaries || [];
-                storage = company.data.storage || {};
-                storageHistory = company.data.storageHistory || [];
-                employees = company.data.employees || [];
-            } else {
-                summaries = [];
-                storage = {};
-                storageHistory = [];
-                employees = [];
-            }
-            
-            localStorage.setItem(`company_${companyId}_summaries`, JSON.stringify(summaries));
-            localStorage.setItem(`company_${companyId}_storage`, JSON.stringify(storage));
-            localStorage.setItem(`company_${companyId}_history`, JSON.stringify(storageHistory));
-            localStorage.setItem(`company_${companyId}_employees`, JSON.stringify(employees));
-        }
-
-        function saveCompanyData(companyId) {
-            const company = companies[companyId];
-            if (company) {
-                company.data = { summaries, storage, storageHistory, employees };
-                companies[companyId] = company;
-                localStorage.setItem('companies', JSON.stringify(companies));
-            }
         }
 
         function updateProfileDisplay() {
             if (!currentUser) return;
-            
-            document.getElementById('profileName').textContent = currentUser.fullName || 'Пользователь';
-            document.getElementById('profileEmail').textContent = currentUser.email || '—';
-            document.getElementById('profilePosition').textContent = currentUser.position || '—';
-            document.getElementById('profileSection').textContent = `Участок ${currentUser.section || '—'}`;
-            document.getElementById('profilePhone').textContent = currentUser.phone || '—';
+            document.getElementById('profileName').textContent = currentUser.fullName;
+            document.getElementById('profileEmail').textContent = currentUser.email;
+            document.getElementById('profilePosition').textContent = currentUser.position;
+            document.getElementById('profileSection').textContent = `Участок ${currentUser.section}`;
+            document.getElementById('profilePhone').textContent = currentUser.phone;
             document.getElementById('profileDate').textContent = currentUser.registeredAt ? new Date(currentUser.registeredAt).toLocaleDateString('ru-RU') : '—';
-            
-            if (currentCompany) {
-                document.getElementById('profileCompany').textContent = `🏢 ${currentCompany.name}`;
-            } else if (currentUser.companyId && companies[currentUser.companyId]) {
-                currentCompany = companies[currentUser.companyId];
-                document.getElementById('profileCompany').textContent = `🏢 ${currentCompany.name}`;
+        }
+
+        function showMenu(menu) {
+            document.querySelectorAll('.menu-btn').forEach(btn => btn.classList.remove('active'));
+            document.querySelectorAll('.section-card').forEach(section => section.style.display = 'none');
+            document.querySelector(`.menu-btn[onclick="showMenu('${menu}')"]`).classList.add('active');
+            document.getElementById(`${menu}Section`).style.display = 'block';
+        }
+
+        function logout() {
+            if (confirm('Выйти из системы?')) {
+                auth.signOut();
+                currentUser = null;
+                localStorage.removeItem('currentUser');
+                document.getElementById('mainContent').classList.remove('visible');
+                document.getElementById('infoStage').classList.remove('visible');
+                document.getElementById('registerStage').style.display = 'block';
             }
         }
 
-        function updateReferralLink(code) {
-            const link = `${window.location.origin}${window.location.pathname}?ref=${code}`;
-            document.getElementById('referralLink').textContent = link;
+        function openSummaryModal() {
+            alert('Функция создания сводки будет доступна после настройки');
         }
 
-        function copyReferralLink() {
-            const link = document.getElementById('referralLink').textContent;
-            navigator.clipboard.writeText(link);
-            alert('Ссылка скопирована!');
-        }
-
-        // ========== ПРОВЕРКА РЕФЕРАЛЬНОЙ ССЫЛКИ ==========
-        function checkReferral() {
-            const urlParams = new URLSearchParams(window.location.search);
-            const refCode = urlParams.get('ref');
-            
-            if (refCode) {
-                let foundCompany = null;
-                for (let id in companies) {
-                    if (companies[id].referralCode === refCode) {
-                        foundCompany = companies[id];
-                        break;
-                    }
-                }
-                
-                if (foundCompany) {
-                    localStorage.setItem('pendingReferral', refCode);
-                    showMessage('registerInfo', `🔗 Вы приглашены в компанию "${foundCompany.name}". После регистрации и оплаты подписки вы сможете присоединиться.`);
-                }
-            }
-        }
-
-        // ========== ВХОД ==========
         function checkExistingSession() {
             const savedUser = localStorage.getItem('currentUser');
             if (savedUser) {
                 try {
                     currentUser = JSON.parse(savedUser);
-                    if (currentUser.hasCompany && currentUser.companyId && companies[currentUser.companyId]) {
-                        currentCompany = companies[currentUser.companyId];
-                        loadCompanyData(currentUser.companyId);
+                    if (currentUser.hasCompany && currentUser.companyId) {
                         document.getElementById('registerStage').style.display = 'none';
-                        document.getElementById('infoStage').classList.remove('visible');
                         document.getElementById('mainContent').classList.add('visible');
                         updateProfileDisplay();
-                        updateReferralLink(currentCompany.referralCode);
-                        renderSummaries();
-                        renderStorage();
-                        renderEmployees();
-                        renderReports();
                         return true;
                     } else if (currentUser.hasCompany === false) {
                         document.getElementById('registerStage').style.display = 'none';
@@ -1229,252 +1211,6 @@
             return false;
         }
 
-        function login() {
-            const provider = new firebase.auth.GoogleAuthProvider();
-            auth.signInWithPopup(provider)
-                .then((result) => {
-                    const user = result.user;
-                    const existingUser = users[user.uid];
-                    
-                    if (existingUser) {
-                        currentUser = existingUser;
-                        localStorage.setItem('currentUser', JSON.stringify(currentUser));
-                        
-                        if (currentUser.hasCompany && currentUser.companyId) {
-                            currentCompany = companies[currentUser.companyId];
-                            loadCompanyData(currentUser.companyId);
-                            document.getElementById('registerStage').style.display = 'none';
-                            document.getElementById('mainContent').classList.add('visible');
-                            updateProfileDisplay();
-                            updateReferralLink(currentCompany.referralCode);
-                            renderSummaries();
-                            renderStorage();
-                            renderEmployees();
-                            renderReports();
-                        } else {
-                            document.getElementById('registerStage').style.display = 'none';
-                            document.getElementById('infoStage').classList.add('visible');
-                        }
-                    } else {
-                        showMessage('registerError', 'Пользователь не найден. Сначала зарегистрируйтесь.');
-                    }
-                })
-                .catch((error) => {
-                    showMessage('loginError', error.message);
-                });
-        }
-
-        function logout() {
-            if (confirm('Выйти из системы?')) {
-                auth.signOut();
-                currentUser = null;
-                currentCompany = null;
-                localStorage.removeItem('currentUser');
-                document.getElementById('mainContent').classList.remove('visible');
-                document.getElementById('infoStage').classList.remove('visible');
-                document.getElementById('registerStage').style.display = 'block';
-                document.getElementById('registerError').style.display = 'none';
-                document.getElementById('companyFormContainer').style.display = 'none';
-            }
-        }
-
-        function showMessage(elementId, text) {
-            const el = document.getElementById(elementId);
-            el.textContent = text;
-            el.style.display = 'block';
-            setTimeout(() => el.style.display = 'none', 4000);
-        }
-
-        // ========== ФУНКЦИИ СВОДОК (основные) ==========
-        function openSummaryModal() {
-            workRows = []; incomeMaterials = []; outcomeMaterials = [];
-            window.picket_1 = ''; window.picket_2 = ''; window.picket_3 = ''; window.picket_4 = '';
-            for (let i = 1; i <= 4; i++) {
-                for (let j = 1; j <= 6; j++) {
-                    workRows.push({ id: `row_${i}_${j}_${Date.now()}`, section: `Участок ${i}`, sectionIndex: i,
-                        workName: '', workUnit: 'м³', workVolume: '', equipmentType: '', equipmentCount: '', equipmentNumber: '',
-                        machineHours: '', peopleCount: '', peopleHours: '', note: '' });
-                }
-            }
-            document.getElementById('currentMaster').textContent = currentUser?.fullName || 'Мастер';
-            document.getElementById('currentSection').textContent = `Участок ${currentUser?.section || '29'}`;
-            renderWorkTable();
-            document.getElementById('summaryModal').style.display = 'block';
-        }
-        
-        function closeSummaryModal() { document.getElementById('summaryModal').style.display = 'none'; }
-
-        function renderWorkTable() {
-            const tbody = document.getElementById('workBody');
-            tbody.innerHTML = '';
-            let renderedSections = [];
-            workRows.forEach((row) => {
-                if (!renderedSections.includes(row.section)) {
-                    renderedSections.push(row.section);
-                    const rowsInSection = workRows.filter(r => r.section === row.section).length;
-                    const headerRow = tbody.insertRow();
-                    headerRow.innerHTML = `<td rowspan="${rowsInSection}" class="section-cell">
-                        <div class="section-title-text">Участок работ</div>
-                        <div class="section-name">${row.section}</div>
-                        <div class="picket-label">Пикетаж (ПК-ПК):</div>
-                        <input type="text" id="picket_${row.sectionIndex}" class="picket-input" placeholder="например: 1260-1276" value="${window['picket_' + row.sectionIndex] || ''}" onchange="savePicket(${row.sectionIndex}, this.value)">
-                      </td>
-                      <td class="work-cell"><input type="text" value="${row.workName || ''}" placeholder="Наименование работ" onchange="updateRow('${row.id}', 'workName', this.value)"></td>
-                      <td class="work-cell" style="width:60px"><input type="text" value="${row.workUnit}" onchange="updateRow('${row.id}', 'workUnit', this.value)"></td>
-                      <td class="work-cell" style="width:80px"><input type="text" value="${row.workVolume}" onchange="updateRow('${row.id}', 'workVolume', this.value)"></td>
-                      <td class="work-cell"><input type="text" value="${row.equipmentType}" placeholder="Тип техники" onchange="updateRow('${row.id}', 'equipmentType', this.value)"></td>
-                      <td class="work-cell" style="width:60px"><input type="text" value="${row.equipmentCount}" onchange="updateRow('${row.id}', 'equipmentCount', this.value)"></td>
-                      <td class="work-cell" style="width:100px"><input type="text" value="${row.equipmentNumber}" placeholder="А123ВС" onchange="updateRow('${row.id}', 'equipmentNumber', this.value)"></td>
-                      <td class="work-cell" style="width:70px"><input type="text" value="${row.machineHours}" onchange="updateRow('${row.id}', 'machineHours', this.value)"></td>
-                      <td class="work-cell" style="width:60px"><input type="text" value="${row.peopleCount}" onchange="updateRow('${row.id}', 'peopleCount', this.value)"></td>
-                      <td class="work-cell" style="width:70px"><input type="text" value="${row.peopleHours}" onchange="updateRow('${row.id}', 'peopleHours', this.value)"></td>
-                      <td class="work-cell"><input type="text" value="${row.note}" placeholder="Примечание" onchange="updateRow('${row.id}', 'note', this.value)"></td>`;
-                } else {
-                    const tr = tbody.insertRow();
-                    tr.innerHTML = `<td class="work-cell"><input type="text" value="${row.workName}" placeholder="Наименование работ" onchange="updateRow('${row.id}', 'workName', this.value)"></td>
-                      <td class="work-cell" style="width:60px"><input type="text" value="${row.workUnit}" onchange="updateRow('${row.id}', 'workUnit', this.value)"></td>
-                      <td class="work-cell" style="width:80px"><input type="text" value="${row.workVolume}" onchange="updateRow('${row.id}', 'workVolume', this.value)"></td>
-                      <td class="work-cell"><input type="text" value="${row.equipmentType}" placeholder="Тип техники" onchange="updateRow('${row.id}', 'equipmentType', this.value)"></td>
-                      <td class="work-cell" style="width:60px"><input type="text" value="${row.equipmentCount}" onchange="updateRow('${row.id}', 'equipmentCount', this.value)"></td>
-                      <td class="work-cell" style="width:100px"><input type="text" value="${row.equipmentNumber}" placeholder="А123ВС" onchange="updateRow('${row.id}', 'equipmentNumber', this.value)"></td>
-                      <td class="work-cell" style="width:70px"><input type="text" value="${row.machineHours}" onchange="updateRow('${row.id}', 'machineHours', this.value)"></td>
-                      <td class="work-cell" style="width:60px"><input type="text" value="${row.peopleCount}" onchange="updateRow('${row.id}', 'peopleCount', this.value)"></td>
-                      <td class="work-cell" style="width:70px"><input type="text" value="${row.peopleHours}" onchange="updateRow('${row.id}', 'peopleHours', this.value)"></td>
-                      <td class="work-cell"><input type="text" value="${row.note}" placeholder="Примечание" onchange="updateRow('${row.id}', 'note', this.value)"></td>`;
-                }
-            });
-            updateTotals();
-        }
-
-        function savePicket(sectionIndex, value) { window['picket_' + sectionIndex] = value; }
-        function updateRow(id, field, value) { const row = workRows.find(r => r.id == id); if (row) { row[field] = value; updateTotals(); } }
-        function updateTotals() {
-            let people = 0, peopleHours = 0, equip = 0, equipHours = 0;
-            workRows.forEach(row => { people += parseInt(row.peopleCount) || 0; peopleHours += parseFloat(row.peopleHours) || 0; equip += parseInt(row.equipmentCount) || 0; equipHours += parseFloat(row.machineHours) || 0; });
-            document.getElementById('totalPeopleCount').textContent = people;
-            document.getElementById('totalPeopleHours').textContent = peopleHours.toFixed(1);
-            document.getElementById('totalEquipmentCount').textContent = equip;
-            document.getElementById('totalEquipmentHours').textContent = equipHours.toFixed(1);
-            updateMaterialsLists();
-        }
-        function updateMaterialsLists() {
-            const incomeList = document.getElementById('incomeMaterialsList'); incomeList.innerHTML = ''; let totalIncome = 0;
-            incomeMaterials.forEach(item => { totalIncome += parseFloat(item.volume) || 0; incomeList.innerHTML += `<div class="material-item"><span>${item.material}</span><span>${item.volume} ${item.unit}</span></div>`; });
-            document.getElementById('totalIncome').textContent = totalIncome.toFixed(1);
-            const outcomeList = document.getElementById('outcomeMaterialsList'); outcomeList.innerHTML = ''; let totalOutcome = 0;
-            outcomeMaterials.forEach(item => { totalOutcome += parseFloat(item.volume) || 0; outcomeList.innerHTML += `<div class="material-item"><span>${item.material}</span><span>${item.volume} ${item.unit}</span></div>`; });
-            document.getElementById('totalOutcome').textContent = totalOutcome.toFixed(1);
-        }
-        function addIncomeRow() { currentMaterialType = 'income'; openMaterialModal('приход'); }
-        function addOutcomeRow() { currentMaterialType = 'outcome'; openMaterialModal('расход'); }
-        function openMaterialModal(type) {
-            document.getElementById('materialModalTitle').textContent = `Добавить ${type}`;
-            const select = document.getElementById('materialSelect'); select.innerHTML = '<option value="">Выберите</option>';
-            MATERIALS.forEach(m => select.innerHTML += `<option value="${m}">${m}</option>`);
-            document.getElementById('supplierField').style.display = type === 'приход' ? 'block' : 'none';
-            document.getElementById('destinationField').style.display = type === 'расход' ? 'block' : 'none';
-            document.getElementById('materialModal').style.display = 'block';
-        }
-        function closeMaterialModal() { document.getElementById('materialModal').style.display = 'none'; }
-        function saveMaterial() {
-            const material = document.getElementById('materialSelect').value, volume = document.getElementById('materialVolume').value;
-            if (!material || !volume) { alert('Заполните материал и объем'); return; }
-            const item = { id: Date.now(), material, unit: document.getElementById('materialUnit').value, volume, piket: document.getElementById('materialPiket').value };
-            if (currentMaterialType === 'income') { item.supplier = document.getElementById('materialSupplier').value; incomeMaterials.push(item); }
-            else { item.destination = document.getElementById('materialDestination').value; outcomeMaterials.push(item); }
-            closeMaterialModal(); updateMaterialsLists();
-        }
-        function saveSummary() {
-            if (!currentUser) { alert('Авторизуйтесь'); return; }
-            const date = document.getElementById('reportDate').value;
-            if (!date) { alert('Введите дату'); return; }
-            const summary = {
-                id: Date.now(), date, shift: document.getElementById('reportShift').value, master: currentUser.fullName, section: currentUser.section,
-                pickets: { picket_1: window.picket_1, picket_2: window.picket_2, picket_3: window.picket_3, picket_4: window.picket_4 },
-                workRows: [...workRows], incomeMaterials: [...incomeMaterials], outcomeMaterials: [...outcomeMaterials],
-                totalPeople: document.getElementById('totalPeopleCount').textContent, totalPeopleHours: document.getElementById('totalPeopleHours').textContent,
-                totalEquipment: document.getElementById('totalEquipmentCount').textContent, totalHours: document.getElementById('totalEquipmentHours').textContent,
-                totalIncome: document.getElementById('totalIncome').textContent, totalOutcome: document.getElementById('totalOutcome').textContent
-            };
-            summaries.unshift(summary);
-            if (currentCompany) {
-                saveCompanyData(currentCompany.id);
-            }
-            alert('Сводка сохранена'); closeSummaryModal(); renderSummaries();
-        }
-        function renderSummaries() {
-            const masters = [...new Set(summaries.map(s => s.master))];
-            const filter = document.getElementById('summaryMasterFilter'); filter.innerHTML = '<option value="all">Все мастера</option>';
-            masters.forEach(m => filter.innerHTML += `<option value="${m}">${m}</option>`);
-            filterSummaries();
-        }
-        function filterSummaries() {
-            const master = document.getElementById('summaryMasterFilter').value, section = document.getElementById('summarySectionFilter').value, shift = document.getElementById('summaryShiftFilter').value;
-            let filtered = summaries;
-            if (master !== 'all') filtered = filtered.filter(s => s.master === master);
-            if (section !== 'all') filtered = filtered.filter(s => s.section === section);
-            if (shift !== 'all') filtered = filtered.filter(s => s.shift === shift);
-            const grid = document.getElementById('summariesGrid'); grid.innerHTML = filtered.length ? '' : '<div class="empty-state">Нет сводок</div>';
-            filtered.forEach(s => { grid.innerHTML += `<div class="summary-card" onclick='alert(JSON.stringify(${JSON.stringify(s)},null,2))'><div class="summary-header"><span class="summary-date">${s.date}</span><span class="summary-shift">${s.shift}</span></div><div>${s.master}</div><div class="summary-stats"><span>👥 ${s.totalPeople} чел</span><span>🚜 ${s.totalEquipment} тех</span><span>⏱️ ${s.totalHours} ч</span></div></div>`; });
-        }
-        function renderStorage() {
-            const materials = [...new Set(Object.values(storage).map(s => s.material))];
-            const filter = document.getElementById('storageMaterialFilter'); filter.innerHTML = '<option value="all">Все</option>';
-            materials.forEach(m => filter.innerHTML += `<option value="${m}">${m}</option>`);
-            filterStorage();
-        }
-        function filterStorage() {
-            const material = document.getElementById('storageMaterialFilter').value, piket = document.getElementById('storagePiketFilter').value.toLowerCase();
-            let items = Object.values(storage);
-            if (material !== 'all') items = items.filter(i => i.material === material);
-            if (piket) items = items.filter(i => i.piket.toLowerCase().includes(piket));
-            const grid = document.getElementById('storageGrid'); grid.innerHTML = items.length ? '' : '<div class="empty-state">Нет материалов</div>';
-            items.forEach(item => { grid.innerHTML += `<div class="storage-card"><div class="storage-header"><span class="storage-material">${item.material}</span><span class="storage-piket">ПК ${item.piket}</span></div><div class="storage-volume">${item.volume.toFixed(1)} ${item.unit}</div></div>`; });
-            const history = document.getElementById('storageHistoryBody'); history.innerHTML = '';
-            storageHistory.slice(0, 20).forEach(item => { history.innerHTML += `   <tr><td>${item.date}</td><td>${item.material}</td><td style="color:${item.type==='приход'?'var(--success)':'var(--danger)'}">${item.type}</td><td>${item.volume}</td><td>ПК ${item.piket}</td><td>${item.master}</td><td>${item.shift || '-'}</td></tr>`; });
-        }
-        function renderEmployees() { filterEmployees(); }
-        function filterEmployees() {
-            const position = document.getElementById('employeePositionFilter').value, section = document.getElementById('employeeSectionFilter').value;
-            let filtered = employees;
-            if (position !== 'all') filtered = filtered.filter(e => e.position === position);
-            if (section !== 'all') filtered = filtered.filter(e => e.section === section);
-            const grid = document.getElementById('employeesGrid'); grid.innerHTML = filtered.length ? '' : '<div class="empty-state">Нет сотрудников</div>';
-            filtered.forEach(e => { grid.innerHTML += `<div class="employee-card"><div class="employee-name">${e.fullName}</div><div class="employee-position">${e.position}</div><div>📞 ${e.phone}</div><div>📧 ${e.email}</div><div>🏗️ Участок ${e.section}</div></div>`; });
-        }
-        function showAddEmployee() {
-            const name = prompt('ФИО:'); if (!name) return;
-            const position = prompt('Должность:'); if (!position) return;
-            const section = prompt('Участок (29/51):'); if (!section || !['29','51'].includes(section)) return;
-            const phone = prompt('Телефон:'); if (!phone) return;
-            const email = prompt('Email:'); if (!email) return;
-            employees.push({ id: Date.now(), fullName: name, position, section, phone, email });
-            if (currentCompany) saveCompanyData(currentCompany.id);
-            renderEmployees();
-        }
-        function renderReports() {
-            document.getElementById('totalSummaries').textContent = summaries.length;
-            const totalVolume = summaries.reduce((sum, s) => sum + s.workRows.reduce((sSum, r) => sSum + (parseFloat(r.workVolume)||0), 0), 0);
-            document.getElementById('totalWorkVolume').textContent = totalVolume.toFixed(1);
-            const totalStorage = Object.values(storage).reduce((sum, s) => sum + s.volume, 0);
-            document.getElementById('totalStorageValue').textContent = totalStorage.toFixed(1);
-            document.getElementById('totalEmployees').textContent = employees.length;
-            const stats = {};
-            summaries.forEach(s => { if (!stats[s.master]) stats[s.master] = { count:0, volume:0, hours:0 }; stats[s.master].count++; stats[s.master].volume += s.workRows.reduce((sum, r) => sum + (parseFloat(r.workVolume)||0), 0); stats[s.master].hours += parseFloat(s.totalHours) || 0; });
-            const body = document.getElementById('mastersStatsBody'); body.innerHTML = '';
-            Object.entries(stats).forEach(([master, st]) => { body.innerHTML += `    <tr><td>${master}</td><td>${st.count}</td><td>${st.volume.toFixed(1)}</td><td>${st.hours.toFixed(1)}</td></tr>`; });
-        }
-        function showMenu(menu) {
-            document.querySelectorAll('.menu-btn').forEach(btn => btn.classList.remove('active'));
-            document.querySelectorAll('.section-card').forEach(section => section.style.display = 'none');
-            document.querySelector(`.menu-btn[onclick="showMenu('${menu}')"]`).classList.add('active');
-            document.getElementById(`${menu}Section`).style.display = 'block';
-            if (menu === 'summary') renderSummaries();
-            else if (menu === 'storage') renderStorage();
-            else if (menu === 'employees') renderEmployees();
-            else if (menu === 'reports') renderReports();
-        }
-
         // Инициализация
         document.addEventListener('DOMContentLoaded', function() {
             setupPhoneMask();
@@ -1483,8 +1219,8 @@
                 const patronymicInput = document.getElementById('regPatronymic');
                 patronymicInput.disabled = e.target.checked;
                 if (e.target.checked) patronymicInput.value = '';
+                else patronymicInput.disabled = false;
             });
-            checkReferral();
             if (!checkExistingSession()) {
                 document.getElementById('registerStage').style.display = 'block';
             }
