@@ -305,29 +305,36 @@
             overflow-x: auto;
             margin-bottom: 20px;
             background: var(--bg-card);
-            border-radius: 8px;
-            padding: 10px;
+            border-radius: 12px;
+            padding: 0;
+            border: 1px solid var(--border);
         }
 
         .work-table {
             width: 100%;
             border-collapse: collapse;
-            font-size: 12px;
+            font-size: 13px;
             background: var(--bg-secondary);
+            border-radius: 12px;
+            overflow: hidden;
         }
 
         .work-table th {
             background: var(--bg-primary);
             color: var(--text-secondary);
-            padding: 8px 4px;
+            font-weight: 600;
+            padding: 12px 8px;
+            text-align: center;
+            font-size: 12px;
             border: 1px solid var(--border);
-            font-size: 11px;
+            white-space: nowrap;
         }
 
         .work-table td {
-            padding: 4px;
+            padding: 8px 6px;
             border: 1px solid var(--border);
             color: var(--text-primary);
+            vertical-align: middle;
         }
 
         .work-table input {
@@ -336,32 +343,71 @@
             border: none;
             color: var(--text-primary);
             text-align: center;
-            font-size: 11px;
+            font-size: 12px;
+            padding: 6px 4px;
         }
 
-        .section-header {
-            background: var(--accent) !important;
+        .work-table input:focus {
+            outline: none;
+            background: var(--bg-primary);
+            border-radius: 4px;
         }
-        
-        .section-header td {
-            background: var(--accent);
-            padding: 10px;
+
+        .work-table input::placeholder {
+            color: var(--text-secondary);
+            opacity: 0.5;
         }
-        
-        .section-header input {
-            background: white;
-            color: black;
-            padding: 8px 15px;
-            border-radius: 5px;
-            border: none;
-            width: 300px;
-            font-size: 14px;
-            transition: all 0.3s;
+
+        .section-cell {
+            background: linear-gradient(135deg, var(--bg-card) 0%, var(--bg-secondary) 100%);
+            vertical-align: top;
+            padding: 15px;
+            min-width: 220px;
+            border-right: 2px solid var(--accent);
         }
-        
-        .section-header input:focus {
-            outline: 2px solid var(--success);
-            transform: scale(1.02);
+
+        .section-title-text {
+            font-size: 11px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            color: var(--accent);
+            font-weight: 600;
+            margin-bottom: 8px;
+        }
+
+        .section-name {
+            font-size: 16px;
+            font-weight: bold;
+            color: var(--text-primary);
+            margin-bottom: 12px;
+        }
+
+        .picket-label {
+            font-size: 11px;
+            color: var(--text-secondary);
+            margin-bottom: 6px;
+        }
+
+        .picket-input {
+            background: var(--bg-primary);
+            color: var(--text-primary);
+            padding: 8px 10px;
+            border-radius: 8px;
+            border: 1px solid var(--accent);
+            width: 100%;
+            font-size: 13px;
+            text-align: center;
+            transition: all 0.2s;
+        }
+
+        .picket-input:focus {
+            outline: none;
+            border-color: var(--success);
+            box-shadow: 0 0 5px rgba(58, 107, 75, 0.3);
+        }
+
+        .work-cell {
+            background: var(--bg-secondary);
         }
 
         .totals-container {
@@ -431,6 +477,12 @@
             padding: 15px;
             border: 1px solid var(--border);
             cursor: pointer;
+            transition: transform 0.2s;
+        }
+
+        .summary-card:hover {
+            transform: translateX(5px);
+            border-color: var(--accent);
         }
 
         .summary-header {
@@ -448,6 +500,7 @@
             border-radius: 12px;
             background: var(--shift);
             color: white;
+            font-size: 11px;
         }
 
         .storage-grid {
@@ -518,6 +571,25 @@
             border: 1px dashed var(--border);
         }
 
+        .info-row {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 15px;
+            margin-bottom: 20px;
+            padding: 15px;
+            background: var(--bg-card);
+            border-radius: 8px;
+            border: 1px solid var(--border);
+        }
+
+        .info-label {
+            color: var(--text-secondary);
+            font-size: 11px;
+            text-transform: uppercase;
+            display: block;
+            margin-bottom: 5px;
+        }
+
         @media (max-width: 768px) {
             .auth-card {
                 padding: 20px;
@@ -549,14 +621,19 @@
                 padding: 20px;
             }
             
-            .section-header td div {
-                flex-direction: column;
-                align-items: flex-start !important;
-                gap: 10px !important;
+            .info-row {
+                grid-template-columns: 1fr;
+                gap: 10px;
             }
             
-            .section-header input {
-                width: 100%;
+            .section-cell {
+                min-width: 180px;
+            }
+            
+            .work-table th,
+            .work-table td {
+                font-size: 11px;
+                padding: 6px 4px;
             }
         }
     </style>
@@ -649,7 +726,7 @@
             </div>
         </div>
 
-        <!-- Основной контент (после входа) -->
+        <!-- Основной контент -->
         <div id="mainContent" class="main-content">
             <div class="top-menu">
                 <button class="menu-btn active" onclick="showMenu('summary')">📋 Сводки</button>
@@ -708,7 +785,7 @@
                                     <th>Пикет</th>
                                     <th>Мастер</th>
                                     <th>Смена</th>
-                                </tr>
+                                 </tr>
                             </thead>
                             <tbody id="storageHistoryBody"></tbody>
                         </table>
@@ -768,7 +845,7 @@
                                     <th>Кол-во сводок</th>
                                     <th>Объем работ</th>
                                     <th>Маш-часы</th>
-                                </tr>
+                                 </tr>
                             </thead>
                             <tbody id="mastersStatsBody"></tbody>
                         </table>
@@ -785,38 +862,43 @@
             <button class="btn" onclick="closeSummaryModal()">✕ Закрыть</button>
         </div>
 
-        <div class="info-row" style="display: grid; grid-template-columns: repeat(4,1fr); gap:15px; margin-bottom:20px;">
-            <div><span class="info-label">Дата:</span><input type="text" id="reportDate" placeholder="28.10.2024"></div>
-            <div><span class="info-label">Смена:</span>
-                <select id="reportShift">
+        <div class="info-row">
+            <div class="info-item">
+                <span class="info-label">Дата:</span>
+                <input type="text" id="reportDate" placeholder="28.10.2024" style="background: var(--bg-primary); border:1px solid var(--border); padding:8px; border-radius:6px; color: var(--text-primary); width:100%;">
+            </div>
+            <div class="info-item">
+                <span class="info-label">Смена:</span>
+                <select id="reportShift" style="background: var(--bg-primary); border:1px solid var(--border); padding:8px; border-radius:6px; color: var(--text-primary); width:100%;">
                     <option value="день">День</option>
                     <option value="ночь">Ночь</option>
                 </select>
             </div>
-            <div><span class="info-label">Мастер:</span><span id="currentMaster">—</span></div>
-            <div><span class="info-label">Участок:</span><span id="currentSection">—</span></div>
+            <div class="info-item">
+                <span class="info-label">Мастер:</span>
+                <span id="currentMaster" style="color: var(--text-primary);">—</span>
+            </div>
+            <div class="info-item">
+                <span class="info-label">Участок:</span>
+                <span id="currentSection" style="color: var(--text-primary);">—</span>
+            </div>
         </div>
 
         <div class="table-container">
             <table class="work-table" id="workTable">
                 <thead>
                     <tr>
-                        <th rowspan="2">№</th>
-                        <th rowspan="2">Участок</th>
-                        <th colspan="3">Работы</th>
-                        <th colspan="4">Техника</th>
-                        <th rowspan="2">Чел.</th>
-                        <th rowspan="2">Чел-ч</th>
-                        <th rowspan="2">Прим.</th>
-                    </tr>
-                    <tr>
-                        <th>Наименование</th>
-                        <th>Ед.</th>
-                        <th>Объем</th>
-                        <th>Тип</th>
-                        <th>Кол-во</th>
-                        <th>Гос №</th>
-                        <th>Маш-ч</th>
+                        <th>Участок работ<br>(ПК-ПК)</th>
+                        <th>Наименование работ</th>
+                        <th style="width: 60px;">Ед.</th>
+                        <th style="width: 80px;">Объем</th>
+                        <th>Тип техники</th>
+                        <th style="width: 60px;">Кол-во</th>
+                        <th style="width: 100px;">Гос. номер</th>
+                        <th style="width: 70px;">Маш-ч</th>
+                        <th style="width: 60px;">Чел.</th>
+                        <th style="width: 70px;">Чел-ч</th>
+                        <th>Примечание</th>
                     </tr>
                 </thead>
                 <tbody id="workBody"></tbody>
@@ -1171,44 +1253,52 @@
             tbody.innerHTML = '';
             
             let renderedSections = [];
-            let rowNumber = 1;
             
             workRows.forEach((row) => {
                 if (!renderedSections.includes(row.section)) {
                     renderedSections.push(row.section);
                     
+                    const rowsInSection = workRows.filter(r => r.section === row.section).length;
+                    
                     const headerRow = tbody.insertRow();
-                    headerRow.className = 'section-header';
                     headerRow.innerHTML = `
-                        <td colspan="13">
-                            <div style="display: flex; align-items: center; gap: 20px; flex-wrap: wrap;">
-                                <span style="color: white; font-weight: bold; min-width: 150px;">📍 ${row.section}</span>
-                                <span style="color: white;">Участок работ (ПК-ПК):</span>
-                                <input type="text" 
-                                       id="picket_${row.sectionIndex}" 
-                                       placeholder="например: 1260-1276" 
-                                       value="${window['picket_' + row.sectionIndex] || ''}"
-                                       onchange="savePicket(${row.sectionIndex}, this.value)">
-                            </div>
+                        <td rowspan="${rowsInSection}" class="section-cell">
+                            <div class="section-title-text">Участок работ</div>
+                            <div class="section-name">${row.section}</div>
+                            <div class="picket-label">Пикетаж (ПК-ПК):</div>
+                            <input type="text" 
+                                   id="picket_${row.sectionIndex}" 
+                                   class="picket-input"
+                                   placeholder="например: 1260-1276" 
+                                   value="${window['picket_' + row.sectionIndex] || ''}"
+                                   onchange="savePicket(${row.sectionIndex}, this.value)">
                         </td>
+                        <td class="work-cell"><input type="text" value="${row.workName || ''}" placeholder="Наименование работ" onchange="updateRow('${row.id}', 'workName', this.value)"></td>
+                        <td class="work-cell" style="width: 60px;"><input type="text" value="${row.workUnit || 'м³'}" onchange="updateRow('${row.id}', 'workUnit', this.value)"></td>
+                        <td class="work-cell" style="width: 80px;"><input type="text" value="${row.workVolume || ''}" onchange="updateRow('${row.id}', 'workVolume', this.value)"></td>
+                        <td class="work-cell"><input type="text" value="${row.equipmentType || ''}" placeholder="Тип техники" onchange="updateRow('${row.id}', 'equipmentType', this.value)"></td>
+                        <td class="work-cell" style="width: 60px;"><input type="text" value="${row.equipmentCount || ''}" onchange="updateRow('${row.id}', 'equipmentCount', this.value)"></td>
+                        <td class="work-cell" style="width: 100px;"><input type="text" value="${row.equipmentNumber || ''}" placeholder="А123ВС" onchange="updateRow('${row.id}', 'equipmentNumber', this.value)"></td>
+                        <td class="work-cell" style="width: 70px;"><input type="text" value="${row.machineHours || ''}" onchange="updateRow('${row.id}', 'machineHours', this.value)"></td>
+                        <td class="work-cell" style="width: 60px;"><input type="text" value="${row.peopleCount || ''}" onchange="updateRow('${row.id}', 'peopleCount', this.value)"></td>
+                        <td class="work-cell" style="width: 70px;"><input type="text" value="${row.peopleHours || ''}" onchange="updateRow('${row.id}', 'peopleHours', this.value)"></td>
+                        <td class="work-cell"><input type="text" value="${row.note || ''}" placeholder="Примечание" onchange="updateRow('${row.id}', 'note', this.value)"></td>
+                    `;
+                } else {
+                    const tr = tbody.insertRow();
+                    tr.innerHTML = `
+                        <td class="work-cell"><input type="text" value="${row.workName || ''}" placeholder="Наименование работ" onchange="updateRow('${row.id}', 'workName', this.value)"></td>
+                        <td class="work-cell" style="width: 60px;"><input type="text" value="${row.workUnit || 'м³'}" onchange="updateRow('${row.id}', 'workUnit', this.value)"></td>
+                        <td class="work-cell" style="width: 80px;"><input type="text" value="${row.workVolume || ''}" onchange="updateRow('${row.id}', 'workVolume', this.value)"></td>
+                        <td class="work-cell"><input type="text" value="${row.equipmentType || ''}" placeholder="Тип техники" onchange="updateRow('${row.id}', 'equipmentType', this.value)"></td>
+                        <td class="work-cell" style="width: 60px;"><input type="text" value="${row.equipmentCount || ''}" onchange="updateRow('${row.id}', 'equipmentCount', this.value)"></td>
+                        <td class="work-cell" style="width: 100px;"><input type="text" value="${row.equipmentNumber || ''}" placeholder="А123ВС" onchange="updateRow('${row.id}', 'equipmentNumber', this.value)"></td>
+                        <td class="work-cell" style="width: 70px;"><input type="text" value="${row.machineHours || ''}" onchange="updateRow('${row.id}', 'machineHours', this.value)"></td>
+                        <td class="work-cell" style="width: 60px;"><input type="text" value="${row.peopleCount || ''}" onchange="updateRow('${row.id}', 'peopleCount', this.value)"></td>
+                        <td class="work-cell" style="width: 70px;"><input type="text" value="${row.peopleHours || ''}" onchange="updateRow('${row.id}', 'peopleHours', this.value)"></td>
+                        <td class="work-cell"><input type="text" value="${row.note || ''}" placeholder="Примечание" onchange="updateRow('${row.id}', 'note', this.value)"></td>
                     `;
                 }
-                
-                const tr = tbody.insertRow();
-                tr.innerHTML = `
-                    <td>${rowNumber++}</td>
-                    <td style="background: var(--bg-secondary); color: var(--text-secondary);">${row.section}</td>
-                    <td><input value="${row.workName}" onchange="updateRow('${row.id}','workName',this.value)"></td>
-                    <td><input value="${row.workUnit}" style="width:50px;" onchange="updateRow('${row.id}','workUnit',this.value)"></td>
-                    <td><input value="${row.workVolume}" style="width:60px;" onchange="updateRow('${row.id}','workVolume',this.value)"></td>
-                    <td><input value="${row.equipmentType}" onchange="updateRow('${row.id}','equipmentType',this.value)"></td>
-                    <td><input value="${row.equipmentCount}" style="width:50px;" onchange="updateRow('${row.id}','equipmentCount',this.value)"></td>
-                    <td><input value="${row.equipmentNumber}" style="width:70px;" onchange="updateRow('${row.id}','equipmentNumber',this.value)"></td>
-                    <td><input value="${row.machineHours}" style="width:50px;" onchange="updateRow('${row.id}','machineHours',this.value)"></td>
-                    <td><input value="${row.peopleCount}" style="width:50px;" onchange="updateRow('${row.id}','peopleCount',this.value)"></td>
-                    <td><input value="${row.peopleHours}" style="width:50px;" onchange="updateRow('${row.id}','peopleHours',this.value)"></td>
-                    <td><input value="${row.note}" onchange="updateRow('${row.id}','note',this.value)"></td>
-                `;
             });
             
             updateTotals();
@@ -1335,7 +1425,6 @@
                 return;
             }
 
-            // Собираем пикетажи
             const pickets = {
                 picket_1: window.picket_1,
                 picket_2: window.picket_2,
@@ -1485,6 +1574,7 @@
                         <td>${item.volume}</td>
                         <td>ПК ${item.piket}</td>
                         <td>${item.master}</td>
+                        <td>${item.shift || '-'}</td>
                     </tr>
                 `;
             });
