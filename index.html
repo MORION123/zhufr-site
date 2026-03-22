@@ -144,33 +144,6 @@
             color: var(--text-secondary);
         }
 
-        .phone-group {
-            display: flex;
-            gap: 10px;
-            align-items: center;
-        }
-
-        .country-code {
-            width: 90px;
-            background: var(--bg-primary);
-            border: 1px solid var(--border);
-            border-radius: 8px;
-            color: var(--text-primary);
-            padding: 12px 8px;
-            font-size: 15px;
-            text-align: center;
-        }
-
-        .phone-number {
-            flex: 1;
-            background: var(--bg-primary);
-            border: 1px solid var(--border);
-            border-radius: 8px;
-            color: var(--text-primary);
-            padding: 12px 15px;
-            font-size: 15px;
-        }
-
         .btn-primary {
             width: 100%;
             padding: 15px;
@@ -759,12 +732,6 @@
                 flex-direction: column;
                 gap: 20px;
             }
-            .phone-group {
-                flex-direction: column;
-            }
-            .country-code {
-                width: 100%;
-            }
             .features {
                 grid-template-columns: 1fr;
             }
@@ -834,24 +801,10 @@
                 </select>
             </div>
             
-            <!-- Телефон -->
+            <!-- Телефон (простое поле с автоматическим +7) -->
             <div class="form-group">
                 <label>Телефон</label>
-                <div class="phone-group">
-                    <select id="countryCode" class="country-code">
-                        <option value="+7">🇷🇺 +7</option>
-                        <option value="+375">🇧🇾 +375</option>
-                        <option value="+380">🇺🇦 +380</option>
-                        <option value="+7">🇰🇿 +7</option>
-                        <option value="+994">🇦🇿 +994</option>
-                        <option value="+374">🇦🇲 +374</option>
-                        <option value="+996">🇰🇬 +996</option>
-                        <option value="+992">🇹🇯 +992</option>
-                        <option value="+998">🇺🇿 +998</option>
-                        <option value="+373">🇲🇩 +373</option>
-                    </select>
-                    <input type="tel" id="regPhone" class="phone-number" placeholder="(900) 123-45-67">
-                </div>
+                <input type="tel" id="regPhone" placeholder="+7 (900) 123-45-67">
             </div>
             
             <!-- Email -->
@@ -930,7 +883,7 @@
             </div>
         </div>
 
-        <!-- Остальной контент (сводки, склады и т.д.) - сокращенно, полная версия будет в следующем сообщении -->
+        <!-- ЭТАП 3: ОСНОВНОЙ КОНТЕНТ -->
         <div id="mainContent" class="main-content">
             <div class="profile-info">
                 <div class="profile-header">
@@ -1011,21 +964,10 @@
         let currentUser = null;
         let pendingUserData = null;
 
-        // Маска телефона
+        // Маска телефона с +7
         function setupPhoneMask() {
             const phoneInput = document.getElementById('regPhone');
-            const countrySelect = document.getElementById('countryCode');
-            
-            function updateMask() {
-                const code = countrySelect.value;
-                if (code === '+7') Inputmask("(999) 999-99-99").mask(phoneInput);
-                else if (code === '+375') Inputmask("(99) 999-99-99").mask(phoneInput);
-                else if (code === '+380') Inputmask("(99) 999-99-99").mask(phoneInput);
-                else Inputmask("(999) 999-99-99").mask(phoneInput);
-            }
-            
-            countrySelect.addEventListener('change', updateMask);
-            updateMask();
+            Inputmask("+7 (999) 999-99-99").mask(phoneInput);
         }
 
         function validateForm() {
@@ -1036,7 +978,7 @@
             const phone = document.getElementById('regPhone').value.trim();
             const email = document.getElementById('regEmail').value.trim();
             
-            if (!lastName) return { valid: false, field: 'Фамилия' };
+            if (!lastName) return { valid: false, field: 'Фамилию' };
             if (!firstName) return { valid: false, field: 'Имя' };
             if (!noPatronymic && !patronymic) return { valid: false, field: 'Отчество' };
             if (!phone) return { valid: false, field: 'Телефон' };
@@ -1045,7 +987,7 @@
             return { valid: true, data: { lastName, firstName, patronymic: noPatronymic ? '' : patronymic, phone, email } };
         }
 
-        function showMessage(elementId, text, isError = true) {
+        function showMessage(elementId, text) {
             const el = document.getElementById(elementId);
             el.textContent = text;
             el.style.display = 'block';
@@ -1062,7 +1004,6 @@
             pendingUserData = validation.data;
             pendingUserData.position = document.getElementById('regPosition').value;
             pendingUserData.section = document.getElementById('regSection').value;
-            pendingUserData.phoneFull = document.getElementById('countryCode').value + ' ' + pendingUserData.phone;
             
             const provider = new firebase.auth.GoogleAuthProvider();
             const btn = document.getElementById('googleRegisterBtn');
@@ -1088,7 +1029,7 @@
                         patronymic: pendingUserData.patronymic,
                         position: pendingUserData.position,
                         section: pendingUserData.section,
-                        phone: pendingUserData.phoneFull,
+                        phone: pendingUserData.phone,
                         registeredAt: new Date().toISOString(),
                         hasCompany: false,
                         companyId: null
@@ -1104,6 +1045,7 @@
                     document.getElementById('infoStage').classList.add('visible');
                 })
                 .catch((error) => {
+                    console.error('Error:', error);
                     showMessage('registerError', '❌ ' + (error.message || 'Ошибка регистрации'));
                 })
                 .finally(() => {
@@ -1214,13 +1156,22 @@
         // Инициализация
         document.addEventListener('DOMContentLoaded', function() {
             setupPhoneMask();
-            document.getElementById('googleRegisterBtn').onclick = googleRegister;
-            document.getElementById('noPatronymic').addEventListener('change', function(e) {
-                const patronymicInput = document.getElementById('regPatronymic');
-                patronymicInput.disabled = e.target.checked;
-                if (e.target.checked) patronymicInput.value = '';
-                else patronymicInput.disabled = false;
-            });
+            
+            const googleBtn = document.getElementById('googleRegisterBtn');
+            if (googleBtn) {
+                googleBtn.onclick = googleRegister;
+            }
+            
+            const noPatronymicCheckbox = document.getElementById('noPatronymic');
+            if (noPatronymicCheckbox) {
+                noPatronymicCheckbox.addEventListener('change', function(e) {
+                    const patronymicInput = document.getElementById('regPatronymic');
+                    patronymicInput.disabled = e.target.checked;
+                    if (e.target.checked) patronymicInput.value = '';
+                    else patronymicInput.disabled = false;
+                });
+            }
+            
             if (!checkExistingSession()) {
                 document.getElementById('registerStage').style.display = 'block';
             }
