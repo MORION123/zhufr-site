@@ -4,6 +4,11 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=yes">
     <title>ЖУФР - Система учета строительных работ</title>
+    
+    <!-- Firebase SDK -->
+    <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-auth-compat.js"></script>
+    
     <style>
         * {
             margin: 0;
@@ -24,6 +29,7 @@
             --danger: #6b3f3f;
             --storage: #16a085;
             --shift: #2980b9;
+            --google-blue: #4285F4;
         }
 
         body {
@@ -159,8 +165,8 @@
             color: white;
         }
 
-        .btn-verify {
-            background: var(--accent);
+        .btn-google {
+            background: var(--google-blue);
             color: white;
             border: none;
             padding: 15px;
@@ -169,6 +175,43 @@
             font-size: 16px;
             width: 100%;
             margin-top: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+            transition: background 0.2s;
+        }
+
+        .btn-google:hover {
+            background: #3367d6;
+        }
+
+        .btn-google:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+        }
+
+        .divider {
+            display: flex;
+            align-items: center;
+            text-align: center;
+            margin: 20px 0;
+            color: var(--text-secondary);
+        }
+
+        .divider::before,
+        .divider::after {
+            content: '';
+            flex: 1;
+            border-bottom: 1px solid var(--border);
+        }
+
+        .divider::before {
+            margin-right: 15px;
+        }
+
+        .divider::after {
+            margin-left: 15px;
         }
 
         .error-message {
@@ -199,33 +242,6 @@
             padding: 10px;
             background: rgba(93, 109, 126, 0.2);
             border-radius: 5px;
-        }
-
-        .verify-row input {
-            width: 100%;
-            padding: 15px;
-            background: var(--bg-primary);
-            border: 1px solid var(--border);
-            border-radius: 8px;
-            color: var(--text-primary);
-            font-size: 18px;
-            text-align: center;
-        }
-
-        .timer {
-            color: var(--success);
-            font-size: 16px;
-            text-align: center;
-            margin: 10px 0;
-        }
-
-        #verificationBlock {
-            display: none;
-            margin-top: 20px;
-            padding: 20px;
-            background: var(--bg-card);
-            border-radius: 10px;
-            border: 2px solid var(--accent);
         }
 
         .main-content {
@@ -353,11 +369,6 @@
             border-radius: 4px;
         }
 
-        .work-table input::placeholder {
-            color: var(--text-secondary);
-            opacity: 0.5;
-        }
-
         .section-cell {
             background: linear-gradient(135deg, var(--bg-card) 0%, var(--bg-secondary) 100%);
             vertical-align: top;
@@ -397,17 +408,6 @@
             width: 100%;
             font-size: 13px;
             text-align: center;
-            transition: all 0.2s;
-        }
-
-        .picket-input:focus {
-            outline: none;
-            border-color: var(--success);
-            box-shadow: 0 0 5px rgba(58, 107, 75, 0.3);
-        }
-
-        .work-cell {
-            background: var(--bg-secondary);
         }
 
         .totals-container {
@@ -477,12 +477,6 @@
             padding: 15px;
             border: 1px solid var(--border);
             cursor: pointer;
-            transition: transform 0.2s;
-        }
-
-        .summary-card:hover {
-            transform: translateX(5px);
-            border-color: var(--accent);
         }
 
         .summary-header {
@@ -594,46 +588,25 @@
             .auth-card {
                 padding: 20px;
             }
-            
             .form-group input,
             .form-group select {
                 font-size: 16px;
                 padding: 15px;
             }
-            
             .btn-primary,
-            .btn-verify {
+            .btn-google {
                 padding: 18px;
                 font-size: 18px;
             }
-
             .totals-container {
                 grid-template-columns: 1fr;
             }
-
-            .verify-row input {
-                font-size: 20px;
-                padding: 15px;
-            }
-
-            #verificationBlock {
-                margin-top: 20px;
-                padding: 20px;
-            }
-            
             .info-row {
                 grid-template-columns: 1fr;
                 gap: 10px;
             }
-            
             .section-cell {
                 min-width: 180px;
-            }
-            
-            .work-table th,
-            .work-table td {
-                font-size: 11px;
-                padding: 6px 4px;
             }
         }
     </style>
@@ -664,7 +637,21 @@
                 </div>
                 <div class="error-message" id="loginError"></div>
                 <button class="btn-primary" onclick="login()">ВОЙТИ</button>
-                <button class="btn" onclick="demoLogin()" style="margin-top: 10px;">🔑 ДЕМО-ВХОД</button>
+                
+                <div class="divider">или</div>
+                
+                <!-- Кнопка входа через Google -->
+                <button class="btn-google" id="googleLoginBtn">
+                    <svg width="20" height="20" viewBox="0 0 24 24">
+                        <path fill="white" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z" />
+                        <path fill="white" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z" />
+                        <path fill="white" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z" />
+                        <path fill="white" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z" />
+                    </svg>
+                    Войти через Google
+                </button>
+                
+                <button class="btn" onclick="demoLogin()" style="width:100%; margin-top:10px;">🔑 ДЕМО-ВХОД</button>
             </div>
 
             <!-- Форма регистрации -->
@@ -707,17 +694,18 @@
                     <input type="password" id="regConfirmPassword" placeholder="••••••••">
                 </div>
                 
-                <!-- Блок для ввода кода подтверждения -->
-                <div id="verificationBlock">
-                    <label style="font-size: 16px; margin-bottom: 10px; display: block;">Код подтверждения</label>
-                    <div class="verify-row">
-                        <input type="text" id="verificationCode" placeholder="Введите 6-значный код из письма">
-                        <button class="btn-verify" onclick="verifyCode()">ПОДТВЕРДИТЬ КОД</button>
-                    </div>
-                    <div class="timer" id="timer"></div>
-                    <button class="btn" onclick="sendCode()" id="resendBtn" style="width:100%; margin-top:10px;">Отправить код повторно</button>
-                </div>
-
+                <div class="divider">или</div>
+                
+                <button class="btn-google" id="googleRegisterBtn">
+                    <svg width="20" height="20" viewBox="0 0 24 24">
+                        <path fill="white" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z" />
+                        <path fill="white" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z" />
+                        <path fill="white" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z" />
+                        <path fill="white" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z" />
+                    </svg>
+                    Зарегистрироваться через Google
+                </button>
+                
                 <div class="error-message" id="registerError"></div>
                 <div class="success-message" id="registerSuccess"></div>
                 <div class="info-message" id="registerInfo"></div>
@@ -726,7 +714,7 @@
             </div>
         </div>
 
-        <!-- Основной контент -->
+        <!-- ОСНОВНОЙ КОНТЕНТ (сводки, склады, сотрудники, отчеты) -->
         <div id="mainContent" class="main-content">
             <div class="top-menu">
                 <button class="menu-btn active" onclick="showMenu('summary')">📋 Сводки</button>
@@ -736,285 +724,209 @@
                 <button class="menu-btn" onclick="logout()">🚪 Выйти</button>
             </div>
 
-            <!-- Раздел сводок -->
             <div id="summarySection" class="section-card" style="display: block;">
                 <div class="section-title">
                     <span>📋 Управление сводками</span>
                     <button class="btn btn-success" onclick="openSummaryModal()">➕ Новая сводка</button>
                 </div>
                 <div class="filters-bar">
-                    <select class="filter-select" id="summaryMasterFilter" onchange="filterSummaries()">
-                        <option value="all">Все мастера</option>
-                    </select>
-                    <select class="filter-select" id="summarySectionFilter" onchange="filterSummaries()">
-                        <option value="all">Все участки</option>
-                        <option value="29">Участок 29</option>
-                        <option value="51">Участок 51</option>
-                    </select>
-                    <select class="filter-select" id="summaryShiftFilter" onchange="filterSummaries()">
-                        <option value="all">Все смены</option>
-                        <option value="день">День</option>
-                        <option value="ночь">Ночь</option>
-                    </select>
+                    <select class="filter-select" id="summaryMasterFilter" onchange="filterSummaries()"><option value="all">Все мастера</option></select>
+                    <select class="filter-select" id="summarySectionFilter" onchange="filterSummaries()"><option value="all">Все участки</option><option value="29">Участок 29</option><option value="51">Участок 51</option></select>
+                    <select class="filter-select" id="summaryShiftFilter" onchange="filterSummaries()"><option value="all">Все смены</option><option value="день">День</option><option value="ночь">Ночь</option></select>
                 </div>
                 <div id="summariesGrid" class="summaries-grid"></div>
             </div>
 
-            <!-- Раздел складов -->
             <div id="storageSection" class="section-card" style="display: none;">
-                <div class="section-title">
-                    <span>📦 Склады материалов</span>
-                </div>
+                <div class="section-title"><span>📦 Склады материалов</span></div>
                 <div class="filters-bar">
-                    <select class="filter-select" id="storageMaterialFilter" onchange="filterStorage()">
-                        <option value="all">Все материалы</option>
-                    </select>
+                    <select class="filter-select" id="storageMaterialFilter" onchange="filterStorage()"><option value="all">Все материалы</option></select>
                     <input type="text" class="filter-select" id="storagePiketFilter" placeholder="Пикет склада" onchange="filterStorage()">
                 </div>
                 <div id="storageGrid" class="storage-grid"></div>
-                <div style="margin-top: 30px;">
-                    <h3 style="color: var(--text-primary); margin-bottom: 15px;">История движений</h3>
-                    <div class="table-container">
-                        <table class="work-table">
-                            <thead>
-                                <tr>
-                                    <th>Дата</th>
-                                    <th>Материал</th>
-                                    <th>Тип</th>
-                                    <th>Объем</th>
-                                    <th>Пикет</th>
-                                    <th>Мастер</th>
-                                    <th>Смена</th>
-                                 </tr>
-                            </thead>
-                            <tbody id="storageHistoryBody"></tbody>
-                        </table>
-                    </div>
-                </div>
+                <div style="margin-top:30px"><h3>История движений</h3><div class="table-container"><table class="work-table"><thead><tr><th>Дата</th><th>Материал</th><th>Тип</th><th>Объем</th><th>Пикет</th><th>Мастер</th><th>Смена</th></tr></thead><tbody id="storageHistoryBody"></tbody></table></div></div>
             </div>
 
-            <!-- Раздел сотрудников -->
             <div id="employeesSection" class="section-card" style="display: none;">
-                <div class="section-title">
-                    <span>👥 Сотрудники</span>
-                    <button class="btn btn-success" onclick="showAddEmployee()">➕ Добавить</button>
-                </div>
+                <div class="section-title"><span>👥 Сотрудники</span><button class="btn btn-success" onclick="showAddEmployee()">➕ Добавить</button></div>
                 <div class="filters-bar">
-                    <select class="filter-select" id="employeePositionFilter" onchange="filterEmployees()">
-                        <option value="all">Все должности</option>
-                    </select>
-                    <select class="filter-select" id="employeeSectionFilter" onchange="filterEmployees()">
-                        <option value="all">Все участки</option>
-                        <option value="29">Участок 29</option>
-                        <option value="51">Участок 51</option>
-                    </select>
+                    <select class="filter-select" id="employeePositionFilter" onchange="filterEmployees()"><option value="all">Все должности</option></select>
+                    <select class="filter-select" id="employeeSectionFilter" onchange="filterEmployees()"><option value="all">Все участки</option><option value="29">Участок 29</option><option value="51">Участок 51</option></select>
                 </div>
                 <div id="employeesGrid" class="employees-grid"></div>
             </div>
 
-            <!-- Раздел отчетов -->
             <div id="reportsSection" class="section-card" style="display: none;">
-                <div class="section-title">
-                    <span>📊 Аналитические отчеты</span>
-                </div>
+                <div class="section-title"><span>📊 Аналитические отчеты</span></div>
                 <div class="totals-container">
-                    <div class="total-block">
-                        <div class="total-title">Всего сводок</div>
-                        <div class="total-value" id="totalSummaries">0</div>
-                    </div>
-                    <div class="total-block">
-                        <div class="total-title">Общий объем работ</div>
-                        <div class="total-value" id="totalWorkVolume">0</div>
-                    </div>
-                    <div class="total-block">
-                        <div class="total-title">Материалов на складе</div>
-                        <div class="total-value" id="totalStorageValue">0</div>
-                    </div>
-                    <div class="total-block">
-                        <div class="total-title">Всего сотрудников</div>
-                        <div class="total-value" id="totalEmployees">0</div>
-                    </div>
+                    <div class="total-block"><div class="total-title">Всего сводок</div><div class="total-value" id="totalSummaries">0</div></div>
+                    <div class="total-block"><div class="total-title">Общий объем работ</div><div class="total-value" id="totalWorkVolume">0</div></div>
+                    <div class="total-block"><div class="total-title">Материалов на складе</div><div class="total-value" id="totalStorageValue">0</div></div>
+                    <div class="total-block"><div class="total-title">Всего сотрудников</div><div class="total-value" id="totalEmployees">0</div></div>
                 </div>
-                <div style="margin-top: 20px;">
-                    <h3>Статистика по мастерам</h3>
-                    <div class="table-container">
-                        <table class="work-table">
-                            <thead>
-                                <tr>
-                                    <th>Мастер</th>
-                                    <th>Кол-во сводок</th>
-                                    <th>Объем работ</th>
-                                    <th>Маш-часы</th>
-                                 </tr>
-                            </thead>
-                            <tbody id="mastersStatsBody"></tbody>
-                        </table>
-                    </div>
-                </div>
+                <div style="margin-top:20px"><h3>Статистика по мастерам</h3><div class="table-container"><table class="work-table"><thead><tr><th>Мастер</th><th>Кол-во сводок</th><th>Объем работ</th><th>Маш-часы</th></tr></thead><tbody id="mastersStatsBody"></tbody></table></div></div>
             </div>
         </div>
     </div>
 
-    <!-- Модальное окно создания сводки -->
+    <!-- Модальное окно сводки -->
     <div id="summaryModal" class="summary-modal">
-        <div class="modal-header">
-            <h2>📋 Новая сводка</h2>
-            <button class="btn" onclick="closeSummaryModal()">✕ Закрыть</button>
-        </div>
-
+        <div class="modal-header"><h2>📋 Новая сводка</h2><button class="btn" onclick="closeSummaryModal()">✕ Закрыть</button></div>
         <div class="info-row">
-            <div class="info-item">
-                <span class="info-label">Дата:</span>
-                <input type="text" id="reportDate" placeholder="28.10.2024" style="background: var(--bg-primary); border:1px solid var(--border); padding:8px; border-radius:6px; color: var(--text-primary); width:100%;">
-            </div>
-            <div class="info-item">
-                <span class="info-label">Смена:</span>
-                <select id="reportShift" style="background: var(--bg-primary); border:1px solid var(--border); padding:8px; border-radius:6px; color: var(--text-primary); width:100%;">
-                    <option value="день">День</option>
-                    <option value="ночь">Ночь</option>
-                </select>
-            </div>
-            <div class="info-item">
-                <span class="info-label">Мастер:</span>
-                <span id="currentMaster" style="color: var(--text-primary);">—</span>
-            </div>
-            <div class="info-item">
-                <span class="info-label">Участок:</span>
-                <span id="currentSection" style="color: var(--text-primary);">—</span>
-            </div>
+            <div><span class="info-label">Дата:</span><input type="text" id="reportDate" placeholder="28.10.2024"></div>
+            <div><span class="info-label">Смена:</span><select id="reportShift"><option value="день">День</option><option value="ночь">Ночь</option></select></div>
+            <div><span class="info-label">Мастер:</span><span id="currentMaster">—</span></div>
+            <div><span class="info-label">Участок:</span><span id="currentSection">—</span></div>
         </div>
-
         <div class="table-container">
             <table class="work-table" id="workTable">
-                <thead>
-                    <tr>
-                        <th>Участок работ<br>(ПК-ПК)</th>
-                        <th>Наименование работ</th>
-                        <th style="width: 60px;">Ед.</th>
-                        <th style="width: 80px;">Объем</th>
-                        <th>Тип техники</th>
-                        <th style="width: 60px;">Кол-во</th>
-                        <th style="width: 100px;">Гос. номер</th>
-                        <th style="width: 70px;">Маш-ч</th>
-                        <th style="width: 60px;">Чел.</th>
-                        <th style="width: 70px;">Чел-ч</th>
-                        <th>Примечание</th>
-                    </tr>
-                </thead>
+                <thead><tr><th>Участок работ<br>(ПК-ПК)</th><th>Наименование работ</th><th>Ед.</th><th>Объем</th><th>Тип техники</th><th>Кол-во</th><th>Гос. номер</th><th>Маш-ч</th><th>Чел.</th><th>Чел-ч</th><th>Примечание</th></tr></thead>
                 <tbody id="workBody"></tbody>
             </table>
         </div>
-
         <div class="totals-container">
-            <div class="total-block">
-                <div class="total-title">👥 ЛЮДИ</div>
-                <div class="total-row"><span>Количество:</span><span class="total-value" id="totalPeopleCount">0</span></div>
-                <div class="total-row"><span>Человеко-часы:</span><span class="total-value" id="totalPeopleHours">0</span></div>
-            </div>
-            <div class="total-block">
-                <div class="total-title">🚜 ТЕХНИКА</div>
-                <div class="total-row"><span>Количество:</span><span class="total-value" id="totalEquipmentCount">0</span></div>
-                <div class="total-row"><span>Машино-часы:</span><span class="total-value" id="totalEquipmentHours">0</span></div>
-            </div>
-            <div class="total-block">
-                <div class="total-title">📦 ПРИХОД</div>
-                <div class="materials-list" id="incomeMaterialsList"></div>
-                <div class="total-row final-total"><span>Итого:</span><span class="total-value" id="totalIncome">0</span></div>
-                <button class="btn btn-sm" onclick="addIncomeRow()" style="width:100%; margin-top:10px;">+ Приход</button>
-            </div>
-            <div class="total-block">
-                <div class="total-title">📤 РАСХОД</div>
-                <div class="materials-list" id="outcomeMaterialsList"></div>
-                <div class="total-row final-total"><span>Итого:</span><span class="total-value" id="totalOutcome">0</span></div>
-                <button class="btn btn-sm" onclick="addOutcomeRow()" style="width:100%; margin-top:10px;">+ Расход</button>
-            </div>
+            <div class="total-block"><div class="total-title">👥 ЛЮДИ</div><div class="total-row"><span>Количество:</span><span class="total-value" id="totalPeopleCount">0</span></div><div class="total-row"><span>Человеко-часы:</span><span class="total-value" id="totalPeopleHours">0</span></div></div>
+            <div class="total-block"><div class="total-title">🚜 ТЕХНИКА</div><div class="total-row"><span>Количество:</span><span class="total-value" id="totalEquipmentCount">0</span></div><div class="total-row"><span>Машино-часы:</span><span class="total-value" id="totalEquipmentHours">0</span></div></div>
+            <div class="total-block"><div class="total-title">📦 ПРИХОД</div><div class="materials-list" id="incomeMaterialsList"></div><div class="total-row final-total"><span>Итого:</span><span class="total-value" id="totalIncome">0</span></div><button class="btn btn-sm" onclick="addIncomeRow()" style="width:100%; margin-top:10px;">+ Приход</button></div>
+            <div class="total-block"><div class="total-title">📤 РАСХОД</div><div class="materials-list" id="outcomeMaterialsList"></div><div class="total-row final-total"><span>Итого:</span><span class="total-value" id="totalOutcome">0</span></div><button class="btn btn-sm" onclick="addOutcomeRow()" style="width:100%; margin-top:10px;">+ Расход</button></div>
         </div>
-
-        <div class="action-buttons">
-            <button class="btn" onclick="closeSummaryModal()">Отмена</button>
-            <button class="btn btn-success" onclick="saveSummary()">💾 СОХРАНИТЬ</button>
-        </div>
+        <div class="action-buttons"><button class="btn" onclick="closeSummaryModal()">Отмена</button><button class="btn btn-success" onclick="saveSummary()">💾 СОХРАНИТЬ</button></div>
     </div>
 
-    <!-- Модальное окно добавления материала -->
     <div id="materialModal" style="display: none; position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%); background: var(--bg-secondary); border: 1px solid var(--border); border-radius: 12px; padding: 20px; z-index: 1100; max-width: 500px; width: 90%;">
-        <h3 style="color: var(--text-primary); margin-bottom: 20px;" id="materialModalTitle">Добавить приход</h3>
-        <div class="form-group">
-            <label>Материал</label>
-            <select id="materialSelect">
-                <option value="">Выберите материал</option>
-            </select>
-        </div>
-        <div class="form-group">
-            <label>Ед. изм.</label>
-            <input type="text" id="materialUnit" value="м³">
-        </div>
-        <div class="form-group">
-            <label>Объем</label>
-            <input type="text" id="materialVolume" placeholder="0.0">
-        </div>
-        <div class="form-group">
-            <label>Пикет</label>
-            <input type="text" id="materialPiket" placeholder="ПК...">
-        </div>
-        <div class="form-group" id="supplierField">
-            <label>Поставщик</label>
-            <input type="text" id="materialSupplier" placeholder="Поставщик">
-        </div>
-        <div class="form-group" id="destinationField" style="display: none;">
-            <label>Куда</label>
-            <input type="text" id="materialDestination" placeholder="Куда">
-        </div>
-        <div class="action-buttons">
-            <button class="btn" onclick="closeMaterialModal()">Отмена</button>
-            <button class="btn btn-success" onclick="saveMaterial()">Добавить</button>
-        </div>
+        <h3 id="materialModalTitle">Добавить приход</h3>
+        <div class="form-group"><label>Материал</label><select id="materialSelect"></select></div>
+        <div class="form-group"><label>Ед. изм.</label><input type="text" id="materialUnit" value="м³"></div>
+        <div class="form-group"><label>Объем</label><input type="text" id="materialVolume" placeholder="0.0"></div>
+        <div class="form-group"><label>Пикет</label><input type="text" id="materialPiket" placeholder="ПК..."></div>
+        <div class="form-group" id="supplierField"><label>Поставщик</label><input type="text" id="materialSupplier" placeholder="Поставщик"></div>
+        <div class="form-group" id="destinationField" style="display:none"><label>Куда</label><input type="text" id="materialDestination" placeholder="Куда"></div>
+        <div class="action-buttons"><button class="btn" onclick="closeMaterialModal()">Отмена</button><button class="btn btn-success" onclick="saveMaterial()">Добавить</button></div>
     </div>
 
     <script>
+        // ========== FIREBASE КОНФИГУРАЦИЯ ==========
+        const firebaseConfig = {
+            apiKey: "AIzaSyDvbukWCKctLbDYqiDsbWK-tgzokwi-MOg",
+            authDomain: "zhufr-app.firebaseapp.com",
+            projectId: "zhufr-app",
+            storageBucket: "zhufr-app.firebasestorage.app",
+            messagingSenderId: "69139084285",
+            appId: "1:69139084285:web:629cd6b04465d279425f94"
+        };
+        
+        // Инициализация Firebase
+        firebase.initializeApp(firebaseConfig);
+        const auth = firebase.auth();
+
         // ========== ДАННЫЕ ==========
-        const MATERIALS = [
-            'ЩПС 0-80', 'Щебень 20-40', 'Щебень 40-70', 'Щебень 5-20',
-            'Бутовый камень', 'ПГС', 'Песок', 'Грунт', 'ПРС'
-        ];
-
-        // Хранилище для пикетажа участков
-        window.picket_1 = '';
-        window.picket_2 = '';
-        window.picket_3 = '';
-        window.picket_4 = '';
-
-        let users = {};
+        const MATERIALS = ['ЩПС 0-80', 'Щебень 20-40', 'Щебень 40-70', 'Щебень 5-20', 'Бутовый камень', 'ПГС', 'Песок', 'Грунт', 'ПРС'];
+        
+        window.picket_1 = ''; window.picket_2 = ''; window.picket_3 = ''; window.picket_4 = '';
+        
+        let users = JSON.parse(localStorage.getItem('users')) || {};
         let currentUser = null;
-        let pendingUser = null;
-        let currentCode = null;
-        let timerInterval = null;
-
         let summaries = JSON.parse(localStorage.getItem('summaries')) || [];
         let storage = JSON.parse(localStorage.getItem('storage')) || {};
         let storageHistory = JSON.parse(localStorage.getItem('storageHistory')) || [];
-        let employees = [];
-
+        let employees = JSON.parse(localStorage.getItem('employees')) || [];
+        
         let workRows = [];
         let incomeMaterials = [];
         let outcomeMaterials = [];
         let currentMaterialType = 'income';
 
         // ========== АВТОРИЗАЦИЯ ==========
-
         function showTab(tab) {
             document.querySelectorAll('.auth-tab').forEach(t => t.classList.remove('active'));
             document.querySelectorAll('.auth-form').forEach(f => f.classList.remove('active'));
-            
             document.querySelector(`.auth-tab[onclick="showTab('${tab}')"]`).classList.add('active');
             document.getElementById(`${tab}Form`).classList.add('active');
-            
-            if (tab === 'register') {
-                document.getElementById('verificationBlock').style.display = 'none';
-                document.getElementById('registerBtn').style.display = 'block';
+        }
+
+        function login() {
+            const email = document.getElementById('loginEmail').value.trim();
+            const password = document.getElementById('loginPassword').value;
+            if (!email || !password) { showMessage('loginError', 'Введите email и пароль'); return; }
+            const user = users[email];
+            if (!user || user.password !== password) { showMessage('loginError', 'Неверный email или пароль'); return; }
+            currentUser = user;
+            localStorage.setItem('currentUser', JSON.stringify(currentUser));
+            document.getElementById('authCard').style.display = 'none';
+            document.getElementById('mainContent').classList.add('visible');
+            updateAllSections();
+        }
+
+        function demoLogin() {
+            currentUser = { email: 'demo@mail.ru', fullName: 'Демо Пользователь', position: 'Мастер', section: '29' };
+            localStorage.setItem('currentUser', JSON.stringify(currentUser));
+            document.getElementById('authCard').style.display = 'none';
+            document.getElementById('mainContent').classList.add('visible');
+            updateAllSections();
+        }
+
+        function logout() {
+            if (confirm('Выйти?')) {
+                currentUser = null;
+                localStorage.removeItem('currentUser');
+                document.getElementById('authCard').style.display = 'block';
+                document.getElementById('mainContent').classList.remove('visible');
             }
         }
 
+        // ========== GOOGLE ВХОД ==========
+        function googleLogin() {
+            const provider = new firebase.auth.GoogleAuthProvider();
+            const btn = document.getElementById('googleLoginBtn');
+            btn.disabled = true;
+            btn.innerHTML = '⏳ Загрузка...';
+            
+            auth.signInWithPopup(provider)
+                .then((result) => {
+                    const user = result.user;
+                    const userData = {
+                        email: user.email,
+                        fullName: user.displayName,
+                        position: 'Мастер',
+                        section: '29',
+                        phone: user.phoneNumber || 'не указан',
+                        password: 'google_auth_' + user.uid,
+                        registeredAt: new Date().toISOString()
+                    };
+                    
+                    if (!users[user.email]) {
+                        users[user.email] = userData;
+                        localStorage.setItem('users', JSON.stringify(users));
+                        
+                        const newEmployee = {
+                            id: Date.now(),
+                            fullName: user.displayName,
+                            position: 'Мастер',
+                            section: '29',
+                            phone: user.phoneNumber || 'не указан',
+                            email: user.email
+                        };
+                        employees.push(newEmployee);
+                        localStorage.setItem('employees', JSON.stringify(employees));
+                    }
+                    
+                    currentUser = users[user.email];
+                    localStorage.setItem('currentUser', JSON.stringify(currentUser));
+                    document.getElementById('authCard').style.display = 'none';
+                    document.getElementById('mainContent').classList.add('visible');
+                    updateAllSections();
+                })
+                .catch((error) => {
+                    console.error('Google login error:', error);
+                    showMessage('loginError', 'Ошибка: ' + error.message);
+                })
+                .finally(() => {
+                    btn.disabled = false;
+                    btn.innerHTML = '<svg width="20" height="20" viewBox="0 0 24 24"><path fill="white" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"/><path fill="white" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"/><path fill="white" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z"/><path fill="white" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z"/></svg> Войти через Google';
+                });
+        }
+
+        // ========== РЕГИСТРАЦИЯ ==========
         function register() {
             const fullName = document.getElementById('regFullName').value.trim();
             const position = document.getElementById('regPosition').value;
@@ -1023,163 +935,21 @@
             const email = document.getElementById('regEmail').value.trim();
             const password = document.getElementById('regPassword').value;
             const confirm = document.getElementById('regConfirmPassword').value;
-
-            if (!fullName || !phone || !email || !password || !confirm) {
-                showMessage('registerError', 'Заполните все поля');
-                return;
-            }
-
-            if (password !== confirm) {
-                showMessage('registerError', 'Пароли не совпадают');
-                return;
-            }
-
-            if (users[email]) {
-                showMessage('registerError', 'Email уже зарегистрирован');
-                return;
-            }
-
-            pendingUser = { fullName, position, section, phone, email, password };
-            sendCode();
-        }
-
-        function sendCode() {
-            currentCode = Math.floor(100000 + Math.random() * 900000).toString();
             
-            showMessage('registerInfo', `Отправляем код на ${pendingUser.email}...`);
-
-            fetch('https://formspree.io/f/xlgpowrl', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                    'Accept': 'application/json'
-                },
-                body: JSON.stringify({
-                    email: pendingUser.email,
-                    code: currentCode,
-                    name: pendingUser.fullName,
-                    _subject: 'Код подтверждения ЖУФР'
-                })
-            })
-            .then(response => {
-                if (response.ok) {
-                    document.getElementById('verificationBlock').style.display = 'block';
-                    document.getElementById('registerBtn').style.display = 'none';
-                    showMessage('registerSuccess', 'Код отправлен! Проверьте почту.');
-                    startTimer(300);
-                } else {
-                    showMessage('registerError', 'Ошибка отправки');
-                }
-            })
-            .catch(() => {
-                showMessage('registerError', 'Ошибка соединения');
-            });
-        }
-
-        function startTimer(seconds) {
-            const timerDisplay = document.getElementById('timer');
-            const resendBtn = document.getElementById('resendBtn');
+            if (!fullName || !phone || !email || !password || !confirm) { showMessage('registerError', 'Заполните все поля'); return; }
+            if (password !== confirm) { showMessage('registerError', 'Пароли не совпадают'); return; }
+            if (users[email]) { showMessage('registerError', 'Email уже зарегистрирован'); return; }
             
-            resendBtn.disabled = true;
+            const newUser = { email, fullName, position, section, phone, password, registeredAt: new Date().toISOString() };
+            users[email] = newUser;
+            localStorage.setItem('users', JSON.stringify(users));
             
-            if (timerInterval) clearInterval(timerInterval);
+            const newEmployee = { id: Date.now(), fullName, position, section, phone, email };
+            employees.push(newEmployee);
+            localStorage.setItem('employees', JSON.stringify(employees));
             
-            timerInterval = setInterval(() => {
-                const minutes = Math.floor(seconds / 60);
-                const secs = seconds % 60;
-                timerDisplay.textContent = `Код действителен: ${minutes}:${secs.toString().padStart(2, '0')}`;
-                
-                if (seconds <= 0) {
-                    clearInterval(timerInterval);
-                    timerDisplay.textContent = 'Время истекло';
-                    resendBtn.disabled = false;
-                }
-                seconds--;
-            }, 1000);
-        }
-
-        function verifyCode() {
-            const enteredCode = document.getElementById('verificationCode').value.trim();
-            
-            if (!enteredCode) {
-                showMessage('registerError', 'Введите код');
-                return;
-            }
-
-            if (enteredCode === currentCode) {
-                users[pendingUser.email] = pendingUser;
-                
-                showMessage('registerSuccess', 'Регистрация успешна!');
-                
-                document.getElementById('verificationBlock').style.display = 'none';
-                document.getElementById('registerBtn').style.display = 'block';
-                clearInterval(timerInterval);
-                
-                document.getElementById('regFullName').value = '';
-                document.getElementById('regPhone').value = '';
-                document.getElementById('regEmail').value = '';
-                document.getElementById('regPassword').value = '';
-                document.getElementById('regConfirmPassword').value = '';
-                document.getElementById('verificationCode').value = '';
-                
-                setTimeout(() => {
-                    showTab('login');
-                    showMessage('loginError', 'Теперь войдите с вашим email и паролем');
-                }, 2000);
-            } else {
-                showMessage('registerError', 'Неверный код');
-            }
-        }
-
-        function login() {
-            const email = document.getElementById('loginEmail').value.trim();
-            const password = document.getElementById('loginPassword').value;
-
-            if (!email || !password) {
-                showMessage('loginError', 'Введите email и пароль');
-                return;
-            }
-
-            const user = users[email];
-            
-            if (!user || user.password !== password) {
-                showMessage('loginError', 'Неверный email или пароль');
-                return;
-            }
-
-            currentUser = user;
-            document.getElementById('authCard').style.display = 'none';
-            document.getElementById('mainContent').classList.add('visible');
-            
-            renderSummaries();
-            renderStorage();
-            renderEmployees();
-            renderReports();
-        }
-
-        function demoLogin() {
-            currentUser = {
-                email: 'demo@mail.ru',
-                fullName: 'Демо Пользователь',
-                position: 'Мастер',
-                section: '29'
-            };
-            
-            document.getElementById('authCard').style.display = 'none';
-            document.getElementById('mainContent').classList.add('visible');
-            
-            renderSummaries();
-            renderStorage();
-            renderEmployees();
-            renderReports();
-        }
-
-        function logout() {
-            if (confirm('Выйти?')) {
-                currentUser = null;
-                document.getElementById('authCard').style.display = 'block';
-                document.getElementById('mainContent').classList.remove('visible');
-            }
+            showMessage('registerSuccess', 'Регистрация успешна! Теперь войдите.');
+            setTimeout(() => showTab('login'), 2000);
         }
 
         function showMessage(elementId, text) {
@@ -1190,478 +960,233 @@
         }
 
         // ========== МЕНЮ ==========
-
         function showMenu(menu) {
             document.querySelectorAll('.menu-btn').forEach(btn => btn.classList.remove('active'));
             document.querySelectorAll('.section-card').forEach(section => section.style.display = 'none');
-            
             document.querySelector(`.menu-btn[onclick="showMenu('${menu}')"]`).classList.add('active');
             document.getElementById(`${menu}Section`).style.display = 'block';
-            
             if (menu === 'summary') renderSummaries();
             else if (menu === 'storage') renderStorage();
             else if (menu === 'employees') renderEmployees();
             else if (menu === 'reports') renderReports();
         }
 
-        // ========== СВОДКИ ==========
+        function updateAllSections() {
+            renderSummaries(); renderStorage(); renderEmployees(); renderReports();
+        }
 
+        // ========== СВОДКИ ==========
         function openSummaryModal() {
-            workRows = [];
-            incomeMaterials = [];
-            outcomeMaterials = [];
-            
-            // Очищаем сохраненные пикетажи
-            window.picket_1 = '';
-            window.picket_2 = '';
-            window.picket_3 = '';
-            window.picket_4 = '';
-            
+            workRows = []; incomeMaterials = []; outcomeMaterials = [];
+            window.picket_1 = ''; window.picket_2 = ''; window.picket_3 = ''; window.picket_4 = '';
             for (let i = 1; i <= 4; i++) {
                 for (let j = 1; j <= 6; j++) {
-                    workRows.push({
-                        id: `row_${i}_${j}_${Date.now()}`,
-                        section: `Участок ${i}`,
-                        sectionIndex: i,
-                        workName: '', 
-                        workUnit: 'м³', 
-                        workVolume: '',
-                        equipmentType: '', 
-                        equipmentCount: '', 
-                        equipmentNumber: '',
-                        machineHours: '', 
-                        peopleCount: '', 
-                        peopleHours: '', 
-                        note: ''
-                    });
+                    workRows.push({ id: `row_${i}_${j}_${Date.now()}`, section: `Участок ${i}`, sectionIndex: i,
+                        workName: '', workUnit: 'м³', workVolume: '', equipmentType: '', equipmentCount: '', equipmentNumber: '',
+                        machineHours: '', peopleCount: '', peopleHours: '', note: '' });
                 }
             }
-            
             document.getElementById('currentMaster').textContent = currentUser?.fullName || 'Мастер';
             document.getElementById('currentSection').textContent = `Участок ${currentUser?.section || '29'}`;
-            
             renderWorkTable();
             document.getElementById('summaryModal').style.display = 'block';
         }
-
-        function closeSummaryModal() {
-            document.getElementById('summaryModal').style.display = 'none';
-        }
+        function closeSummaryModal() { document.getElementById('summaryModal').style.display = 'none'; }
 
         function renderWorkTable() {
             const tbody = document.getElementById('workBody');
             tbody.innerHTML = '';
-            
             let renderedSections = [];
-            
             workRows.forEach((row) => {
                 if (!renderedSections.includes(row.section)) {
                     renderedSections.push(row.section);
-                    
                     const rowsInSection = workRows.filter(r => r.section === row.section).length;
-                    
                     const headerRow = tbody.insertRow();
-                    headerRow.innerHTML = `
-                        <td rowspan="${rowsInSection}" class="section-cell">
-                            <div class="section-title-text">Участок работ</div>
-                            <div class="section-name">${row.section}</div>
-                            <div class="picket-label">Пикетаж (ПК-ПК):</div>
-                            <input type="text" 
-                                   id="picket_${row.sectionIndex}" 
-                                   class="picket-input"
-                                   placeholder="например: 1260-1276" 
-                                   value="${window['picket_' + row.sectionIndex] || ''}"
-                                   onchange="savePicket(${row.sectionIndex}, this.value)">
-                        </td>
-                        <td class="work-cell"><input type="text" value="${row.workName || ''}" placeholder="Наименование работ" onchange="updateRow('${row.id}', 'workName', this.value)"></td>
-                        <td class="work-cell" style="width: 60px;"><input type="text" value="${row.workUnit || 'м³'}" onchange="updateRow('${row.id}', 'workUnit', this.value)"></td>
-                        <td class="work-cell" style="width: 80px;"><input type="text" value="${row.workVolume || ''}" onchange="updateRow('${row.id}', 'workVolume', this.value)"></td>
-                        <td class="work-cell"><input type="text" value="${row.equipmentType || ''}" placeholder="Тип техники" onchange="updateRow('${row.id}', 'equipmentType', this.value)"></td>
-                        <td class="work-cell" style="width: 60px;"><input type="text" value="${row.equipmentCount || ''}" onchange="updateRow('${row.id}', 'equipmentCount', this.value)"></td>
-                        <td class="work-cell" style="width: 100px;"><input type="text" value="${row.equipmentNumber || ''}" placeholder="А123ВС" onchange="updateRow('${row.id}', 'equipmentNumber', this.value)"></td>
-                        <td class="work-cell" style="width: 70px;"><input type="text" value="${row.machineHours || ''}" onchange="updateRow('${row.id}', 'machineHours', this.value)"></td>
-                        <td class="work-cell" style="width: 60px;"><input type="text" value="${row.peopleCount || ''}" onchange="updateRow('${row.id}', 'peopleCount', this.value)"></td>
-                        <td class="work-cell" style="width: 70px;"><input type="text" value="${row.peopleHours || ''}" onchange="updateRow('${row.id}', 'peopleHours', this.value)"></td>
-                        <td class="work-cell"><input type="text" value="${row.note || ''}" placeholder="Примечание" onchange="updateRow('${row.id}', 'note', this.value)"></td>
-                    `;
+                    headerRow.innerHTML = `<td rowspan="${rowsInSection}" class="section-cell">
+                        <div class="section-title-text">Участок работ</div>
+                        <div class="section-name">${row.section}</div>
+                        <div class="picket-label">Пикетаж (ПК-ПК):</div>
+                        <input type="text" id="picket_${row.sectionIndex}" class="picket-input" placeholder="например: 1260-1276" value="${window['picket_' + row.sectionIndex] || ''}" onchange="savePicket(${row.sectionIndex}, this.value)">
+                    </td>
+                    <td class="work-cell"><input type="text" value="${row.workName || ''}" placeholder="Наименование работ" onchange="updateRow('${row.id}', 'workName', this.value)"></td>
+                    <td class="work-cell" style="width:60px"><input type="text" value="${row.workUnit}" onchange="updateRow('${row.id}', 'workUnit', this.value)"></td>
+                    <td class="work-cell" style="width:80px"><input type="text" value="${row.workVolume}" onchange="updateRow('${row.id}', 'workVolume', this.value)"></td>
+                    <td class="work-cell"><input type="text" value="${row.equipmentType}" placeholder="Тип техники" onchange="updateRow('${row.id}', 'equipmentType', this.value)"></td>
+                    <td class="work-cell" style="width:60px"><input type="text" value="${row.equipmentCount}" onchange="updateRow('${row.id}', 'equipmentCount', this.value)"></td>
+                    <td class="work-cell" style="width:100px"><input type="text" value="${row.equipmentNumber}" placeholder="А123ВС" onchange="updateRow('${row.id}', 'equipmentNumber', this.value)"></td>
+                    <td class="work-cell" style="width:70px"><input type="text" value="${row.machineHours}" onchange="updateRow('${row.id}', 'machineHours', this.value)"></td>
+                    <td class="work-cell" style="width:60px"><input type="text" value="${row.peopleCount}" onchange="updateRow('${row.id}', 'peopleCount', this.value)"></td>
+                    <td class="work-cell" style="width:70px"><input type="text" value="${row.peopleHours}" onchange="updateRow('${row.id}', 'peopleHours', this.value)"></td>
+                    <td class="work-cell"><input type="text" value="${row.note}" placeholder="Примечание" onchange="updateRow('${row.id}', 'note', this.value)"></td>`;
                 } else {
                     const tr = tbody.insertRow();
-                    tr.innerHTML = `
-                        <td class="work-cell"><input type="text" value="${row.workName || ''}" placeholder="Наименование работ" onchange="updateRow('${row.id}', 'workName', this.value)"></td>
-                        <td class="work-cell" style="width: 60px;"><input type="text" value="${row.workUnit || 'м³'}" onchange="updateRow('${row.id}', 'workUnit', this.value)"></td>
-                        <td class="work-cell" style="width: 80px;"><input type="text" value="${row.workVolume || ''}" onchange="updateRow('${row.id}', 'workVolume', this.value)"></td>
-                        <td class="work-cell"><input type="text" value="${row.equipmentType || ''}" placeholder="Тип техники" onchange="updateRow('${row.id}', 'equipmentType', this.value)"></td>
-                        <td class="work-cell" style="width: 60px;"><input type="text" value="${row.equipmentCount || ''}" onchange="updateRow('${row.id}', 'equipmentCount', this.value)"></td>
-                        <td class="work-cell" style="width: 100px;"><input type="text" value="${row.equipmentNumber || ''}" placeholder="А123ВС" onchange="updateRow('${row.id}', 'equipmentNumber', this.value)"></td>
-                        <td class="work-cell" style="width: 70px;"><input type="text" value="${row.machineHours || ''}" onchange="updateRow('${row.id}', 'machineHours', this.value)"></td>
-                        <td class="work-cell" style="width: 60px;"><input type="text" value="${row.peopleCount || ''}" onchange="updateRow('${row.id}', 'peopleCount', this.value)"></td>
-                        <td class="work-cell" style="width: 70px;"><input type="text" value="${row.peopleHours || ''}" onchange="updateRow('${row.id}', 'peopleHours', this.value)"></td>
-                        <td class="work-cell"><input type="text" value="${row.note || ''}" placeholder="Примечание" onchange="updateRow('${row.id}', 'note', this.value)"></td>
-                    `;
+                    tr.innerHTML = `<td class="work-cell"><input type="text" value="${row.workName}" placeholder="Наименование работ" onchange="updateRow('${row.id}', 'workName', this.value)"></td>
+                    <td class="work-cell" style="width:60px"><input type="text" value="${row.workUnit}" onchange="updateRow('${row.id}', 'workUnit', this.value)"></td>
+                    <td class="work-cell" style="width:80px"><input type="text" value="${row.workVolume}" onchange="updateRow('${row.id}', 'workVolume', this.value)"></td>
+                    <td class="work-cell"><input type="text" value="${row.equipmentType}" placeholder="Тип техники" onchange="updateRow('${row.id}', 'equipmentType', this.value)"></td>
+                    <td class="work-cell" style="width:60px"><input type="text" value="${row.equipmentCount}" onchange="updateRow('${row.id}', 'equipmentCount', this.value)"></td>
+                    <td class="work-cell" style="width:100px"><input type="text" value="${row.equipmentNumber}" placeholder="А123ВС" onchange="updateRow('${row.id}', 'equipmentNumber', this.value)"></td>
+                    <td class="work-cell" style="width:70px"><input type="text" value="${row.machineHours}" onchange="updateRow('${row.id}', 'machineHours', this.value)"></td>
+                    <td class="work-cell" style="width:60px"><input type="text" value="${row.peopleCount}" onchange="updateRow('${row.id}', 'peopleCount', this.value)"></td>
+                    <td class="work-cell" style="width:70px"><input type="text" value="${row.peopleHours}" onchange="updateRow('${row.id}', 'peopleHours', this.value)"></td>
+                    <td class="work-cell"><input type="text" value="${row.note}" placeholder="Примечание" onchange="updateRow('${row.id}', 'note', this.value)"></td>`;
                 }
             });
-            
             updateTotals();
         }
 
-        function savePicket(sectionIndex, value) {
-            window['picket_' + sectionIndex] = value;
-            console.log(`Пикет участка ${sectionIndex} сохранен: ${value}`);
-        }
-
-        function updateRow(id, field, value) {
-            const row = workRows.find(r => r.id == id);
-            if (row) {
-                row[field] = value;
-                updateTotals();
-            }
-        }
-
+        function savePicket(sectionIndex, value) { window['picket_' + sectionIndex] = value; }
+        function updateRow(id, field, value) { const row = workRows.find(r => r.id == id); if (row) { row[field] = value; updateTotals(); } }
         function updateTotals() {
             let people = 0, peopleHours = 0, equip = 0, equipHours = 0;
-            
-            workRows.forEach(row => {
-                people += parseInt(row.peopleCount) || 0;
-                peopleHours += parseFloat(row.peopleHours) || 0;
-                equip += parseInt(row.equipmentCount) || 0;
-                equipHours += parseFloat(row.machineHours) || 0;
-            });
-            
+            workRows.forEach(row => { people += parseInt(row.peopleCount) || 0; peopleHours += parseFloat(row.peopleHours) || 0; equip += parseInt(row.equipmentCount) || 0; equipHours += parseFloat(row.machineHours) || 0; });
             document.getElementById('totalPeopleCount').textContent = people;
             document.getElementById('totalPeopleHours').textContent = peopleHours.toFixed(1);
             document.getElementById('totalEquipmentCount').textContent = equip;
             document.getElementById('totalEquipmentHours').textContent = equipHours.toFixed(1);
-            
             updateMaterialsLists();
         }
-
         function updateMaterialsLists() {
-            const incomeList = document.getElementById('incomeMaterialsList');
-            incomeList.innerHTML = '';
-            let totalIncome = 0;
-            
-            incomeMaterials.forEach(item => {
-                totalIncome += parseFloat(item.volume) || 0;
-                incomeList.innerHTML += `<div class="material-item"><span>${item.material}</span><span>${item.volume} ${item.unit}</span></div>`;
-            });
+            const incomeList = document.getElementById('incomeMaterialsList'); incomeList.innerHTML = ''; let totalIncome = 0;
+            incomeMaterials.forEach(item => { totalIncome += parseFloat(item.volume) || 0; incomeList.innerHTML += `<div class="material-item"><span>${item.material}</span><span>${item.volume} ${item.unit}</span></div>`; });
             document.getElementById('totalIncome').textContent = totalIncome.toFixed(1);
-            
-            const outcomeList = document.getElementById('outcomeMaterialsList');
-            outcomeList.innerHTML = '';
-            let totalOutcome = 0;
-            
-            outcomeMaterials.forEach(item => {
-                totalOutcome += parseFloat(item.volume) || 0;
-                outcomeList.innerHTML += `<div class="material-item"><span>${item.material}</span><span>${item.volume} ${item.unit}</span></div>`;
-            });
+            const outcomeList = document.getElementById('outcomeMaterialsList'); outcomeList.innerHTML = ''; let totalOutcome = 0;
+            outcomeMaterials.forEach(item => { totalOutcome += parseFloat(item.volume) || 0; outcomeList.innerHTML += `<div class="material-item"><span>${item.material}</span><span>${item.volume} ${item.unit}</span></div>`; });
             document.getElementById('totalOutcome').textContent = totalOutcome.toFixed(1);
         }
-
-        function addIncomeRow() {
-            currentMaterialType = 'income';
-            openMaterialModal('приход');
-        }
-
-        function addOutcomeRow() {
-            currentMaterialType = 'outcome';
-            openMaterialModal('расход');
-        }
-
+        function addIncomeRow() { currentMaterialType = 'income'; openMaterialModal('приход'); }
+        function addOutcomeRow() { currentMaterialType = 'outcome'; openMaterialModal('расход'); }
         function openMaterialModal(type) {
             document.getElementById('materialModalTitle').textContent = `Добавить ${type}`;
-            
-            const select = document.getElementById('materialSelect');
-            select.innerHTML = '<option value="">Выберите</option>';
+            const select = document.getElementById('materialSelect'); select.innerHTML = '<option value="">Выберите</option>';
             MATERIALS.forEach(m => select.innerHTML += `<option value="${m}">${m}</option>`);
-            
             document.getElementById('supplierField').style.display = type === 'приход' ? 'block' : 'none';
             document.getElementById('destinationField').style.display = type === 'расход' ? 'block' : 'none';
-            
             document.getElementById('materialModal').style.display = 'block';
         }
-
-        function closeMaterialModal() {
-            document.getElementById('materialModal').style.display = 'none';
-        }
-
+        function closeMaterialModal() { document.getElementById('materialModal').style.display = 'none'; }
         function saveMaterial() {
-            const material = document.getElementById('materialSelect').value;
-            const volume = document.getElementById('materialVolume').value;
-            
-            if (!material || !volume) {
-                alert('Заполните материал и объем');
-                return;
-            }
-            
-            const item = {
-                id: Date.now(),
-                material,
-                unit: document.getElementById('materialUnit').value,
-                volume,
-                piket: document.getElementById('materialPiket').value
-            };
-            
-            if (currentMaterialType === 'income') {
-                item.supplier = document.getElementById('materialSupplier').value;
-                incomeMaterials.push(item);
-            } else {
-                item.destination = document.getElementById('materialDestination').value;
-                outcomeMaterials.push(item);
-            }
-            
-            closeMaterialModal();
-            updateMaterialsLists();
+            const material = document.getElementById('materialSelect').value, volume = document.getElementById('materialVolume').value;
+            if (!material || !volume) { alert('Заполните материал и объем'); return; }
+            const item = { id: Date.now(), material, unit: document.getElementById('materialUnit').value, volume, piket: document.getElementById('materialPiket').value };
+            if (currentMaterialType === 'income') { item.supplier = document.getElementById('materialSupplier').value; incomeMaterials.push(item); }
+            else { item.destination = document.getElementById('materialDestination').value; outcomeMaterials.push(item); }
+            closeMaterialModal(); updateMaterialsLists();
         }
-
         function saveSummary() {
-            if (!currentUser) {
-                alert('Авторизуйтесь');
-                return;
-            }
-
+            if (!currentUser) { alert('Авторизуйтесь'); return; }
             const date = document.getElementById('reportDate').value;
-            if (!date) {
-                alert('Введите дату');
-                return;
-            }
-
-            const pickets = {
-                picket_1: window.picket_1,
-                picket_2: window.picket_2,
-                picket_3: window.picket_3,
-                picket_4: window.picket_4
-            };
-
+            if (!date) { alert('Введите дату'); return; }
             const summary = {
-                id: Date.now(),
-                date,
-                shift: document.getElementById('reportShift').value,
-                master: currentUser.fullName,
-                section: currentUser.section,
-                pickets: pickets,
-                workRows: [...workRows],
-                incomeMaterials: [...incomeMaterials],
-                outcomeMaterials: [...outcomeMaterials],
-                totalPeople: document.getElementById('totalPeopleCount').textContent,
-                totalPeopleHours: document.getElementById('totalPeopleHours').textContent,
-                totalEquipment: document.getElementById('totalEquipmentCount').textContent,
-                totalHours: document.getElementById('totalEquipmentHours').textContent,
-                totalIncome: document.getElementById('totalIncome').textContent,
-                totalOutcome: document.getElementById('totalOutcome').textContent
+                id: Date.now(), date, shift: document.getElementById('reportShift').value, master: currentUser.fullName, section: currentUser.section,
+                pickets: { picket_1: window.picket_1, picket_2: window.picket_2, picket_3: window.picket_3, picket_4: window.picket_4 },
+                workRows: [...workRows], incomeMaterials: [...incomeMaterials], outcomeMaterials: [...outcomeMaterials],
+                totalPeople: document.getElementById('totalPeopleCount').textContent, totalPeopleHours: document.getElementById('totalPeopleHours').textContent,
+                totalEquipment: document.getElementById('totalEquipmentCount').textContent, totalHours: document.getElementById('totalEquipmentHours').textContent,
+                totalIncome: document.getElementById('totalIncome').textContent, totalOutcome: document.getElementById('totalOutcome').textContent
             };
-
-            summaries.unshift(summary);
-            localStorage.setItem('summaries', JSON.stringify(summaries));
-            
+            summaries.unshift(summary); localStorage.setItem('summaries', JSON.stringify(summaries));
             updateStorage(summary);
-            
-            alert('Сводка сохранена');
-            closeSummaryModal();
-            renderSummaries();
+            alert('Сводка сохранена'); closeSummaryModal(); renderSummaries();
         }
-
         function updateStorage(summary) {
             summary.incomeMaterials.forEach(item => {
                 if (item.material && item.volume && item.piket) {
                     const key = `${item.material}|${item.piket}`;
                     if (!storage[key]) storage[key] = { material: item.material, piket: item.piket, volume: 0, unit: item.unit };
                     storage[key].volume += parseFloat(item.volume) || 0;
-                    
-                    storageHistory.unshift({
-                        date: summary.date, material: item.material, type: 'приход',
-                        volume: item.volume, piket: item.piket, master: summary.master
-                    });
+                    storageHistory.unshift({ date: summary.date, material: item.material, type: 'приход', volume: item.volume, piket: item.piket, master: summary.master });
                 }
             });
-
             summary.outcomeMaterials.forEach(item => {
                 if (item.material && item.volume && item.piket) {
                     const key = `${item.material}|${item.piket}`;
-                    if (storage[key]) {
-                        storage[key].volume -= parseFloat(item.volume) || 0;
-                        storageHistory.unshift({
-                            date: summary.date, material: item.material, type: 'расход',
-                            volume: item.volume, piket: item.piket, master: summary.master
-                        });
-                    }
+                    if (storage[key]) { storage[key].volume -= parseFloat(item.volume) || 0; storageHistory.unshift({ date: summary.date, material: item.material, type: 'расход', volume: item.volume, piket: item.piket, master: summary.master }); }
                 }
             });
-
-            localStorage.setItem('storage', JSON.stringify(storage));
-            localStorage.setItem('storageHistory', JSON.stringify(storageHistory));
+            localStorage.setItem('storage', JSON.stringify(storage)); localStorage.setItem('storageHistory', JSON.stringify(storageHistory));
         }
-
         function renderSummaries() {
             const masters = [...new Set(summaries.map(s => s.master))];
-            const filter = document.getElementById('summaryMasterFilter');
-            filter.innerHTML = '<option value="all">Все мастера</option>';
+            const filter = document.getElementById('summaryMasterFilter'); filter.innerHTML = '<option value="all">Все мастера</option>';
             masters.forEach(m => filter.innerHTML += `<option value="${m}">${m}</option>`);
             filterSummaries();
         }
-
         function filterSummaries() {
-            const master = document.getElementById('summaryMasterFilter').value;
-            const section = document.getElementById('summarySectionFilter').value;
-            const shift = document.getElementById('summaryShiftFilter').value;
-
+            const master = document.getElementById('summaryMasterFilter').value, section = document.getElementById('summarySectionFilter').value, shift = document.getElementById('summaryShiftFilter').value;
             let filtered = summaries;
             if (master !== 'all') filtered = filtered.filter(s => s.master === master);
             if (section !== 'all') filtered = filtered.filter(s => s.section === section);
             if (shift !== 'all') filtered = filtered.filter(s => s.shift === shift);
-
-            const grid = document.getElementById('summariesGrid');
-            grid.innerHTML = filtered.length ? '' : '<div class="empty-state">Нет сводок</div>';
-            
-            filtered.forEach(s => {
-                grid.innerHTML += `
-                    <div class="summary-card" onclick='alert(JSON.stringify(${JSON.stringify(s)},null,2))'>
-                        <div class="summary-header">
-                            <span class="summary-date">${s.date}</span>
-                            <span class="summary-shift">${s.shift}</span>
-                        </div>
-                        <div>${s.master}</div>
-                        <div class="summary-stats">
-                            <span>👥 ${s.totalPeople} чел</span>
-                            <span>🚜 ${s.totalEquipment} тех</span>
-                            <span>⏱️ ${s.totalHours} ч</span>
-                        </div>
-                    </div>
-                `;
-            });
+            const grid = document.getElementById('summariesGrid'); grid.innerHTML = filtered.length ? '' : '<div class="empty-state">Нет сводок</div>';
+            filtered.forEach(s => { grid.innerHTML += `<div class="summary-card" onclick='alert(JSON.stringify(${JSON.stringify(s)},null,2))'><div class="summary-header"><span class="summary-date">${s.date}</span><span class="summary-shift">${s.shift}</span></div><div>${s.master}</div><div class="summary-stats"><span>👥 ${s.totalPeople} чел</span><span>🚜 ${s.totalEquipment} тех</span><span>⏱️ ${s.totalHours} ч</span></div></div>`; });
         }
-
-        // ========== СКЛАДЫ ==========
-
         function renderStorage() {
             const materials = [...new Set(Object.values(storage).map(s => s.material))];
-            const filter = document.getElementById('storageMaterialFilter');
-            filter.innerHTML = '<option value="all">Все</option>';
+            const filter = document.getElementById('storageMaterialFilter'); filter.innerHTML = '<option value="all">Все</option>';
             materials.forEach(m => filter.innerHTML += `<option value="${m}">${m}</option>`);
             filterStorage();
         }
-
         function filterStorage() {
-            const material = document.getElementById('storageMaterialFilter').value;
-            const piket = document.getElementById('storagePiketFilter').value.toLowerCase();
-
+            const material = document.getElementById('storageMaterialFilter').value, piket = document.getElementById('storagePiketFilter').value.toLowerCase();
             let items = Object.values(storage);
             if (material !== 'all') items = items.filter(i => i.material === material);
             if (piket) items = items.filter(i => i.piket.toLowerCase().includes(piket));
-
-            const grid = document.getElementById('storageGrid');
-            grid.innerHTML = items.length ? '' : '<div class="empty-state">Нет материалов</div>';
-            
-            items.forEach(item => {
-                grid.innerHTML += `
-                    <div class="storage-card">
-                        <div class="storage-header">
-                            <span class="storage-material">${item.material}</span>
-                            <span class="storage-piket">ПК ${item.piket}</span>
-                        </div>
-                        <div class="storage-volume">${item.volume.toFixed(1)} ${item.unit}</div>
-                    </div>
-                `;
-            });
-
-            const history = document.getElementById('storageHistoryBody');
-            history.innerHTML = '';
-            storageHistory.slice(0, 20).forEach(item => {
-                history.innerHTML += `
-                    <tr>
-                        <td>${item.date}</td>
-                        <td>${item.material}</td>
-                        <td style="color:${item.type==='приход'?'var(--success)':'var(--danger)'}">${item.type}</td>
-                        <td>${item.volume}</td>
-                        <td>ПК ${item.piket}</td>
-                        <td>${item.master}</td>
-                        <td>${item.shift || '-'}</td>
-                    </tr>
-                `;
-            });
+            const grid = document.getElementById('storageGrid'); grid.innerHTML = items.length ? '' : '<div class="empty-state">Нет материалов</div>';
+            items.forEach(item => { grid.innerHTML += `<div class="storage-card"><div class="storage-header"><span class="storage-material">${item.material}</span><span class="storage-piket">ПК ${item.piket}</span></div><div class="storage-volume">${item.volume.toFixed(1)} ${item.unit}</div></div>`; });
+            const history = document.getElementById('storageHistoryBody'); history.innerHTML = '';
+            storageHistory.slice(0, 20).forEach(item => { history.innerHTML += `<tr><td>${item.date}</td><td>${item.material}</td><td style="color:${item.type==='приход'?'var(--success)':'var(--danger)'}">${item.type}</td><td>${item.volume}</td><td>ПК ${item.piket}</td><td>${item.master}</td><td>${item.shift || '-'}</td></tr>`; });
         }
-
-        // ========== СОТРУДНИКИ ==========
-
-        function renderEmployees() {
-            filterEmployees();
-        }
-
+        function renderEmployees() { filterEmployees(); }
         function filterEmployees() {
-            const position = document.getElementById('employeePositionFilter').value;
-            const section = document.getElementById('employeeSectionFilter').value;
-
+            const position = document.getElementById('employeePositionFilter').value, section = document.getElementById('employeeSectionFilter').value;
             let filtered = employees;
             if (position !== 'all') filtered = filtered.filter(e => e.position === position);
             if (section !== 'all') filtered = filtered.filter(e => e.section === section);
-
-            const grid = document.getElementById('employeesGrid');
-            grid.innerHTML = filtered.length ? '' : '<div class="empty-state">Нет сотрудников</div>';
-            
-            filtered.forEach(e => {
-                grid.innerHTML += `
-                    <div class="employee-card">
-                        <div class="employee-name">${e.fullName}</div>
-                        <div class="employee-position">${e.position}</div>
-                        <div>📞 ${e.phone}</div>
-                        <div>📧 ${e.email}</div>
-                        <div>🏗️ Участок ${e.section}</div>
-                    </div>
-                `;
-            });
+            const grid = document.getElementById('employeesGrid'); grid.innerHTML = filtered.length ? '' : '<div class="empty-state">Нет сотрудников</div>';
+            filtered.forEach(e => { grid.innerHTML += `<div class="employee-card"><div class="employee-name">${e.fullName}</div><div class="employee-position">${e.position}</div><div>📞 ${e.phone}</div><div>📧 ${e.email}</div><div>🏗️ Участок ${e.section}</div></div>`; });
         }
-
         function showAddEmployee() {
-            const name = prompt('ФИО:');
-            if (!name) return;
-            const position = prompt('Должность:');
-            if (!position) return;
-            const section = prompt('Участок (29/51):');
-            if (!section || !['29','51'].includes(section)) return;
-            const phone = prompt('Телефон:');
-            if (!phone) return;
-            const email = prompt('Email:');
-            if (!email) return;
-
-            employees.push({
-                id: Date.now(),
-                fullName: name,
-                position,
-                section,
-                phone,
-                email
-            });
-            
+            const name = prompt('ФИО:'); if (!name) return;
+            const position = prompt('Должность:'); if (!position) return;
+            const section = prompt('Участок (29/51):'); if (!section || !['29','51'].includes(section)) return;
+            const phone = prompt('Телефон:'); if (!phone) return;
+            const email = prompt('Email:'); if (!email) return;
+            employees.push({ id: Date.now(), fullName: name, position, section, phone, email });
+            localStorage.setItem('employees', JSON.stringify(employees));
             renderEmployees();
         }
-
-        // ========== ОТЧЕТЫ ==========
-
         function renderReports() {
             document.getElementById('totalSummaries').textContent = summaries.length;
-            
-            const totalVolume = summaries.reduce((sum, s) => 
-                sum + s.workRows.reduce((sSum, r) => sSum + (parseFloat(r.workVolume)||0), 0), 0);
+            const totalVolume = summaries.reduce((sum, s) => sum + s.workRows.reduce((sSum, r) => sSum + (parseFloat(r.workVolume)||0), 0), 0);
             document.getElementById('totalWorkVolume').textContent = totalVolume.toFixed(1);
-            
             const totalStorage = Object.values(storage).reduce((sum, s) => sum + s.volume, 0);
             document.getElementById('totalStorageValue').textContent = totalStorage.toFixed(1);
-            
             document.getElementById('totalEmployees').textContent = employees.length;
-
             const stats = {};
-            summaries.forEach(s => {
-                if (!stats[s.master]) stats[s.master] = { count:0, volume:0, hours:0 };
-                stats[s.master].count++;
-                stats[s.master].volume += s.workRows.reduce((sum, r) => sum + (parseFloat(r.workVolume)||0), 0);
-                stats[s.master].hours += parseFloat(s.totalHours) || 0;
-            });
-
-            const body = document.getElementById('mastersStatsBody');
-            body.innerHTML = '';
-            Object.entries(stats).forEach(([master, st]) => {
-                body.innerHTML += `<tr><td>${master}</td><td>${st.count}</td><td>${st.volume.toFixed(1)}</td><td>${st.hours.toFixed(1)}</td></tr>`;
-            });
+            summaries.forEach(s => { if (!stats[s.master]) stats[s.master] = { count:0, volume:0, hours:0 }; stats[s.master].count++; stats[s.master].volume += s.workRows.reduce((sum, r) => sum + (parseFloat(r.workVolume)||0), 0); stats[s.master].hours += parseFloat(s.totalHours) || 0; });
+            const body = document.getElementById('mastersStatsBody'); body.innerHTML = '';
+            Object.entries(stats).forEach(([master, st]) => { body.innerHTML += `<tr><td>${master}</td><td>${st.count}</td><td>${st.volume.toFixed(1)}</td><td>${st.hours.toFixed(1)}</td></tr>`; });
         }
+
+        // Проверка сохраненной сессии
+        const savedUser = localStorage.getItem('currentUser');
+        if (savedUser) {
+            try {
+                currentUser = JSON.parse(savedUser);
+                document.getElementById('authCard').style.display = 'none';
+                document.getElementById('mainContent').classList.add('visible');
+                updateAllSections();
+            } catch(e) {}
+        }
+
+        // Привязка кнопок Google
+        document.addEventListener('DOMContentLoaded', function() {
+            const googleLoginBtn = document.getElementById('googleLoginBtn');
+            const googleRegisterBtn = document.getElementById('googleRegisterBtn');
+            if (googleLoginBtn) googleLoginBtn.onclick = googleLogin;
+            if (googleRegisterBtn) googleRegisterBtn.onclick = googleLogin;
+        });
     </script>
 </body>
 </html>
