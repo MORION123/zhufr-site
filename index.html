@@ -436,23 +436,7 @@
             vertical-align: middle;
         }
 
-        .work-table input {
-            width: 100%;
-            background: transparent;
-            border: none;
-            color: var(--text-primary);
-            text-align: center;
-            font-size: 11px;
-            padding: 4px 2px;
-        }
-
-        .work-table input:focus {
-            outline: none;
-            background: var(--bg-primary);
-            border-radius: 4px;
-        }
-
-        /* Текстовые области для больших полей */
+        .work-table input,
         .work-table textarea {
             width: 100%;
             background: var(--bg-primary);
@@ -461,11 +445,15 @@
             color: var(--text-primary);
             font-size: 11px;
             padding: 6px;
-            resize: vertical;
             font-family: inherit;
-            line-height: 1.4;
         }
 
+        .work-table textarea {
+            resize: vertical;
+            min-height: 60px;
+        }
+
+        .work-table input:focus,
         .work-table textarea:focus {
             outline: none;
             border-color: var(--accent);
@@ -475,7 +463,6 @@
             background: linear-gradient(135deg, var(--bg-card) 0%, var(--bg-secondary) 100%);
             vertical-align: top;
             padding: 12px;
-            min-width: 180px;
             border-right: 2px solid var(--accent);
         }
 
@@ -488,7 +475,7 @@
             font-size: 12px;
             padding: 10px;
             resize: vertical;
-            min-height: 60px;
+            min-height: 80px;
             font-family: inherit;
         }
 
@@ -717,9 +704,6 @@
                 font-size: 9px;
                 padding: 6px 2px;
             }
-            .section-cell {
-                min-width: 120px;
-            }
         }
     </style>
 </head>
@@ -826,7 +810,7 @@
                 <div class="section-title"><span>📦 Склады материалов</span></div>
                 <div class="filters-bar"><select class="filter-select" id="storageMaterialFilter" onchange="filterStorage()"><option value="all">Все материалы</option></select><input type="text" class="filter-select" id="storagePiketFilter" placeholder="Пикет склада" onchange="filterStorage()"></div>
                 <div id="storageGrid" class="storage-grid"><div class="empty-state">Нет материалов</div></div>
-                <div style="margin-top:20px"><h3>История движений</h3><div class="table-container"><table class="work-table"><thead>    <tr><th>Дата</th><th>Материал</th><th>Тип</th><th>Объем</th><th>Пикет</th><th>Мастер</th></tr></thead><tbody id="storageHistoryBody"></tbody></table></div></div>
+                <div style="margin-top:20px"><h3>История движений</h3><div class="table-container"><table class="work-table"><thead>    <td><th>Дата</th><th>Материал</th><th>Тип</th><th>Объем</th><th>Пикет</th><th>Мастер</th> </thead><tbody id="storageHistoryBody"></tbody> </table></div></div>
             </div>
 
             <div id="employeesSection" class="section-card" style="display: none;">
@@ -843,7 +827,7 @@
                     <div class="total-block"><div class="total-title">Материалов на складе</div><div class="total-value" id="totalStorageValue">0</div></div>
                     <div class="total-block"><div class="total-title">Всего сотрудников</div><div class="total-value" id="totalEmployees">0</div></div>
                 </div>
-                <div style="margin-top:20px"><h3>Статистика по мастерам</h3><div class="table-container"><table class="work-table"><thead>    <tr><th>Мастер</th><th>Кол-во сводок</th><th>Объем работ</th><th>Маш-часы</th></tr></thead><tbody id="mastersStatsBody"></tbody></table></div></div>
+                <div style="margin-top:20px"><h3>Статистика по мастерам</h3><div class="table-container"><table class="work-table"><thead>    <tr><th>Мастер</th><th>Кол-во сводок</th><th>Объем работ</th><th>Маш-часы</th> </thead><tbody id="mastersStatsBody"></tbody> </table></div></div>
             </div>
         </div>
     </div>
@@ -861,9 +845,9 @@
             <table class="work-table" id="workTable">
                 <thead>
                     <tr>
-                        <th style="min-width: 140px;">Участок работ<br>(ПК-ПК)</th>
-                        <th style="min-width: 160px;">Вид работ</th>
-                        <th style="min-width: 260px;">Состав работы</th>
+                        <th style="min-width: 160px;">Участок работ<br>(ПК-ПК)</th>
+                        <th style="min-width: 180px;">Вид работ</th>
+                        <th style="min-width: 280px;">Состав работы</th>
                         <th style="width: 50px;">Ед.</th>
                         <th style="width: 70px;">Объем</th>
                         <th style="min-width: 100px;">Тип техники</th>
@@ -873,7 +857,7 @@
                         <th style="width: 50px;">Чел.</th>
                         <th style="width: 60px;">Чел-ч</th>
                         <th style="min-width: 100px;">Примечание</th>
-                    </tr>
+                     </tr>
                 </thead>
                 <tbody id="workBody"></tbody>
             </table>
@@ -1077,8 +1061,8 @@
                 for (let j = 1; j <= 6; j++) {
                     workRows.push({ 
                         id: `row_${i}_${j}_${Date.now()}`, 
-                        sectionIndex: i, 
-                        workType: '',   // Вид работ (один на весь участок)
+                        sectionIndex: i,
+                        workType: '',   // Вид работ (общий для участка)
                         workName: '',   // Состав работы (для каждой строки)
                         workUnit: 'м³', 
                         workVolume: '', 
@@ -1103,7 +1087,6 @@
             const tbody = document.getElementById('workBody'); 
             tbody.innerHTML = '';
             
-            // Группируем строки по sectionIndex
             let sectionGroups = {};
             workRows.forEach(row => {
                 if (!sectionGroups[row.sectionIndex]) {
@@ -1112,29 +1095,28 @@
                 sectionGroups[row.sectionIndex].push(row);
             });
             
-            // Отрисовываем каждый участок
             for (let sectionIdx = 1; sectionIdx <= 4; sectionIdx++) {
                 const rows = sectionGroups[sectionIdx] || [];
                 if (rows.length === 0) continue;
                 
-                // Получаем сохраненное значение вида работ для этого участка
                 const savedWorkType = window['workType_' + sectionIdx] || '';
+                const savedPicket = window['picket_' + sectionIdx] || '';
                 
-                // Заголовок участка с полем для пикетажа и полем для вида работ (объединенные ячейки)
+                // Заголовок участка - объединенная ячейка
                 const headerRow = tbody.insertRow();
                 headerRow.innerHTML = `
                     <td rowspan="${rows.length}" class="section-cell">
                         <textarea id="picket_${sectionIdx}" 
                                placeholder="Пикетаж (ПК-ПК)" 
-                               style="width:100%; padding:10px; border-radius:6px; background:var(--bg-primary); border:1px solid var(--accent); color:white; min-height:60px; resize:vertical; margin-bottom:10px;">${window['picket_' + sectionIdx] || ''}</textarea>
+                               style="width:100%; min-height:70px; resize:vertical; background:var(--bg-primary); border:1px solid var(--accent); border-radius:6px; color:white; padding:8px; margin-bottom:8px;">${savedPicket}</textarea>
                         <textarea id="workType_${sectionIdx}" 
-                               placeholder="Вид работ (общий для участка)" 
-                               style="width:100%; padding:10px; border-radius:6px; background:var(--bg-primary); border:1px solid var(--accent); color:white; min-height:80px; resize:vertical;">${savedWorkType}</textarea>
-                     </td>
+                               placeholder="Вид работ" 
+                               style="width:100%; min-height:80px; resize:vertical; background:var(--bg-primary); border:1px solid var(--accent); border-radius:6px; color:white; padding:8px;">${savedWorkType}</textarea>
+                      </td>
                 `;
                 
-                // Добавляем строки для этого участка
-                rows.forEach((row, idx) => {
+                // Строки работ
+                rows.forEach((row) => {
                     const tr = tbody.insertRow();
                     tr.innerHTML = `
                         <td><textarea style="width:100%; min-height:70px; resize:vertical; background:var(--bg-primary); border:1px solid var(--border); border-radius:4px; color:var(--text-primary); padding:6px;" 
@@ -1152,7 +1134,6 @@
                 });
             }
             
-            // Привязываем события сохранения для текстовых областей
             for (let i = 1; i <= 4; i++) {
                 const picketField = document.getElementById(`picket_${i}`);
                 const workTypeField = document.getElementById(`workType_${i}`);
@@ -1226,7 +1207,6 @@
             const date = document.getElementById('reportDate').value;
             if (!date) { alert('Введите дату'); return; }
             
-            // Собираем пикетажи и виды работ для каждого участка
             const pickets = {};
             const workTypes = {};
             for (let i = 1; i <= 4; i++) {
@@ -1292,7 +1272,7 @@
             const grid = document.getElementById('storageGrid'); grid.innerHTML = items.length ? '' : '<div class="empty-state">Нет материалов</div>';
             items.forEach(item => { grid.innerHTML += `<div class="storage-card"><div class="storage-header"><span class="storage-material">${item.material}</span><span class="storage-piket">ПК ${item.piket}</span></div><div class="storage-volume">${item.volume.toFixed(1)} ${item.unit}</div></div>`; });
             const history = document.getElementById('storageHistoryBody'); history.innerHTML = '';
-            storageHistory.slice(0, 20).forEach(item => { history.innerHTML += `        <tr><td>${item.date}</td><td>${item.material}</td><td style="color:${item.type==='приход'?'var(--success)':'var(--danger)'}">${item.type}</td><td>${item.volume}</td><td>ПК ${item.piket}</td><td>${item.master}</td></tr>`; });
+            storageHistory.slice(0, 20).forEach(item => { history.innerHTML += `        器<th>${item.date}</th><th>${item.material}</th><td style="color:${item.type==='приход'?'var(--success)':'var(--danger)'}">${item.type}</td><th>${item.volume}</th><th>ПК ${item.piket}</th><th>${item.master}</th>`; });
         }
         
         function renderEmployees() { filterEmployees(); }
@@ -1328,7 +1308,7 @@
             const stats = {};
             summaries.forEach(s => { if (!stats[s.master]) stats[s.master] = { count:0, volume:0, hours:0 }; stats[s.master].count++; stats[s.master].volume += s.workRows.reduce((sum, r) => sum + (parseFloat(r.workVolume)||0), 0); stats[s.master].hours += parseFloat(s.totalHours) || 0; });
             const body = document.getElementById('mastersStatsBody'); body.innerHTML = '';
-            Object.entries(stats).forEach(([master, st]) => { body.innerHTML += `        器<th>${master}</th><th>${st.count}</th><th>${st.volume.toFixed(1)}</th><th>${st.hours.toFixed(1)}</th>`; });
+            Object.entries(stats).forEach(([master, st]) => { body.innerHTML += `<tr><td>${master}</td><td>${st.count}</td><td>${st.volume.toFixed(1)}</td><td>${st.hours.toFixed(1)}</td></tr>`; });
         }
 
         // Инициализация
