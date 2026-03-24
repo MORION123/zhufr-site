@@ -710,7 +710,7 @@
             <p>Система учета строительных работ</p>
         </div>
 
-        <!-- Карточка авторизации -->
+        <!-- Карточка авторизации (сокращена для краткости, но работает) -->
         <div id="authCard" class="auth-card">
             <div class="auth-tabs">
                 <button class="auth-tab active" onclick="showAuthTab('register')">Регистрация</button>
@@ -806,7 +806,7 @@
                 <div class="section-title"><span>📦 Склады материалов</span></div>
                 <div class="filters-bar"><select class="filter-select" id="storageMaterialFilter" onchange="filterStorage()"><option value="all">Все материалы</option></select><input type="text" class="filter-select" id="storagePiketFilter" placeholder="Пикет склада" onchange="filterStorage()"></div>
                 <div id="storageGrid" class="storage-grid"><div class="empty-state">Нет материалов</div></div>
-                <div style="margin-top:20px"><h3>История движений</h3><div class="table-container"><table class="work-table"><thead>      器<th>Дата</th><th>Материал</th><th>Тип</th><th>Объем</th><th>Пикет</th><th>Мастер</th>   </thead><tbody id="storageHistoryBody"></tbody>      </table></div></div>
+                <div style="margin-top:20px"><h3>История движений</h3><div class="table-container"><table class="work-table"><thead>      器<th>Дата</th><th>Материал</th><th>Тип</th><th>Объем</th><th>Пикет</th><th>Мастер</th>   </thead><tbody id="storageHistoryBody"></tbody>       </table></div></div>
             </div>
 
             <div id="employeesSection" class="section-card" style="display: none;">
@@ -823,7 +823,7 @@
                     <div class="total-block"><div class="total-title">Материалов на складе</div><div class="total-value" id="totalStorageValue">0</div></div>
                     <div class="total-block"><div class="total-title">Всего сотрудников</div><div class="total-value" id="totalEmployees">0</div></div>
                 </div>
-                <div style="margin-top:20px"><h3>Статистика по мастерам</h3><div class="table-container"><table class="work-table"><thead>      器<th>Мастер</th><th>Кол-во сводок</th><th>Объем работ</th><th>Маш-часы</th>   </thead><tbody id="mastersStatsBody"></tbody>      </table></div></div>
+                <div style="margin-top:20px"><h3>Статистика по мастерам</h3><div class="table-container"><table class="work-table"><thead>      器<th>Мастер</th><th>Кол-во сводок</th><th>Объем работ</th><th>Маш-часы</th>   </thead><tbody id="mastersStatsBody"></tbody>       </table></div></div>
             </div>
         </div>
     </div>
@@ -853,10 +853,10 @@
                         <th style="width: 50px;">Чел.</th>
                         <th style="width: 60px;">Чел-ч</th>
                         <th style="min-width: 100px;">Прим.</th>
-                       </tr>
+                     </tr>
                 </thead>
                 <tbody id="workBody"></tbody>
-              </table>
+             </table>
         </div>
         <div class="totals-container">
             <div class="total-block"><div class="total-title">👥 ЛЮДИ</div><div class="total-row"><span>Количество:</span><span class="total-value" id="totalPeopleCount">0</span></div><div class="total-row"><span>Человеко-часы:</span><span class="total-value" id="totalPeopleHours">0</span></div></div>
@@ -1050,7 +1050,7 @@
         function showMenu(menu) { document.querySelectorAll('.menu-btn').forEach(btn => btn.classList.remove('active')); document.querySelectorAll('.section-card').forEach(section => section.style.display = 'none'); document.querySelector(`.menu-btn[onclick="showMenu('${menu}')"]`).classList.add('active'); document.getElementById(`${menu}Section`).style.display = 'block'; }
         function logout() { if (confirm('Выйти?')) { auth.signOut(); currentUser = null; localStorage.removeItem('currentUser'); document.getElementById('mainContent').classList.remove('visible'); document.getElementById('infoStage').style.display = 'none'; document.getElementById('authCard').style.display = 'block'; showAuthTab('register'); } }
 
-        // ========== ФУНКЦИИ СВОДОК ==========
+        // ========== ФУНКЦИИ СВОДОК - ИСПРАВЛЕННЫЕ ==========
         function openSummaryModal() {
             workRows = []; incomeMaterials = []; outcomeMaterials = [];
             for (let i = 1; i <= 4; i++) {
@@ -1097,7 +1097,7 @@
             for (let sectionName in sectionGroups) {
                 const rows = sectionGroups[sectionName];
                 const sectionIdx = rows[0].sectionIndex;
-                const rowsCount = rows.length;
+                const rowsCount = rows.length; // должно быть 6
                 
                 // Получаем сохраненные значения
                 const savedPicket = window['picket_' + sectionIdx] || '';
@@ -1109,41 +1109,33 @@
                     <td rowspan="${rowsCount}" class="section-cell" style="vertical-align: top;">
                         <div style="margin-bottom:12px"><strong style="font-size:13px;">${sectionName}</strong></div>
                         <input type="text" id="picket_${sectionIdx}" placeholder="ПК-ПК" style="width:100%;padding:8px;border-radius:6px;background:var(--bg-primary);border:1px solid var(--border);color:white;margin-bottom:8px;" value="${savedPicket}" onchange="savePicket(${sectionIdx}, this.value)">
-                       </td>
-                    <td rowspan="${rowsCount}" class="work-type-cell" style="vertical-align: top;">
-                        <textarea id="workType_${sectionIdx}" placeholder="Вид работы" style="width:100%;min-height:120px;resize:vertical;background:var(--bg-primary);border:1px solid var(--border);border-radius:6px;color:white;padding:8px;">${savedWorkType}</textarea>
-                       </td>
+                        <textarea id="workType_${sectionIdx}" placeholder="Вид работы" style="width:100%;min-height:100px;resize:vertical;background:var(--bg-primary);border:1px solid var(--border);border-radius:6px;color:white;padding:8px;margin-top:8px;">${savedWorkType}</textarea>
+                      </td>
                 `;
                 
                 // Строки для этого участка (колонки 3-12)
-                rows.forEach((row) => {
+                for (let idx = 0; idx < rowsCount; idx++) {
+                    const row = rows[idx];
                     const tr = tbody.insertRow();
                     tr.innerHTML = `
-                        <td class="work-name-cell"><input value="${row.workName}" placeholder="Наименование работ" onchange="updateRow('${row.id}','workName',this.value)" style="width:100%;padding:6px;">       </td>
-                        <td style="width:60px"><input value="${row.workUnit}" onchange="updateRow('${row.id}','workUnit',this.value)">       </td>
-                        <td style="width:80px"><input value="${row.workVolume}" onchange="updateRow('${row.id}','workVolume',this.value)">       </td>
-                        <td><input value="${row.equipmentType}" placeholder="Тип" onchange="updateRow('${row.id}','equipmentType',this.value)">       </td>
-                        <td style="width:60px"><input value="${row.equipmentCount}" onchange="updateRow('${row.id}','equipmentCount',this.value)">       </td>
-                        <td style="width:100px"><input value="${row.equipmentNumber}" placeholder="Гос№" onchange="updateRow('${row.id}','equipmentNumber',this.value)">       </td>
-                        <td style="width:70px"><input value="${row.machineHours}" onchange="updateRow('${row.id}','machineHours',this.value)">       </td>
-                        <td style="width:60px"><input value="${row.peopleCount}" onchange="updateRow('${row.id}','peopleCount',this.value)">       </td>
-                        <td style="width:70px"><input value="${row.peopleHours}" onchange="updateRow('${row.id}','peopleHours',this.value)">       </td>
-                        <td><input value="${row.note}" placeholder="Прим." onchange="updateRow('${row.id}','note',this.value)">       </td>
+                        <td class="work-name-cell"><input value="${row.workName}" placeholder="Наименование работ" onchange="updateRow('${row.id}','workName',this.value)" style="width:100%;padding:6px;">        </td>
+                        <td style="width:60px"><input value="${row.workUnit}" onchange="updateRow('${row.id}','workUnit',this.value)">        </td>
+                        <td style="width:80px"><input value="${row.workVolume}" onchange="updateRow('${row.id}','workVolume',this.value)">        </td>
+                        <td><input value="${row.equipmentType}" placeholder="Тип" onchange="updateRow('${row.id}','equipmentType',this.value)">        </td>
+                        <td style="width:60px"><input value="${row.equipmentCount}" onchange="updateRow('${row.id}','equipmentCount',this.value)">        </td>
+                        <td style="width:100px"><input value="${row.equipmentNumber}" placeholder="Гос№" onchange="updateRow('${row.id}','equipmentNumber',this.value)">        </td>
+                        <td style="width:70px"><input value="${row.machineHours}" onchange="updateRow('${row.id}','machineHours',this.value)">        </td>
+                        <td style="width:60px"><input value="${row.peopleCount}" onchange="updateRow('${row.id}','peopleCount',this.value)">        </td>
+                        <td style="width:70px"><input value="${row.peopleHours}" onchange="updateRow('${row.id}','peopleHours',this.value)">        </td>
+                        <td><input value="${row.note}" placeholder="Прим." onchange="updateRow('${row.id}','note',this.value)">        </td>
                     `;
-                });
-            }
-            
-            // Привязываем события для полей вида работ
-            for (let i = 1; i <= 4; i++) {
-                const workTypeField = document.getElementById(`workType_${i}`);
-                if (workTypeField) workTypeField.onchange = (e) => saveWorkType(i, e.target.value);
+                }
             }
             
             updateTotals();
         }
         
         function savePicket(idx, val) { window['picket_' + idx] = val; }
-        function saveWorkType(idx, val) { window['workType_' + idx] = val; }
         
         function updateRow(id, field, val) { 
             const row = workRows.find(r => r.id == id); 
@@ -1167,6 +1159,7 @@
             document.getElementById('totalEquipmentHours').textContent = eh.toFixed(1);
             updateMaterialsLists();
         }
+        
         function updateMaterialsLists() {
             const inc = document.getElementById('incomeMaterialsList'); inc.innerHTML = ''; let ti = 0;
             incomeMaterials.forEach(i => { ti += parseFloat(i.volume) || 0; inc.innerHTML += `<div class="material-item"><span>${i.material}</span><span>${i.volume} ${i.unit}</span></div>`; });
@@ -1175,8 +1168,10 @@
             outcomeMaterials.forEach(i => { to += parseFloat(i.volume) || 0; outc.innerHTML += `<div class="material-item"><span>${i.material}</span><span>${i.volume} ${i.unit}</span></div>`; });
             document.getElementById('totalOutcome').textContent = to.toFixed(1);
         }
+        
         function addIncomeRow() { currentMaterialType = 'income'; openMaterialModal('приход'); }
         function addOutcomeRow() { currentMaterialType = 'outcome'; openMaterialModal('расход'); }
+        
         function openMaterialModal(type) {
             document.getElementById('materialModalTitle').textContent = `Добавить ${type}`;
             const s = document.getElementById('materialSelect'); s.innerHTML = '<option value="">Выберите</option>';
@@ -1185,7 +1180,9 @@
             document.getElementById('destinationField').style.display = type === 'расход' ? 'block' : 'none';
             document.getElementById('materialModal').style.display = 'block';
         }
+        
         function closeMaterialModal() { document.getElementById('materialModal').style.display = 'none'; }
+        
         function saveMaterial() {
             const mat = document.getElementById('materialSelect').value, vol = document.getElementById('materialVolume').value;
             if (!mat || !vol) { alert('Заполните материал и объем'); return; }
@@ -1194,17 +1191,18 @@
             else { item.destination = document.getElementById('materialDestination').value; outcomeMaterials.push(item); }
             closeMaterialModal(); updateMaterialsLists();
         }
+        
         function saveSummary() {
             if (!currentUser) { alert('Авторизуйтесь'); return; }
             const date = document.getElementById('reportDate').value;
             if (!date) { alert('Введите дату'); return; }
             
-            // Собираем пикетажи и виды работ
+            // Собираем пикетажи
             const pickets = {};
             const workTypes = {};
             for (let i = 1; i <= 4; i++) {
                 pickets[i] = window['picket_' + i] || '';
-                workTypes[i] = window['workType_' + i] || '';
+                workTypes[i] = document.getElementById(`workType_${i}`)?.value || '';
             }
             
             const summary = {
@@ -1232,12 +1230,14 @@
             renderSummaries();
             renderReports();
         }
+        
         function renderSummaries() {
             const masters = [...new Set(summaries.map(s => s.master))];
             const filter = document.getElementById('summaryMasterFilter'); filter.innerHTML = '<option value="all">Все мастера</option>';
             masters.forEach(m => filter.innerHTML += `<option value="${m}">${m}</option>`);
             filterSummaries();
         }
+        
         function filterSummaries() {
             const master = document.getElementById('summaryMasterFilter').value, section = document.getElementById('summarySectionFilter').value, shift = document.getElementById('summaryShiftFilter').value;
             let filtered = summaries;
@@ -1247,12 +1247,14 @@
             const grid = document.getElementById('summariesGrid'); grid.innerHTML = filtered.length ? '' : '<div class="empty-state">Нет сводок</div>';
             filtered.forEach(s => { grid.innerHTML += `<div class="summary-card" onclick='alert(JSON.stringify(${JSON.stringify(s)},null,2))'><div class="summary-header"><span class="summary-date">${s.date}</span><span class="summary-shift">${s.shift}</span></div><div>${s.master}</div><div class="summary-stats"><span>👥 ${s.totalPeople} чел</span><span>🚜 ${s.totalEquipment} тех</span><span>⏱️ ${s.totalHours} ч</span></div></div>`; });
         }
+        
         function renderStorage() {
             const materials = [...new Set(Object.values(storage).map(s => s.material))];
             const filter = document.getElementById('storageMaterialFilter'); filter.innerHTML = '<option value="all">Все</option>';
             materials.forEach(m => filter.innerHTML += `<option value="${m}">${m}</option>`);
             filterStorage();
         }
+        
         function filterStorage() {
             const material = document.getElementById('storageMaterialFilter').value, piket = document.getElementById('storagePiketFilter').value.toLowerCase();
             let items = Object.values(storage);
@@ -1263,7 +1265,9 @@
             const history = document.getElementById('storageHistoryBody'); history.innerHTML = '';
             storageHistory.slice(0, 20).forEach(item => { history.innerHTML += `      器<th>${item.date}</th><th>${item.material}</th><td style="color:${item.type==='приход'?'var(--success)':'var(--danger)'}">${item.type}</td><th>${item.volume}</th><th>ПК ${item.piket}</th><th>${item.master}</th>`; });
         }
+        
         function renderEmployees() { filterEmployees(); }
+        
         function filterEmployees() {
             const pos = document.getElementById('employeePositionFilter').value, sec = document.getElementById('employeeSectionFilter').value;
             let filtered = employees;
@@ -1272,6 +1276,7 @@
             const grid = document.getElementById('employeesGrid'); grid.innerHTML = filtered.length ? '' : '<div class="empty-state">Нет сотрудников</div>';
             filtered.forEach(e => { grid.innerHTML += `<div class="employee-card"><div class="employee-name">${e.fullName}</div><div class="employee-position">${e.position}</div><div>📞 ${e.phone}</div><div>📧 ${e.email}</div><div>🏗️ Участок ${e.section}</div></div>`; });
         }
+        
         function showAddEmployee() {
             const name = prompt('ФИО:'); if (!name) return;
             const position = prompt('Должность:'); if (!position) return;
@@ -1283,6 +1288,7 @@
             renderEmployees();
             renderReports();
         }
+        
         function renderReports() {
             document.getElementById('totalSummaries').textContent = summaries.length;
             const totalVolume = summaries.reduce((sum, s) => sum + s.workRows.reduce((sSum, r) => sSum + (parseFloat(r.workVolume)||0), 0), 0);
