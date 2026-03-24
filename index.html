@@ -899,10 +899,10 @@
                         <th style="width: 50px;">Чел.</th>
                         <th style="width: 60px;">Чел-ч</th>
                         <th style="min-width: 100px;">Прим.</th>
-                        </tr>
+                         
                 </thead>
                 <tbody id="workBody"></tbody>
-             </table>
+               </table>
         </div>
         <div class="totals-container">
             <div class="total-block"><div class="total-title">👥 ЛЮДИ</div><div class="total-row"><span>Количество:</span><span class="total-value" id="totalPeopleCount">0</span></div><div class="total-row"><span>Человеко-часы:</span><span class="total-value" id="totalPeopleHours">0</span></div></div>
@@ -1106,6 +1106,7 @@
 
         // ========== ФУНКЦИИ СВОДОК ==========
         function openSummaryModal() {
+            console.log("openSummaryModal вызвана");
             editingSummaryId = null;
             document.getElementById('modalTitle').textContent = '📋 Новая сводка';
             document.getElementById('deleteSummaryBtn').style.display = 'none';
@@ -1158,7 +1159,6 @@
         function renderWorkTable() {
             const tbody = document.getElementById('workBody'); 
             tbody.innerHTML = '';
-            let renderedSections = [];
             
             let sectionGroups = {};
             workRows.forEach(row => {
@@ -1182,22 +1182,22 @@
                         <div style="margin-bottom:12px"><strong style="font-size:13px;">${sectionName}</strong></div>
                         <input type="text" id="picket_${sectionIdx}" placeholder="ПК-ПК" style="width:100%;padding:8px;border-radius:6px;background:var(--bg-primary);border:1px solid var(--border);color:white;margin-bottom:8px;" value="${savedPicket}" onchange="savePicket(${sectionIdx}, this.value)">
                         <textarea id="workType_${sectionIdx}" placeholder="Вид работы" style="width:100%;min-height:100px;resize:vertical;background:var(--bg-primary);border:1px solid var(--border);border-radius:6px;color:white;padding:8px;margin-top:8px;">${savedWorkType}</textarea>
-                     </td>
+                      </td>
                 `;
                 
                 rows.forEach((row) => {
                     const tr = tbody.insertRow();
                     tr.innerHTML = `
-                        <td class="work-name-cell"><input value="${row.workName}" placeholder="Наименование работ" onchange="updateRow('${row.id}','workName',this.value)" style="width:100%;padding:6px;"></td>
-                        <td style="width:60px"><input value="${row.workUnit}" onchange="updateRow('${row.id}','workUnit',this.value)"></td>
-                        <td style="width:80px"><input value="${row.workVolume}" onchange="updateRow('${row.id}','workVolume',this.value)"></td>
-                        <td><input value="${row.equipmentType}" placeholder="Тип" onchange="updateRow('${row.id}','equipmentType',this.value)"></td>
-                        <td style="width:60px"><input value="${row.equipmentCount}" onchange="updateRow('${row.id}','equipmentCount',this.value)"></td>
-                        <td style="width:100px"><input value="${row.equipmentNumber}" placeholder="Гос№" onchange="updateRow('${row.id}','equipmentNumber',this.value)"></td>
-                        <td style="width:70px"><input value="${row.machineHours}" onchange="updateRow('${row.id}','machineHours',this.value)"></td>
-                        <td style="width:60px"><input value="${row.peopleCount}" onchange="updateRow('${row.id}','peopleCount',this.value)"></td>
-                        <td style="width:70px"><input value="${row.peopleHours}" onchange="updateRow('${row.id}','peopleHours',this.value)"></td>
-                        <td><input value="${row.note}" placeholder="Прим." onchange="updateRow('${row.id}','note',this.value)"></td>
+                        <td class="work-name-cell"><input value="${row.workName}" placeholder="Наименование работ" onchange="updateRow('${row.id}','workName',this.value)" style="width:100%;padding:6px;"> </td>
+                        <td style="width:60px"><input value="${row.workUnit}" onchange="updateRow('${row.id}','workUnit',this.value)"> </td>
+                        <td style="width:80px"><input value="${row.workVolume}" onchange="updateRow('${row.id}','workVolume',this.value)"> </td>
+                        <td><input value="${row.equipmentType}" placeholder="Тип" onchange="updateRow('${row.id}','equipmentType',this.value)"> </td>
+                        <td style="width:60px"><input value="${row.equipmentCount}" onchange="updateRow('${row.id}','equipmentCount',this.value)"> </td>
+                        <td style="width:100px"><input value="${row.equipmentNumber}" placeholder="Гос№" onchange="updateRow('${row.id}','equipmentNumber',this.value)"> </td>
+                        <td style="width:70px"><input value="${row.machineHours}" onchange="updateRow('${row.id}','machineHours',this.value)"> </td>
+                        <td style="width:60px"><input value="${row.peopleCount}" onchange="updateRow('${row.id}','peopleCount',this.value)"> </td>
+                        <td style="width:70px"><input value="${row.peopleHours}" onchange="updateRow('${row.id}','peopleHours',this.value)"> </td>
+                        <td><input value="${row.note}" placeholder="Прим." onchange="updateRow('${row.id}','note',this.value)"> </td>
                     `;
                 });
             }
@@ -1473,11 +1473,21 @@
 
         // Инициализация
         document.addEventListener('DOMContentLoaded', function() {
+            console.log("DOM загружен");
             setupPhoneMask();
             document.getElementById('googleRegisterBtn').onclick = googleRegister;
             document.getElementById('googleLoginBtn').onclick = googleLogin;
             document.getElementById('subscribeBtn').onclick = showCompanyForm;
             document.getElementById('createCompanyBtn').onclick = createCompany;
+            
+            const newSummaryBtn = document.getElementById('summarySection').querySelector('.btn-success');
+            if (newSummaryBtn) {
+                console.log("Кнопка найдена");
+                newSummaryBtn.onclick = openSummaryModal;
+            } else {
+                console.error("Кнопка не найдена!");
+            }
+            
             document.getElementById('noPatronymic').addEventListener('change', function(e) { 
                 const input = document.getElementById('regPatronymic'); 
                 input.disabled = e.target.checked; 
