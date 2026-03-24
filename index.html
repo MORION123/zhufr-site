@@ -436,47 +436,28 @@
             vertical-align: middle;
         }
 
-        .work-table input,
-        .work-table textarea {
+        .work-table input {
             width: 100%;
-            background: var(--bg-primary);
-            border: 1px solid var(--border);
-            border-radius: 4px;
+            background: transparent;
+            border: none;
             color: var(--text-primary);
+            text-align: center;
             font-size: 11px;
-            padding: 6px;
-            font-family: inherit;
+            padding: 4px 2px;
         }
 
-        .work-table textarea {
-            resize: vertical;
-            min-height: 60px;
-        }
-
-        .work-table input:focus,
-        .work-table textarea:focus {
+        .work-table input:focus {
             outline: none;
-            border-color: var(--accent);
+            background: var(--bg-primary);
+            border-radius: 4px;
         }
 
         .section-cell {
             background: linear-gradient(135deg, var(--bg-card) 0%, var(--bg-secondary) 100%);
             vertical-align: top;
             padding: 12px;
+            min-width: 200px;
             border-right: 2px solid var(--accent);
-        }
-
-        .section-cell textarea {
-            width: 100%;
-            background: var(--bg-primary);
-            border: 1px solid var(--accent);
-            border-radius: 6px;
-            color: var(--text-primary);
-            font-size: 12px;
-            padding: 10px;
-            resize: vertical;
-            min-height: 80px;
-            font-family: inherit;
         }
 
         .totals-container {
@@ -700,10 +681,6 @@
             .profile-details {
                 grid-template-columns: 1fr;
             }
-            .work-table th {
-                font-size: 9px;
-                padding: 6px 2px;
-            }
         }
     </style>
 </head>
@@ -711,7 +688,7 @@
     <div class="container">
         <div class="header">
             <h1>ЖУФР</h1>
-            <p>Журнал учета работ · Система управления строительством</p>
+            <p>Система учета строительных работ</p>
         </div>
 
         <!-- Карточка авторизации -->
@@ -810,7 +787,7 @@
                 <div class="section-title"><span>📦 Склады материалов</span></div>
                 <div class="filters-bar"><select class="filter-select" id="storageMaterialFilter" onchange="filterStorage()"><option value="all">Все материалы</option></select><input type="text" class="filter-select" id="storagePiketFilter" placeholder="Пикет склада" onchange="filterStorage()"></div>
                 <div id="storageGrid" class="storage-grid"><div class="empty-state">Нет материалов</div></div>
-                <div style="margin-top:20px"><h3>История движений</h3><div class="table-container"><table class="work-table"><thead>    <tr><th>Дата</th><th>Материал</th><th>Тип</th><th>Объем</th><th>Пикет</th><th>Мастер</th> </thead><tbody id="storageHistoryBody"></tbody>  </table></div></div>
+                <div style="margin-top:20px"><h3>История движений</h3><div class="table-container"><table class="work-table"><thead>   <tr><th>Дата</th><th>Материал</th><th>Тип</th><th>Объем</th><th>Пикет</th><th>Мастер</th></tr></thead><tbody id="storageHistoryBody"></tbody></table></div></div>
             </div>
 
             <div id="employeesSection" class="section-card" style="display: none;">
@@ -827,83 +804,51 @@
                     <div class="total-block"><div class="total-title">Материалов на складе</div><div class="total-value" id="totalStorageValue">0</div></div>
                     <div class="total-block"><div class="total-title">Всего сотрудников</div><div class="total-value" id="totalEmployees">0</div></div>
                 </div>
-                <div style="margin-top:20px"><h3>Статистика по мастерам</h3><div class="table-container"><table class="work-table"><thead>    <tr><th>Мастер</th><th>Кол-во сводок</th><th>Объем работ</th><th>Маш-часы</th> </thead><tbody id="mastersStatsBody"></tbody>  </table></div></div>
+                <div style="margin-top:20px"><h3>Статистика по мастерам</h3><div class="table-container"><table class="work-table"><thead>   <tr><th>Мастер</th><th>Кол-во сводок</th><th>Объем работ</th><th>Маш-часы</th></tr></thead><tbody id="mastersStatsBody"></tbody></table></div></div>
             </div>
         </div>
     </div>
 
-    <!-- Модальное окно создания сводки - ПОЛНОСТЬЮ ПЕРЕДЕЛАНО ПО ВАШЕМУ ОБРАЗЦУ -->
+    <!-- Модальное окно создания сводки -->
     <div id="summaryModal" class="summary-modal">
         <div class="modal-header"><h2>📋 Новая сводка</h2><button class="btn" onclick="closeSummaryModal()">✕ Закрыть</button></div>
-        
-        <!-- Шапка с ФИО, телефоном, участком -->
-        <div class="info-row" style="grid-template-columns: repeat(6, 1fr);">
+        <div class="info-row">
             <div><span class="info-label">Дата:</span><input type="text" id="reportDate" placeholder="28.10.2024"></div>
             <div><span class="info-label">Смена:</span><select id="reportShift"><option value="день">День</option><option value="ночь">Ночь</option></select></div>
-            <div><span class="info-label">Ф.И.О.:</span><span id="currentMaster">—</span></div>
-            <div><span class="info-label">Телефон:</span><span id="currentPhone">—</span></div>
+            <div><span class="info-label">Мастер:</span><span id="currentMaster">—</span></div>
             <div><span class="info-label">Участок:</span><span id="currentSection">—</span></div>
-            <div></div>
         </div>
-        
         <div class="table-container">
             <table class="work-table" id="workTable">
                 <thead>
-                    <!-- Основные заголовки -->
                     <tr>
                         <th rowspan="2">Участок работ<br>(ПК-ПК)</th>
-                        <th rowspan="2">Вид работы</th>
+                        <th rowspan="2">Вид работ</th>
                         <th rowspan="2">Состав работы</th>
-                        <th rowspan="2">Ед. изм.</th>
-                        <th rowspan="2">Объем работы</th>
-                        <th colspan="3">Материалы</th>
-                        <th colspan="4">Машины, механизмы, автотранспорт</th>
-                        <th rowspan="2">Примечание</th>
-                     </tr>
+                        <th rowspan="2">Ед.</th>
+                        <th rowspan="2">Объем</th>
+                        <th colspan="4">Техника</th>
+                        <th rowspan="2">Чел.</th>
+                        <th rowspan="2">Чел-ч</th>
+                        <th rowspan="2">Прим.</th>
+                    </tr>
                     <tr>
-                        <th>Наименование</th>
-                        <th>Ед. изм.</th>
-                        <th>Объем (кол-во)</th>
-                        <th>Тип техники/трудовые ресурсы</th>
-                        <th>кол-во</th>
-                        <th>Гос. Номер (полностью)</th>
-                        <th>м-часы (чел-часы)</th>
+                        <th>Тип</th>
+                        <th>Кол-во</th>
+                        <th>Гос №</th>
+                        <th>Маш-ч</th>
                     </tr>
                 </thead>
                 <tbody id="workBody"></tbody>
-             </table>
+            </table>
         </div>
-        
-        <!-- Итоговые блоки -->
-        <div class="totals-container" style="grid-template-columns: repeat(4, 1fr);">
-            <div class="total-block">
-                <div class="total-title">👥 ЛЮДИ</div>
-                <div class="total-row"><span>Количество человек (по табелю):</span><span class="total-value" id="totalPeopleCount">0</span></div>
-                <div class="total-row"><span>Чел-часы:</span><span class="total-value" id="totalPeopleHours">0</span></div>
-            </div>
-            <div class="total-block">
-                <div class="total-title">🚜 ТЕХНИКА</div>
-                <div class="total-row"><span>Количество техники:</span><span class="total-value" id="totalEquipmentCount">0</span></div>
-                <div class="total-row"><span>Маш-часы:</span><span class="total-value" id="totalEquipmentHours">0</span></div>
-            </div>
-            <div class="total-block">
-                <div class="total-title">📦 ПРИХОД МАТЕРИАЛЫ</div>
-                <div class="materials-list" id="incomeMaterialsList"></div>
-                <div class="total-row final-total"><span>Итого приход:</span><span class="total-value" id="totalIncome">0</span></div>
-                <button class="btn" onclick="addIncomeRow()" style="width:100%; margin-top:10px;">+ Добавить приход</button>
-            </div>
-            <div class="total-block">
-                <div class="total-title">📤 РАСХОД МАТЕРИАЛЫ</div>
-                <div class="materials-list" id="outcomeMaterialsList"></div>
-                <div class="total-row final-total"><span>Итого расход:</span><span class="total-value" id="totalOutcome">0</span></div>
-                <button class="btn" onclick="addOutcomeRow()" style="width:100%; margin-top:10px;">+ Добавить расход</button>
-            </div>
+        <div class="totals-container">
+            <div class="total-block"><div class="total-title">👥 ЛЮДИ</div><div class="total-row"><span>Количество:</span><span class="total-value" id="totalPeopleCount">0</span></div><div class="total-row"><span>Человеко-часы:</span><span class="total-value" id="totalPeopleHours">0</span></div></div>
+            <div class="total-block"><div class="total-title">🚜 ТЕХНИКА</div><div class="total-row"><span>Количество:</span><span class="total-value" id="totalEquipmentCount">0</span></div><div class="total-row"><span>Машино-часы:</span><span class="total-value" id="totalEquipmentHours">0</span></div></div>
+            <div class="total-block"><div class="total-title">📦 ПРИХОД</div><div class="materials-list" id="incomeMaterialsList"></div><div class="total-row"><span>Итого:</span><span class="total-value" id="totalIncome">0</span></div><button class="btn" onclick="addIncomeRow()" style="width:100%; margin-top:10px;">+ Приход</button></div>
+            <div class="total-block"><div class="total-title">📤 РАСХОД</div><div class="materials-list" id="outcomeMaterialsList"></div><div class="total-row"><span>Итого:</span><span class="total-value" id="totalOutcome">0</span></div><button class="btn" onclick="addOutcomeRow()" style="width:100%; margin-top:10px;">+ Расход</button></div>
         </div>
-        
-        <div class="action-buttons">
-            <button class="btn" onclick="closeSummaryModal()">Отмена</button>
-            <button class="btn btn-success" onclick="saveSummary()">💾 СОХРАНИТЬ СВОДКУ</button>
-        </div>
+        <div class="action-buttons"><button class="btn" onclick="closeSummaryModal()">Отмена</button><button class="btn btn-success" onclick="saveSummary()">💾 СОХРАНИТЬ</button></div>
     </div>
 
     <!-- Модальное окно добавления материала -->
@@ -1076,11 +1021,6 @@
             document.getElementById('profilePhone').textContent = currentUser.phone;
             document.getElementById('profileDate').textContent = currentUser.registeredAt ? new Date(currentUser.registeredAt).toLocaleDateString('ru-RU') : '—';
             if (currentUser.companyId && companies[currentUser.companyId]) document.getElementById('profileCompany').textContent = `🏢 ${companies[currentUser.companyId].name}`;
-            
-            // Обновляем данные в модальном окне
-            document.getElementById('currentMaster').textContent = currentUser.fullName;
-            document.getElementById('currentPhone').textContent = currentUser.phone;
-            document.getElementById('currentSection').textContent = `Участок ${currentUser.section || '29'}`;
         }
 
         function updateReferralLink() {
@@ -1094,44 +1034,42 @@
         function showMenu(menu) { document.querySelectorAll('.menu-btn').forEach(btn => btn.classList.remove('active')); document.querySelectorAll('.section-card').forEach(section => section.style.display = 'none'); document.querySelector(`.menu-btn[onclick="showMenu('${menu}')"]`).classList.add('active'); document.getElementById(`${menu}Section`).style.display = 'block'; }
         function logout() { if (confirm('Выйти?')) { auth.signOut(); currentUser = null; localStorage.removeItem('currentUser'); document.getElementById('mainContent').classList.remove('visible'); document.getElementById('infoStage').style.display = 'none'; document.getElementById('authCard').style.display = 'block'; showAuthTab('register'); } }
 
-        // ========== ФУНКЦИИ СВОДОК (ПЕРЕДЕЛАНЫ ПОД НОВУЮ СТРУКТУРУ) ==========
+        // ========== ФУНКЦИИ СВОДОК ==========
         function openSummaryModal() {
             workRows = []; incomeMaterials = []; outcomeMaterials = [];
-            
-            // Создаем 4 участка по 6 строк
             for (let i = 1; i <= 4; i++) {
                 for (let j = 1; j <= 6; j++) {
                     workRows.push({ 
                         id: `row_${i}_${j}_${Date.now()}`, 
-                        sectionIndex: i,
-                        picket: '',           // Пикетаж участка (общий для участка)
-                        workType: '',         // Вид работы (общий для участка)
-                        workName: '',         // Состав работы
+                        section: '', // убрали "Участок 1,2,3,4"
+                        sectionIndex: i, 
+                        workType: '', // Вид работ
+                        workName: '', // Состав работы
                         workUnit: 'м³', 
                         workVolume: '', 
-                        materialName: '',     // Наименование материала
-                        materialUnit: 'м³',   // Ед. изм. материала
-                        materialVolume: '',   // Объем материала
-                        equipmentType: '',    // Тип техники
-                        equipmentCount: '',   // Кол-во техники
-                        equipmentNumber: '',  // Гос. номер
-                        machineHours: '',     // Маш-часы
-                        peopleCount: '',      // Количество человек
-                        peopleHours: '',      // Чел-часы
+                        equipmentType: '', 
+                        equipmentCount: '', 
+                        equipmentNumber: '', 
+                        machineHours: '', 
+                        peopleCount: '', 
+                        peopleHours: '', 
                         note: '' 
                     });
                 }
             }
-            
+            document.getElementById('currentMaster').textContent = currentUser?.fullName || 'Мастер';
+            document.getElementById('currentSection').textContent = `Участок ${currentUser?.section || '29'}`;
             renderWorkTable();
             document.getElementById('summaryModal').style.display = 'block';
         }
         function closeSummaryModal() { document.getElementById('summaryModal').style.display = 'none'; }
         
         function renderWorkTable() {
-            const tbody = document.getElementById('workBody'); 
-            tbody.innerHTML = '';
+            const tbody = document.getElementById('workBody'); tbody.innerHTML = '';
+            let renderedSections = [];
+            let rowNum = 1;
             
+            // Группируем строки по sectionIndex
             let sectionGroups = {};
             workRows.forEach(row => {
                 if (!sectionGroups[row.sectionIndex]) {
@@ -1140,60 +1078,46 @@
                 sectionGroups[row.sectionIndex].push(row);
             });
             
+            // Отрисовываем каждый участок
             for (let sectionIdx = 1; sectionIdx <= 4; sectionIdx++) {
                 const rows = sectionGroups[sectionIdx] || [];
                 if (rows.length === 0) continue;
                 
-                const savedPicket = window['picket_' + sectionIdx] || '';
-                const savedWorkType = window['workType_' + sectionIdx] || '';
-                
-                // Заголовок участка - объединенная ячейка на 6 строк
+                // Заголовок участка с полем для пикетажа (объединенная ячейка)
                 const headerRow = tbody.insertRow();
                 headerRow.innerHTML = `
                     <td rowspan="${rows.length}" class="section-cell">
-                        <textarea id="picket_${sectionIdx}" 
-                               placeholder="Участок работ (ПК-ПК)" 
-                               style="width:100%; min-height:70px; resize:vertical; background:var(--bg-primary); border:1px solid var(--accent); border-radius:6px; color:white; padding:8px; margin-bottom:8px;">${savedPicket}</textarea>
-                        <textarea id="workType_${sectionIdx}" 
-                               placeholder="Вид работы" 
-                               style="width:100%; min-height:80px; resize:vertical; background:var(--bg-primary); border:1px solid var(--accent); border-radius:6px; color:white; padding:8px;">${savedWorkType}</textarea>
-                       </td>
+                        <input type="text" 
+                               id="picket_${sectionIdx}" 
+                               placeholder="Пикетаж (ПК-ПК)" 
+                               style="width:100%; padding:8px; border-radius:6px; background:var(--bg-primary); border:1px solid var(--accent); color:white; text-align:center"
+                               value="${window['picket_' + sectionIdx] || ''}" 
+                               onchange="savePicket(${sectionIdx}, this.value)">
+                    </td>
                 `;
                 
-                // Строки работ
-                rows.forEach((row) => {
+                // Добавляем строки для этого участка
+                rows.forEach((row, idx) => {
                     const tr = tbody.insertRow();
                     tr.innerHTML = `
-                        <td><textarea style="width:100%; min-height:70px; resize:vertical; background:var(--bg-primary); border:1px solid var(--border); border-radius:4px; color:var(--text-primary); padding:6px;" 
-                                   onchange="updateRow('${row.id}','workName',this.value)">${row.workName || ''}</textarea></td>
-                        <td style="width:50px"><input value="${row.workUnit}" onchange="updateRow('${row.id}','workUnit',this.value)"></td>
-                        <td style="width:70px"><input value="${row.workVolume}" onchange="updateRow('${row.id}','workVolume',this.value)"></td>
-                        <td><input value="${row.materialName}" placeholder="Наименование" onchange="updateRow('${row.id}','materialName',this.value)"></td>
-                        <td style="width:60px"><input value="${row.materialUnit}" onchange="updateRow('${row.id}','materialUnit',this.value)"></td>
-                        <td style="width:70px"><input value="${row.materialVolume}" onchange="updateRow('${row.id}','materialVolume',this.value)"></td>
-                        <td><input value="${row.equipmentType}" placeholder="Тип техники" onchange="updateRow('${row.id}','equipmentType',this.value)"></td>
-                        <td style="width:50px"><input value="${row.equipmentCount}" onchange="updateRow('${row.id}','equipmentCount',this.value)"></td>
-                        <td style="width:90px"><input value="${row.equipmentNumber}" placeholder="Гос. номер" onchange="updateRow('${row.id}','equipmentNumber',this.value)"></td>
-                        <td style="width:70px"><input value="${row.machineHours}" placeholder="м-ч" onchange="updateRow('${row.id}','machineHours',this.value)"></td>
-                        <td style="width:60px"><input value="${row.note}" placeholder="Примечание" onchange="updateRow('${row.id}','note',this.value)"></td>
+                        <td><input value="${row.workType || ''}" placeholder="Вид работ" onchange="updateRow('${row.id}','workType',this.value)"></td>
+                        <td><input value="${row.workName || ''}" placeholder="Состав работы" onchange="updateRow('${row.id}','workName',this.value)"></td>
+                        <td style="width:60px"><input value="${row.workUnit}" onchange="updateRow('${row.id}','workUnit',this.value)"></td>
+                        <td style="width:80px"><input value="${row.workVolume}" onchange="updateRow('${row.id}','workVolume',this.value)"></td>
+                        <td><input value="${row.equipmentType}" placeholder="Тип" onchange="updateRow('${row.id}','equipmentType',this.value)"></td>
+                        <td style="width:60px"><input value="${row.equipmentCount}" onchange="updateRow('${row.id}','equipmentCount',this.value)"></td>
+                        <td style="width:100px"><input value="${row.equipmentNumber}" placeholder="Гос№" onchange="updateRow('${row.id}','equipmentNumber',this.value)"></td>
+                        <td style="width:70px"><input value="${row.machineHours}" onchange="updateRow('${row.id}','machineHours',this.value)"></td>
+                        <td style="width:60px"><input value="${row.peopleCount}" onchange="updateRow('${row.id}','peopleCount',this.value)"></td>
+                        <td style="width:70px"><input value="${row.peopleHours}" onchange="updateRow('${row.id}','peopleHours',this.value)"></td>
+                        <td><input value="${row.note}" placeholder="Прим." onchange="updateRow('${row.id}','note',this.value)"></td>
                     `;
                 });
             }
-            
-            // Привязываем события сохранения для текстовых областей
-            for (let i = 1; i <= 4; i++) {
-                const picketField = document.getElementById(`picket_${i}`);
-                const workTypeField = document.getElementById(`workType_${i}`);
-                if (picketField) picketField.onchange = (e) => savePicket(i, e.target.value);
-                if (workTypeField) workTypeField.onchange = (e) => saveWorkType(i, e.target.value);
-            }
-            
             updateTotals();
         }
         
         function savePicket(idx, val) { window['picket_' + idx] = val; }
-        function saveWorkType(idx, val) { window['workType_' + idx] = val; }
-        
         function updateRow(id, field, val) { 
             const row = workRows.find(r => r.id == id); 
             if (row) { 
@@ -1201,123 +1125,59 @@
                 updateTotals(); 
             } 
         }
-        
         function updateTotals() {
-            let people = 0, peopleHours = 0, equip = 0, equipHours = 0;
+            let p = 0, ph = 0, e = 0, eh = 0;
             workRows.forEach(r => { 
-                people += parseInt(r.peopleCount) || 0; 
-                peopleHours += parseFloat(r.peopleHours) || 0; 
-                equip += parseInt(r.equipmentCount) || 0; 
-                equipHours += parseFloat(r.machineHours) || 0; 
+                p += parseInt(r.peopleCount) || 0; 
+                ph += parseFloat(r.peopleHours) || 0; 
+                e += parseInt(r.equipmentCount) || 0; 
+                eh += parseFloat(r.machineHours) || 0; 
             });
-            document.getElementById('totalPeopleCount').textContent = people;
-            document.getElementById('totalPeopleHours').textContent = peopleHours.toFixed(1);
-            document.getElementById('totalEquipmentCount').textContent = equip;
-            document.getElementById('totalEquipmentHours').textContent = equipHours.toFixed(1);
-            
-            // Обновляем списки материалов
+            document.getElementById('totalPeopleCount').textContent = p;
+            document.getElementById('totalPeopleHours').textContent = ph.toFixed(1);
+            document.getElementById('totalEquipmentCount').textContent = e;
+            document.getElementById('totalEquipmentHours').textContent = eh.toFixed(1);
             updateMaterialsLists();
         }
-        
         function updateMaterialsLists() {
-            // Группируем приход по материалам
-            const incomeSummary = {};
-            let totalIncome = 0;
-            incomeMaterials.forEach(item => {
-                const vol = parseFloat(item.volume) || 0;
-                totalIncome += vol;
-                if (!incomeSummary[item.material]) incomeSummary[item.material] = 0;
-                incomeSummary[item.material] += vol;
-            });
-            
-            const incomeDiv = document.getElementById('incomeMaterialsList');
-            incomeDiv.innerHTML = '';
-            Object.entries(incomeSummary).forEach(([name, vol]) => {
-                incomeDiv.innerHTML += `<div class="material-item"><span>${name}</span><span>${vol.toFixed(1)}</span></div>`;
-            });
-            document.getElementById('totalIncome').textContent = totalIncome.toFixed(1);
-            
-            // Группируем расход по материалам
-            const outcomeSummary = {};
-            let totalOutcome = 0;
-            outcomeMaterials.forEach(item => {
-                const vol = parseFloat(item.volume) || 0;
-                totalOutcome += vol;
-                if (!outcomeSummary[item.material]) outcomeSummary[item.material] = 0;
-                outcomeSummary[item.material] += vol;
-            });
-            
-            const outcomeDiv = document.getElementById('outcomeMaterialsList');
-            outcomeDiv.innerHTML = '';
-            Object.entries(outcomeSummary).forEach(([name, vol]) => {
-                outcomeDiv.innerHTML += `<div class="material-item"><span>${name}</span><span>${vol.toFixed(1)}</span></div>`;
-            });
-            document.getElementById('totalOutcome').textContent = totalOutcome.toFixed(1);
+            const inc = document.getElementById('incomeMaterialsList'); inc.innerHTML = ''; let ti = 0;
+            incomeMaterials.forEach(i => { ti += parseFloat(i.volume) || 0; inc.innerHTML += `<div class="material-item"><span>${i.material}</span><span>${i.volume} ${i.unit}</span></div>`; });
+            document.getElementById('totalIncome').textContent = ti.toFixed(1);
+            const outc = document.getElementById('outcomeMaterialsList'); outc.innerHTML = ''; let to = 0;
+            outcomeMaterials.forEach(i => { to += parseFloat(i.volume) || 0; outc.innerHTML += `<div class="material-item"><span>${i.material}</span><span>${i.volume} ${i.unit}</span></div>`; });
+            document.getElementById('totalOutcome').textContent = to.toFixed(1);
         }
-        
         function addIncomeRow() { currentMaterialType = 'income'; openMaterialModal('приход'); }
         function addOutcomeRow() { currentMaterialType = 'outcome'; openMaterialModal('расход'); }
-        
         function openMaterialModal(type) {
             document.getElementById('materialModalTitle').textContent = `Добавить ${type}`;
-            const s = document.getElementById('materialSelect'); s.innerHTML = '<option value="">Выберите материал</option>';
+            const s = document.getElementById('materialSelect'); s.innerHTML = '<option value="">Выберите</option>';
             MATERIALS.forEach(m => s.innerHTML += `<option value="${m}">${m}</option>`);
             document.getElementById('supplierField').style.display = type === 'приход' ? 'block' : 'none';
             document.getElementById('destinationField').style.display = type === 'расход' ? 'block' : 'none';
             document.getElementById('materialModal').style.display = 'block';
         }
-        
         function closeMaterialModal() { document.getElementById('materialModal').style.display = 'none'; }
-        
         function saveMaterial() {
             const mat = document.getElementById('materialSelect').value, vol = document.getElementById('materialVolume').value;
             if (!mat || !vol) { alert('Заполните материал и объем'); return; }
             const item = { id: Date.now(), material: mat, unit: document.getElementById('materialUnit').value, volume: vol, piket: document.getElementById('materialPiket').value };
-            if (currentMaterialType === 'income') { 
-                item.supplier = document.getElementById('materialSupplier').value; 
-                incomeMaterials.push(item); 
-            } else { 
-                item.destination = document.getElementById('materialDestination').value; 
-                outcomeMaterials.push(item); 
-            }
-            closeMaterialModal(); 
-            updateMaterialsLists();
+            if (currentMaterialType === 'income') { item.supplier = document.getElementById('materialSupplier').value; incomeMaterials.push(item); }
+            else { item.destination = document.getElementById('materialDestination').value; outcomeMaterials.push(item); }
+            closeMaterialModal(); updateMaterialsLists();
         }
-        
         function saveSummary() {
             if (!currentUser) { alert('Авторизуйтесь'); return; }
             const date = document.getElementById('reportDate').value;
             if (!date) { alert('Введите дату'); return; }
-            
-            // Собираем пикетажи и виды работ для каждого участка
-            const pickets = {};
-            const workTypes = {};
-            for (let i = 1; i <= 4; i++) {
-                pickets[i] = window['picket_' + i] || '';
-                workTypes[i] = window['workType_' + i] || '';
-            }
-            
             const summary = {
-                id: Date.now(), 
-                date: date, 
-                shift: document.getElementById('reportShift').value, 
-                master: currentUser.fullName, 
-                phone: currentUser.phone,
-                section: currentUser.section,
-                pickets: pickets,
-                workTypes: workTypes,
-                workRows: [...workRows], 
-                incomeMaterials: [...incomeMaterials], 
-                outcomeMaterials: [...outcomeMaterials],
-                totalPeople: document.getElementById('totalPeopleCount').textContent, 
-                totalPeopleHours: document.getElementById('totalPeopleHours').textContent,
-                totalEquipment: document.getElementById('totalEquipmentCount').textContent, 
-                totalHours: document.getElementById('totalEquipmentHours').textContent,
-                totalIncome: document.getElementById('totalIncome').textContent, 
-                totalOutcome: document.getElementById('totalOutcome').textContent,
-                createdAt: new Date().toISOString()
+                id: Date.now(), date, shift: document.getElementById('reportShift').value, master: currentUser.fullName, section: currentUser.section,
+                pickets: { picket_1: window.picket_1, picket_2: window.picket_2, picket_3: window.picket_3, picket_4: window.picket_4 },
+                workRows: [...workRows], incomeMaterials: [...incomeMaterials], outcomeMaterials: [...outcomeMaterials],
+                totalPeople: document.getElementById('totalPeopleCount').textContent, totalPeopleHours: document.getElementById('totalPeopleHours').textContent,
+                totalEquipment: document.getElementById('totalEquipmentCount').textContent, totalHours: document.getElementById('totalEquipmentHours').textContent,
+                totalIncome: document.getElementById('totalIncome').textContent, totalOutcome: document.getElementById('totalOutcome').textContent
             };
-            
             summaries.unshift(summary);
             saveCompanyData();
             alert('✅ Сводка сохранена!');
@@ -1325,14 +1185,12 @@
             renderSummaries();
             renderReports();
         }
-        
         function renderSummaries() {
             const masters = [...new Set(summaries.map(s => s.master))];
             const filter = document.getElementById('summaryMasterFilter'); filter.innerHTML = '<option value="all">Все мастера</option>';
             masters.forEach(m => filter.innerHTML += `<option value="${m}">${m}</option>`);
             filterSummaries();
         }
-        
         function filterSummaries() {
             const master = document.getElementById('summaryMasterFilter').value, section = document.getElementById('summarySectionFilter').value, shift = document.getElementById('summaryShiftFilter').value;
             let filtered = summaries;
@@ -1342,14 +1200,12 @@
             const grid = document.getElementById('summariesGrid'); grid.innerHTML = filtered.length ? '' : '<div class="empty-state">Нет сводок</div>';
             filtered.forEach(s => { grid.innerHTML += `<div class="summary-card" onclick='alert(JSON.stringify(${JSON.stringify(s)},null,2))'><div class="summary-header"><span class="summary-date">${s.date}</span><span class="summary-shift">${s.shift}</span></div><div>${s.master}</div><div class="summary-stats"><span>👥 ${s.totalPeople} чел</span><span>🚜 ${s.totalEquipment} тех</span><span>⏱️ ${s.totalHours} ч</span></div></div>`; });
         }
-        
         function renderStorage() {
             const materials = [...new Set(Object.values(storage).map(s => s.material))];
             const filter = document.getElementById('storageMaterialFilter'); filter.innerHTML = '<option value="all">Все</option>';
             materials.forEach(m => filter.innerHTML += `<option value="${m}">${m}</option>`);
             filterStorage();
         }
-        
         function filterStorage() {
             const material = document.getElementById('storageMaterialFilter').value, piket = document.getElementById('storagePiketFilter').value.toLowerCase();
             let items = Object.values(storage);
@@ -1358,11 +1214,9 @@
             const grid = document.getElementById('storageGrid'); grid.innerHTML = items.length ? '' : '<div class="empty-state">Нет материалов</div>';
             items.forEach(item => { grid.innerHTML += `<div class="storage-card"><div class="storage-header"><span class="storage-material">${item.material}</span><span class="storage-piket">ПК ${item.piket}</span></div><div class="storage-volume">${item.volume.toFixed(1)} ${item.unit}</div></div>`; });
             const history = document.getElementById('storageHistoryBody'); history.innerHTML = '';
-            storageHistory.slice(0, 20).forEach(item => { history.innerHTML += `        器<th>${item.date}</th><th>${item.material}</th><td style="color:${item.type==='приход'?'var(--success)':'var(--danger)'}">${item.type}</td><th>${item.volume}</th><th>ПК ${item.piket}</th><th>${item.master}</th>`; });
+            storageHistory.slice(0, 20).forEach(item => { history.innerHTML += `        <tr><td>${item.date}</td><td>${item.material}</td><td style="color:${item.type==='приход'?'var(--success)':'var(--danger)'}">${item.type}</td><td>${item.volume}</td><td>ПК ${item.piket}</td><td>${item.master}</td></tr>`; });
         }
-        
         function renderEmployees() { filterEmployees(); }
-        
         function filterEmployees() {
             const pos = document.getElementById('employeePositionFilter').value, sec = document.getElementById('employeeSectionFilter').value;
             let filtered = employees;
@@ -1371,7 +1225,6 @@
             const grid = document.getElementById('employeesGrid'); grid.innerHTML = filtered.length ? '' : '<div class="empty-state">Нет сотрудников</div>';
             filtered.forEach(e => { grid.innerHTML += `<div class="employee-card"><div class="employee-name">${e.fullName}</div><div class="employee-position">${e.position}</div><div>📞 ${e.phone}</div><div>📧 ${e.email}</div><div>🏗️ Участок ${e.section}</div></div>`; });
         }
-        
         function showAddEmployee() {
             const name = prompt('ФИО:'); if (!name) return;
             const position = prompt('Должность:'); if (!position) return;
@@ -1383,7 +1236,6 @@
             renderEmployees();
             renderReports();
         }
-        
         function renderReports() {
             document.getElementById('totalSummaries').textContent = summaries.length;
             const totalVolume = summaries.reduce((sum, s) => sum + s.workRows.reduce((sSum, r) => sSum + (parseFloat(r.workVolume)||0), 0), 0);
@@ -1394,7 +1246,7 @@
             const stats = {};
             summaries.forEach(s => { if (!stats[s.master]) stats[s.master] = { count:0, volume:0, hours:0 }; stats[s.master].count++; stats[s.master].volume += s.workRows.reduce((sum, r) => sum + (parseFloat(r.workVolume)||0), 0); stats[s.master].hours += parseFloat(s.totalHours) || 0; });
             const body = document.getElementById('mastersStatsBody'); body.innerHTML = '';
-            Object.entries(stats).forEach(([master, st]) => { body.innerHTML += `     <tr><td>${master}</td><td>${st.count}</td><td>${st.volume.toFixed(1)}</td><td>${st.hours.toFixed(1)}</td></tr>`; });
+            Object.entries(stats).forEach(([master, st]) => { body.innerHTML += `        <tr><td>${master}</td><td>${st.count}</td><td>${st.volume.toFixed(1)}</td><td>${st.hours.toFixed(1)}</td></tr>`; });
         }
 
         // Инициализация
