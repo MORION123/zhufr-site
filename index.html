@@ -5,6 +5,10 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=yes">
     <title>ЖУФР - Система учета строительных работ</title>
     
+    <!-- Favicon -->
+    <link rel="icon" type="image/png" href="Favicon.png">
+    <link rel="apple-touch-icon" href="Favicon.png">
+    
     <!-- Firebase SDK -->
     <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-auth-compat.js"></script>
@@ -787,7 +791,7 @@
                 <div class="section-title"><span>📦 Склады материалов</span></div>
                 <div class="filters-bar"><select class="filter-select" id="storageMaterialFilter" onchange="filterStorage()"><option value="all">Все материалы</option></select><input type="text" class="filter-select" id="storagePiketFilter" placeholder="Пикет склада" onchange="filterStorage()"></div>
                 <div id="storageGrid" class="storage-grid"><div class="empty-state">Нет материалов</div></div>
-                <div style="margin-top:20px"><h3>История движений</h3><div class="table-container"><table class="work-table"><thead>   <tr><th>Дата</th><th>Материал</th><th>Тип</th><th>Объем</th><th>Пикет</th><th>Мастер</th></tr></thead><tbody id="storageHistoryBody"></tbody></table></div></div>
+                <div style="margin-top:20px"><h3>История движений</h3><div class="table-container"><table class="work-table"><thead>   器<th>Дата</th><th>Материал</th><th>Тип</th><th>Объем</th><th>Пикет</th><th>Мастер</th>   </thead><tbody id="storageHistoryBody"></tbody>    </table></div></div>
             </div>
 
             <div id="employeesSection" class="section-card" style="display: none;">
@@ -804,7 +808,7 @@
                     <div class="total-block"><div class="total-title">Материалов на складе</div><div class="total-value" id="totalStorageValue">0</div></div>
                     <div class="total-block"><div class="total-title">Всего сотрудников</div><div class="total-value" id="totalEmployees">0</div></div>
                 </div>
-                <div style="margin-top:20px"><h3>Статистика по мастерам</h3><div class="table-container"><table class="work-table"><thead>   <tr><th>Мастер</th><th>Кол-во сводок</th><th>Объем работ</th><th>Маш-часы</th></tr></thead><tbody id="mastersStatsBody"></tbody></table></div></div>
+                <div style="margin-top:20px"><h3>Статистика по мастерам</h3><div class="table-container"><table class="work-table"><thead>   器<th>Мастер</th><th>Кол-во сводок</th><th>Объем работ</th><th>Маш-часы</th>   </thead><tbody id="mastersStatsBody"></tbody>    </table></div></div>
             </div>
         </div>
     </div>
@@ -1079,33 +1083,33 @@
                         <td rowspan="${rowsInSection}" class="section-cell">
                             <div style="margin-bottom:10px"><strong>${row.section}</strong></div>
                             <input type="text" id="picket_${row.sectionIndex}" placeholder="ПК-ПК" style="width:100%;padding:6px;border-radius:6px;background:var(--bg-primary);border:1px solid var(--border);color:white" value="${window['picket_' + row.sectionIndex] || ''}" onchange="savePicket(${row.sectionIndex}, this.value)">
-                        </td>
-                        <td><input value="${row.workType}" placeholder="Вид работы" onchange="updateRow('${row.id}','workType',this.value)"></td>
-                        <td><input value="${row.workName}" placeholder="Наименование работ" onchange="updateRow('${row.id}','workName',this.value)"></td>
+                         </td>
+                         <td><input value="${row.workType}" placeholder="Вид работы" onchange="updateRow('${row.id}','workType',this.value)"></td>
+                         <td><input value="${row.workName}" placeholder="Наименование работ" onchange="updateRow('${row.id}','workName',this.value)"></td>
                         <td style="width:60px"><input value="${row.workUnit}" onchange="updateRow('${row.id}','workUnit',this.value)"></td>
                         <td style="width:80px"><input value="${row.workVolume}" onchange="updateRow('${row.id}','workVolume',this.value)"></td>
-                        <td><input value="${row.equipmentType}" placeholder="Тип" onchange="updateRow('${row.id}','equipmentType',this.value)"></td>
+                         <td><input value="${row.equipmentType}" placeholder="Тип" onchange="updateRow('${row.id}','equipmentType',this.value)"></td>
                         <td style="width:60px"><input value="${row.equipmentCount}" onchange="updateRow('${row.id}','equipmentCount',this.value)"></td>
                         <td style="width:100px"><input value="${row.equipmentNumber}" placeholder="Гос№" onchange="updateRow('${row.id}','equipmentNumber',this.value)"></td>
                         <td style="width:70px"><input value="${row.machineHours}" onchange="updateRow('${row.id}','machineHours',this.value)"></td>
                         <td style="width:60px"><input value="${row.peopleCount}" onchange="updateRow('${row.id}','peopleCount',this.value)"></td>
                         <td style="width:70px"><input value="${row.peopleHours}" onchange="updateRow('${row.id}','peopleHours',this.value)"></td>
-                        <td><input value="${row.note}" placeholder="Прим." onchange="updateRow('${row.id}','note',this.value)"></td>
+                         <td><input value="${row.note}" placeholder="Прим." onchange="updateRow('${row.id}','note',this.value)"></td>
                     `;
                 } else {
                     const tr = tbody.insertRow();
                     tr.innerHTML = `
-                        <td><input value="${row.workType}" placeholder="Вид работы" onchange="updateRow('${row.id}','workType',this.value)"></td>
-                        <td><input value="${row.workName}" placeholder="Наименование работ" onchange="updateRow('${row.id}','workName',this.value)"></td>
+                         <td><input value="${row.workType}" placeholder="Вид работы" onchange="updateRow('${row.id}','workType',this.value)"></td>
+                         <td><input value="${row.workName}" placeholder="Наименование работ" onchange="updateRow('${row.id}','workName',this.value)"></td>
                         <td style="width:60px"><input value="${row.workUnit}" onchange="updateRow('${row.id}','workUnit',this.value)"></td>
                         <td style="width:80px"><input value="${row.workVolume}" onchange="updateRow('${row.id}','workVolume',this.value)"></td>
-                        <td><input value="${row.equipmentType}" placeholder="Тип" onchange="updateRow('${row.id}','equipmentType',this.value)"></td>
+                         <td><input value="${row.equipmentType}" placeholder="Тип" onchange="updateRow('${row.id}','equipmentType',this.value)"></td>
                         <td style="width:60px"><input value="${row.equipmentCount}" onchange="updateRow('${row.id}','equipmentCount',this.value)"></td>
                         <td style="width:100px"><input value="${row.equipmentNumber}" placeholder="Гос№" onchange="updateRow('${row.id}','equipmentNumber',this.value)"></td>
                         <td style="width:70px"><input value="${row.machineHours}" onchange="updateRow('${row.id}','machineHours',this.value)"></td>
                         <td style="width:60px"><input value="${row.peopleCount}" onchange="updateRow('${row.id}','peopleCount',this.value)"></td>
                         <td style="width:70px"><input value="${row.peopleHours}" onchange="updateRow('${row.id}','peopleHours',this.value)"></td>
-                        <td><input value="${row.note}" placeholder="Прим." onchange="updateRow('${row.id}','note',this.value)"></td>
+                         <td><input value="${row.note}" placeholder="Прим." onchange="updateRow('${row.id}','note',this.value)"></td>
                     `;
                 }
             });
@@ -1198,7 +1202,7 @@
             const grid = document.getElementById('storageGrid'); grid.innerHTML = items.length ? '' : '<div class="empty-state">Нет материалов</div>';
             items.forEach(item => { grid.innerHTML += `<div class="storage-card"><div class="storage-header"><span class="storage-material">${item.material}</span><span class="storage-piket">ПК ${item.piket}</span></div><div class="storage-volume">${item.volume.toFixed(1)} ${item.unit}</div></div>`; });
             const history = document.getElementById('storageHistoryBody'); history.innerHTML = '';
-            storageHistory.slice(0, 20).forEach(item => { history.innerHTML += `     器<th>${item.date}</th><th>${item.material}</th><td style="color:${item.type==='приход'?'var(--success)':'var(--danger)'}">${item.type}</td><th>${item.volume}</th><th>ПК ${item.piket}</th><th>${item.master}</th>`; });
+            storageHistory.slice(0, 20).forEach(item => { history.innerHTML += `     <tr><td>${item.date}</td><td>${item.material}</td><td style="color:${item.type==='приход'?'var(--success)':'var(--danger)'}">${item.type}</td><td>${item.volume}</td><td>ПК ${item.piket}</td><td>${item.master}</td></tr>`; });
         }
         function renderEmployees() { filterEmployees(); }
         function filterEmployees() {
@@ -1230,7 +1234,7 @@
             const stats = {};
             summaries.forEach(s => { if (!stats[s.master]) stats[s.master] = { count:0, volume:0, hours:0 }; stats[s.master].count++; stats[s.master].volume += s.workRows.reduce((sum, r) => sum + (parseFloat(r.workVolume)||0), 0); stats[s.master].hours += parseFloat(s.totalHours) || 0; });
             const body = document.getElementById('mastersStatsBody'); body.innerHTML = '';
-            Object.entries(stats).forEach(([master, st]) => { body.innerHTML += `     器<th>${master}</th><th>${st.count}</th><th>${st.volume.toFixed(1)}</th><th>${st.hours.toFixed(1)}</th>`; });
+            Object.entries(stats).forEach(([master, st]) => { body.innerHTML += `     <tr><td>${master}</td><td>${st.count}</td><td>${st.volume.toFixed(1)}</td><td>${st.hours.toFixed(1)}</td></tr>`; });
         }
 
         // Инициализация
@@ -1262,4 +1266,3 @@
     </script>
 </body>
 </html>
-Вернулись к этому коду
