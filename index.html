@@ -436,20 +436,27 @@
             vertical-align: middle;
         }
 
-        .work-table input {
+        .work-table input,
+        .work-table textarea {
             width: 100%;
-            background: transparent;
-            border: none;
+            background: var(--bg-primary);
+            border: 1px solid var(--border);
+            border-radius: 4px;
             color: var(--text-primary);
-            text-align: center;
             font-size: 11px;
-            padding: 4px 2px;
+            padding: 6px;
+            font-family: inherit;
         }
 
-        .work-table input:focus {
+        .work-table textarea {
+            resize: vertical;
+            min-height: 60px;
+        }
+
+        .work-table input:focus,
+        .work-table textarea:focus {
             outline: none;
-            background: var(--bg-primary);
-            border-radius: 4px;
+            border-color: var(--accent);
         }
 
         .section-cell {
@@ -799,7 +806,7 @@
                 <div class="section-title"><span>📦 Склады материалов</span></div>
                 <div class="filters-bar"><select class="filter-select" id="storageMaterialFilter" onchange="filterStorage()"><option value="all">Все материалы</option></select><input type="text" class="filter-select" id="storagePiketFilter" placeholder="Пикет склада" onchange="filterStorage()"></div>
                 <div id="storageGrid" class="storage-grid"><div class="empty-state">Нет материалов</div></div>
-                <div style="margin-top:20px"><h3>История движений</h3><div class="table-container"><table class="work-table"><thead>    <tr><th>Дата</th><th>Материал</th><th>Тип</th><th>Объем</th><th>Пикет</th><th>Мастер</th></tr></thead><tbody id="storageHistoryBody"></tbody></table></div></div>
+                <div style="margin-top:20px"><h3>История движений</h3><div class="table-container"><table class="work-table"><thead>    <tr><th>Дата</th><th>Материал</th><th>Тип</th><th>Объем</th><th>Пикет</th><th>Мастер</th> </thead><tbody id="storageHistoryBody"></tbody>   </table></div></div>
             </div>
 
             <div id="employeesSection" class="section-card" style="display: none;">
@@ -816,7 +823,7 @@
                     <div class="total-block"><div class="total-title">Материалов на складе</div><div class="total-value" id="totalStorageValue">0</div></div>
                     <div class="total-block"><div class="total-title">Всего сотрудников</div><div class="total-value" id="totalEmployees">0</div></div>
                 </div>
-                <div style="margin-top:20px"><h3>Статистика по мастерам</h3><div class="table-container"><table class="work-table"><thead>    <tr><th>Мастер</th><th>Кол-во сводок</th><th>Объем работ</th><th>Маш-часы</th></tr></thead><tbody id="mastersStatsBody"></tbody></table></div></div>
+                <div style="margin-top:20px"><h3>Статистика по мастерам</h3><div class="table-container"><table class="work-table"><thead>    <tr><th>Мастер</th><th>Кол-во сводок</th><th>Объем работ</th><th>Маш-часы</th> </thead><tbody id="mastersStatsBody"></tbody>   </table></div></div>
             </div>
         </div>
     </div>
@@ -846,10 +853,10 @@
                         <th style="width: 50px;">Чел.</th>
                         <th style="width: 60px;">Чел-ч</th>
                         <th style="min-width: 100px;">Прим.</th>
-                     </tr>
+                      </tr>
                 </thead>
                 <tbody id="workBody"></tbody>
-             </table>
+            </table>
         </div>
         <div class="totals-container">
             <div class="total-block"><div class="total-title">👥 ЛЮДИ</div><div class="total-row"><span>Количество:</span><span class="total-value" id="totalPeopleCount">0</span></div><div class="total-row"><span>Человеко-часы:</span><span class="total-value" id="totalPeopleHours">0</span></div></div>
@@ -1255,7 +1262,7 @@
             const grid = document.getElementById('storageGrid'); grid.innerHTML = items.length ? '' : '<div class="empty-state">Нет материалов</div>';
             items.forEach(item => { grid.innerHTML += `<div class="storage-card"><div class="storage-header"><span class="storage-material">${item.material}</span><span class="storage-piket">ПК ${item.piket}</span></div><div class="storage-volume">${item.volume.toFixed(1)} ${item.unit}</div></div>`; });
             const history = document.getElementById('storageHistoryBody'); history.innerHTML = '';
-            storageHistory.slice(0, 20).forEach(item => { history.innerHTML += `     器<th>${item.date}</th><th>${item.material}</th><td style="color:${item.type==='приход'?'var(--success)':'var(--danger)'}">${item.type}    <th>${item.volume}</th><th>ПК ${item.piket}</th><th>${item.master}</th>`; });
+            storageHistory.slice(0, 20).forEach(item => { history.innerHTML += `     器<th>${item.date}</th><th>${item.material}</th><td style="color:${item.type==='приход'?'var(--success)':'var(--danger)'}">${item.type}</td><th>${item.volume}</th><th>ПК ${item.piket}</th><th>${item.master}</th>`; });
         }
         function renderEmployees() { filterEmployees(); }
         function filterEmployees() {
