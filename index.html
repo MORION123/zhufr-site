@@ -787,7 +787,7 @@
                 <div class="section-title"><span>📦 Склады материалов</span></div>
                 <div class="filters-bar"><select class="filter-select" id="storageMaterialFilter" onchange="filterStorage()"><option value="all">Все материалы</option></select><input type="text" class="filter-select" id="storagePiketFilter" placeholder="Пикет склада" onchange="filterStorage()"></div>
                 <div id="storageGrid" class="storage-grid"><div class="empty-state">Нет материалов</div></div>
-                <div style="margin-top:20px"><h3>История движений</h3><div class="table-container"><table class="work-table"><thead>   <tr><th>Дата</th><th>Материал</th><th>Тип</th><th>Объем</th><th>Пикет</th><th>Мастер</th></tr></thead><tbody id="storageHistoryBody"></tbody></table></div></div>
+                <div style="margin-top:20px"><h3>История движений</h3><div class="table-container"><table class="work-table"><thead> <tr><th>Дата</th><th>Материал</th><th>Тип</th><th>Объем</th><th>Пикет</th><th>Мастер</th></tr></thead><tbody id="storageHistoryBody"></tbody></table></div></div>
             </div>
 
             <div id="employeesSection" class="section-card" style="display: none;">
@@ -804,7 +804,7 @@
                     <div class="total-block"><div class="total-title">Материалов на складе</div><div class="total-value" id="totalStorageValue">0</div></div>
                     <div class="total-block"><div class="total-title">Всего сотрудников</div><div class="total-value" id="totalEmployees">0</div></div>
                 </div>
-                <div style="margin-top:20px"><h3>Статистика по мастерам</h3><div class="table-container"><table class="work-table"><thead>   <tr><th>Мастер</th><th>Кол-во сводок</th><th>Объем работ</th><th>Маш-часы</th></tr></thead><tbody id="mastersStatsBody"></tbody></table></div></div>
+                <div style="margin-top:20px"><h3>Статистика по мастерам</h3><div class="table-container"><table class="work-table"><thead> <tr><th>Мастер</th><th>Кол-во сводок</th><th>Объем работ</th><th>Маш-часы</th></tr></thead><tbody id="mastersStatsBody"></tbody></table></div></div>
             </div>
         </div>
     </div>
@@ -820,25 +820,8 @@
         </div>
         <div class="table-container">
             <table class="work-table" id="workTable">
-                <thead>
-                    <tr>
-                        <th rowspan="2">Участок работ<br>(ПК-ПК)</th>
-                        <th rowspan="2">Вид работ</th>
-                        <th rowspan="2">Состав работы</th>
-                        <th rowspan="2">Ед.</th>
-                        <th rowspan="2">Объем</th>
-                        <th colspan="4">Техника</th>
-                        <th rowspan="2">Чел.</th>
-                        <th rowspan="2">Чел-ч</th>
-                        <th rowspan="2">Прим.</th>
-                    </tr>
-                    <tr>
-                        <th>Тип</th>
-                        <th>Кол-во</th>
-                        <th>Гос №</th>
-                        <th>Маш-ч</th>
-                    </tr>
-                </thead>
+                <thead> <tr><th rowspan="2">Участок работ<br>(ПК-ПК)</th><th rowspan="2">Наименование работ</th><th rowspan="2">Ед.</th><th rowspan="2">Объем</th><th colspan="4">Техника</th><th rowspan="2">Чел.</th><th rowspan="2">Чел-ч</th><th rowspan="2">Прим.</th></tr>
+                <tr><th>Тип</th><th>Кол-во</th><th>Гос №</th><th>Маш-ч</th></tr></thead>
                 <tbody id="workBody"></tbody>
             </table>
         </div>
@@ -1039,22 +1022,7 @@
             workRows = []; incomeMaterials = []; outcomeMaterials = [];
             for (let i = 1; i <= 4; i++) {
                 for (let j = 1; j <= 6; j++) {
-                    workRows.push({ 
-                        id: `row_${i}_${j}_${Date.now()}`, 
-                        section: '', // убрали "Участок 1,2,3,4"
-                        sectionIndex: i, 
-                        workType: '', // Вид работ
-                        workName: '', // Состав работы
-                        workUnit: 'м³', 
-                        workVolume: '', 
-                        equipmentType: '', 
-                        equipmentCount: '', 
-                        equipmentNumber: '', 
-                        machineHours: '', 
-                        peopleCount: '', 
-                        peopleHours: '', 
-                        note: '' 
-                    });
+                    workRows.push({ id: `row_${i}_${j}_${Date.now()}`, section: `Участок ${i}`, sectionIndex: i, workName: '', workUnit: 'м³', workVolume: '', equipmentType: '', equipmentCount: '', equipmentNumber: '', machineHours: '', peopleCount: '', peopleHours: '', note: '' });
                 }
             }
             document.getElementById('currentMaster').textContent = currentUser?.fullName || 'Мастер';
@@ -1066,73 +1034,45 @@
         
         function renderWorkTable() {
             const tbody = document.getElementById('workBody'); tbody.innerHTML = '';
-            let renderedSections = [];
-            let rowNum = 1;
-            
-            // Группируем строки по sectionIndex
-            let sectionGroups = {};
+            let renderedSections = [], rowNum = 1;
             workRows.forEach(row => {
-                if (!sectionGroups[row.sectionIndex]) {
-                    sectionGroups[row.sectionIndex] = [];
-                }
-                sectionGroups[row.sectionIndex].push(row);
-            });
-            
-            // Отрисовываем каждый участок
-            for (let sectionIdx = 1; sectionIdx <= 4; sectionIdx++) {
-                const rows = sectionGroups[sectionIdx] || [];
-                if (rows.length === 0) continue;
-                
-                // Заголовок участка с полем для пикетажа (объединенная ячейка)
-                const headerRow = tbody.insertRow();
-                headerRow.innerHTML = `
-                    <td rowspan="${rows.length}" class="section-cell">
-                        <input type="text" 
-                               id="picket_${sectionIdx}" 
-                               placeholder="Пикетаж (ПК-ПК)" 
-                               style="width:100%; padding:8px; border-radius:6px; background:var(--bg-primary); border:1px solid var(--accent); color:white; text-align:center"
-                               value="${window['picket_' + sectionIdx] || ''}" 
-                               onchange="savePicket(${sectionIdx}, this.value)">
-                    </td>
-                `;
-                
-                // Добавляем строки для этого участка
-                rows.forEach((row, idx) => {
+                if (!renderedSections.includes(row.section)) {
+                    renderedSections.push(row.section);
+                    const rowsInSection = workRows.filter(r => r.section === row.section).length;
+                    const headerRow = tbody.insertRow();
+                    headerRow.innerHTML = `<td rowspan="${rowsInSection}" class="section-cell"><div style="margin-bottom:10px"><strong>${row.section}</strong></div><input type="text" id="picket_${row.sectionIndex}" placeholder="ПК-ПК" style="width:100%;padding:6px;border-radius:6px;background:var(--bg-primary);border:1px solid var(--border);color:white" value="${window['picket_' + row.sectionIndex] || ''}" onchange="savePicket(${row.sectionIndex}, this.value)">   </td>
+                    <td><input value="${row.workName}" placeholder="Работы" onchange="updateRow('${row.id}','workName',this.value)">   </td>
+                    <td style="width:60px"><input value="${row.workUnit}" onchange="updateRow('${row.id}','workUnit',this.value)">   </td>
+                    <td style="width:80px"><input value="${row.workVolume}" onchange="updateRow('${row.id}','workVolume',this.value)">   </td>
+                    <td><input value="${row.equipmentType}" placeholder="Тип" onchange="updateRow('${row.id}','equipmentType',this.value)">   </td>
+                    <td style="width:60px"><input value="${row.equipmentCount}" onchange="updateRow('${row.id}','equipmentCount',this.value)">   </td>
+                    <td style="width:100px"><input value="${row.equipmentNumber}" placeholder="Гос№" onchange="updateRow('${row.id}','equipmentNumber',this.value)">   </td>
+                    <td style="width:70px"><input value="${row.machineHours}" onchange="updateRow('${row.id}','machineHours',this.value)">   </td>
+                    <td style="width:60px"><input value="${row.peopleCount}" onchange="updateRow('${row.id}','peopleCount',this.value)">   </td>
+                    <td style="width:70px"><input value="${row.peopleHours}" onchange="updateRow('${row.id}','peopleHours',this.value)">   </td>
+                    <td><input value="${row.note}" placeholder="Прим." onchange="updateRow('${row.id}','note',this.value)">   </td>`;
+                } else {
                     const tr = tbody.insertRow();
-                    tr.innerHTML = `
-                        <td><input value="${row.workType || ''}" placeholder="Вид работ" onchange="updateRow('${row.id}','workType',this.value)"></td>
-                        <td><input value="${row.workName || ''}" placeholder="Состав работы" onchange="updateRow('${row.id}','workName',this.value)"></td>
-                        <td style="width:60px"><input value="${row.workUnit}" onchange="updateRow('${row.id}','workUnit',this.value)"></td>
-                        <td style="width:80px"><input value="${row.workVolume}" onchange="updateRow('${row.id}','workVolume',this.value)"></td>
-                        <td><input value="${row.equipmentType}" placeholder="Тип" onchange="updateRow('${row.id}','equipmentType',this.value)"></td>
-                        <td style="width:60px"><input value="${row.equipmentCount}" onchange="updateRow('${row.id}','equipmentCount',this.value)"></td>
-                        <td style="width:100px"><input value="${row.equipmentNumber}" placeholder="Гос№" onchange="updateRow('${row.id}','equipmentNumber',this.value)"></td>
-                        <td style="width:70px"><input value="${row.machineHours}" onchange="updateRow('${row.id}','machineHours',this.value)"></td>
-                        <td style="width:60px"><input value="${row.peopleCount}" onchange="updateRow('${row.id}','peopleCount',this.value)"></td>
-                        <td style="width:70px"><input value="${row.peopleHours}" onchange="updateRow('${row.id}','peopleHours',this.value)"></td>
-                        <td><input value="${row.note}" placeholder="Прим." onchange="updateRow('${row.id}','note',this.value)"></td>
-                    `;
-                });
-            }
+                    tr.innerHTML = `<td><input value="${row.workName}" placeholder="Работы" onchange="updateRow('${row.id}','workName',this.value)">   </td>
+                    <td style="width:60px"><input value="${row.workUnit}" onchange="updateRow('${row.id}','workUnit',this.value)">   </td>
+                    <td style="width:80px"><input value="${row.workVolume}" onchange="updateRow('${row.id}','workVolume',this.value)">   </td>
+                    <td><input value="${row.equipmentType}" placeholder="Тип" onchange="updateRow('${row.id}','equipmentType',this.value)">   </td>
+                    <td style="width:60px"><input value="${row.equipmentCount}" onchange="updateRow('${row.id}','equipmentCount',this.value)">   </td>
+                    <td style="width:100px"><input value="${row.equipmentNumber}" placeholder="Гос№" onchange="updateRow('${row.id}','equipmentNumber',this.value)">   </td>
+                    <td style="width:70px"><input value="${row.machineHours}" onchange="updateRow('${row.id}','machineHours',this.value)">   </td>
+                    <td style="width:60px"><input value="${row.peopleCount}" onchange="updateRow('${row.id}','peopleCount',this.value)">   </td>
+                    <td style="width:70px"><input value="${row.peopleHours}" onchange="updateRow('${row.id}','peopleHours',this.value)">   </td>
+                    <td><input value="${row.note}" placeholder="Прим." onchange="updateRow('${row.id}','note',this.value)">   </td>`;
+                }
+            });
             updateTotals();
         }
         
         function savePicket(idx, val) { window['picket_' + idx] = val; }
-        function updateRow(id, field, val) { 
-            const row = workRows.find(r => r.id == id); 
-            if (row) { 
-                row[field] = val; 
-                updateTotals(); 
-            } 
-        }
+        function updateRow(id, field, val) { const row = workRows.find(r => r.id == id); if (row) { row[field] = val; updateTotals(); } }
         function updateTotals() {
             let p = 0, ph = 0, e = 0, eh = 0;
-            workRows.forEach(r => { 
-                p += parseInt(r.peopleCount) || 0; 
-                ph += parseFloat(r.peopleHours) || 0; 
-                e += parseInt(r.equipmentCount) || 0; 
-                eh += parseFloat(r.machineHours) || 0; 
-            });
+            workRows.forEach(r => { p += parseInt(r.peopleCount) || 0; ph += parseFloat(r.peopleHours) || 0; e += parseInt(r.equipmentCount) || 0; eh += parseFloat(r.machineHours) || 0; });
             document.getElementById('totalPeopleCount').textContent = p;
             document.getElementById('totalPeopleHours').textContent = ph.toFixed(1);
             document.getElementById('totalEquipmentCount').textContent = e;
@@ -1172,7 +1112,6 @@
             if (!date) { alert('Введите дату'); return; }
             const summary = {
                 id: Date.now(), date, shift: document.getElementById('reportShift').value, master: currentUser.fullName, section: currentUser.section,
-                pickets: { picket_1: window.picket_1, picket_2: window.picket_2, picket_3: window.picket_3, picket_4: window.picket_4 },
                 workRows: [...workRows], incomeMaterials: [...incomeMaterials], outcomeMaterials: [...outcomeMaterials],
                 totalPeople: document.getElementById('totalPeopleCount').textContent, totalPeopleHours: document.getElementById('totalPeopleHours').textContent,
                 totalEquipment: document.getElementById('totalEquipmentCount').textContent, totalHours: document.getElementById('totalEquipmentHours').textContent,
@@ -1214,7 +1153,7 @@
             const grid = document.getElementById('storageGrid'); grid.innerHTML = items.length ? '' : '<div class="empty-state">Нет материалов</div>';
             items.forEach(item => { grid.innerHTML += `<div class="storage-card"><div class="storage-header"><span class="storage-material">${item.material}</span><span class="storage-piket">ПК ${item.piket}</span></div><div class="storage-volume">${item.volume.toFixed(1)} ${item.unit}</div></div>`; });
             const history = document.getElementById('storageHistoryBody'); history.innerHTML = '';
-            storageHistory.slice(0, 20).forEach(item => { history.innerHTML += `        <tr><td>${item.date}</td><td>${item.material}</td><td style="color:${item.type==='приход'?'var(--success)':'var(--danger)'}">${item.type}</td><td>${item.volume}</td><td>ПК ${item.piket}</td><td>${item.master}</td></tr>`; });
+            storageHistory.slice(0, 20).forEach(item => { history.innerHTML += `     <tr><td>${item.date}</td><td>${item.material}</td><td style="color:${item.type==='приход'?'var(--success)':'var(--danger)'}">${item.type}</td><td>${item.volume}</td><td>ПК ${item.piket}</td><td>${item.master}</td></tr>`; });
         }
         function renderEmployees() { filterEmployees(); }
         function filterEmployees() {
@@ -1246,7 +1185,7 @@
             const stats = {};
             summaries.forEach(s => { if (!stats[s.master]) stats[s.master] = { count:0, volume:0, hours:0 }; stats[s.master].count++; stats[s.master].volume += s.workRows.reduce((sum, r) => sum + (parseFloat(r.workVolume)||0), 0); stats[s.master].hours += parseFloat(s.totalHours) || 0; });
             const body = document.getElementById('mastersStatsBody'); body.innerHTML = '';
-            Object.entries(stats).forEach(([master, st]) => { body.innerHTML += `        <tr><td>${master}</td><td>${st.count}</td><td>${st.volume.toFixed(1)}</td><td>${st.hours.toFixed(1)}</td></tr>`; });
+            Object.entries(stats).forEach(([master, st]) => { body.innerHTML += `     <tr><td>${master}</td><td>${st.count}</td><td>${st.volume.toFixed(1)}</td><td>${st.hours.toFixed(1)}</td></tr>`; });
         }
 
         // Инициализация
