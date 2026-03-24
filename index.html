@@ -463,7 +463,7 @@
             background: linear-gradient(135deg, var(--bg-card) 0%, var(--bg-secondary) 100%);
             vertical-align: top;
             padding: 12px;
-            min-width: 100px;
+            min-width: 140px;
             border-right: 2px solid var(--accent);
         }
 
@@ -476,7 +476,7 @@
         }
 
         .work-name-cell {
-            min-width: 320px;
+            min-width: 280px;
         }
 
         .totals-container {
@@ -841,9 +841,9 @@
             <table class="work-table" id="workTable">
                 <thead>
                     <tr>
-                        <th style="min-width: 100px;">Участок работ<br>(ПК-ПК)</th>
+                        <th style="min-width: 140px;">Участок работ<br>(ПК-ПК)</th>
                         <th style="min-width: 160px;">Вид работы</th>
-                        <th style="min-width: 340px;">Наименование работ</th>
+                        <th style="min-width: 320px;">Наименование работ</th>
                         <th style="width: 50px;">Ед.</th>
                         <th style="width: 70px;">Объем</th>
                         <th style="min-width: 100px;">Тип техники</th>
@@ -853,10 +853,10 @@
                         <th style="width: 50px;">Чел.</th>
                         <th style="width: 60px;">Чел-ч</th>
                         <th style="min-width: 100px;">Прим.</th>
-                       </tr>
+                      </tr>
                 </thead>
                 <tbody id="workBody"></tbody>
-             </table>
+            </table>
         </div>
         <div class="totals-container">
             <div class="total-block"><div class="total-title">👥 ЛЮДИ</div><div class="total-row"><span>Количество:</span><span class="total-value" id="totalPeopleCount">0</span></div><div class="total-row"><span>Человеко-часы:</span><span class="total-value" id="totalPeopleHours">0</span></div></div>
@@ -1110,26 +1110,26 @@
                     <td rowspan="${rowsCount}" class="section-cell">
                         <div style="margin-bottom:10px"><strong>${sectionName}</strong></div>
                         <input type="text" id="picket_${sectionIdx}" placeholder="ПК-ПК" style="width:100%;padding:8px;border-radius:6px;background:var(--bg-primary);border:1px solid var(--border);color:white" value="${savedPicket}" onchange="savePicket(${sectionIdx}, this.value)">
-                     </td>
+                    </td>
                     <td rowspan="${rowsCount}" class="work-type-cell">
                         <textarea id="workType_${sectionIdx}" placeholder="Вид работы" style="width:100%;min-height:120px;resize:vertical;background:var(--bg-primary);border:1px solid var(--border);border-radius:6px;color:white;padding:8px;">${savedWorkType}</textarea>
-                     </td>
+                    </td>
                 `;
                 
                 // Строки для этого участка (колонки 3-12)
                 rows.forEach((row, idx) => {
                     const tr = tbody.insertRow();
                     tr.innerHTML = `
-                        <td class="work-name-cell"><input value="${row.workName}" placeholder="Наименование работ" onchange="updateRow('${row.id}','workName',this.value)" style="width:100%;padding:6px;">     </td>
-                        <td style="width:60px"><input value="${row.workUnit}" onchange="updateRow('${row.id}','workUnit',this.value)">     </td>
-                        <td style="width:80px"><input value="${row.workVolume}" onchange="updateRow('${row.id}','workVolume',this.value)">     </td>
-                        <td><input value="${row.equipmentType}" placeholder="Тип" onchange="updateRow('${row.id}','equipmentType',this.value)">     </td>
-                        <td style="width:60px"><input value="${row.equipmentCount}" onchange="updateRow('${row.id}','equipmentCount',this.value)">     </td>
-                        <td style="width:100px"><input value="${row.equipmentNumber}" placeholder="Гос№" onchange="updateRow('${row.id}','equipmentNumber',this.value)">     </td>
-                        <td style="width:70px"><input value="${row.machineHours}" onchange="updateRow('${row.id}','machineHours',this.value)">     </td>
-                        <td style="width:60px"><input value="${row.peopleCount}" onchange="updateRow('${row.id}','peopleCount',this.value)">     </td>
-                        <td style="width:70px"><input value="${row.peopleHours}" onchange="updateRow('${row.id}','peopleHours',this.value)">     </td>
-                        <td><input value="${row.note}" placeholder="Прим." onchange="updateRow('${row.id}','note',this.value)">     </td>
+                        <td class="work-name-cell"><input value="${row.workName}" placeholder="Наименование работ" onchange="updateRow('${row.id}','workName',this.value)" style="width:100%;padding:6px;">    </td>
+                        <td style="width:60px"><input value="${row.workUnit}" onchange="updateRow('${row.id}','workUnit',this.value)">    </td>
+                        <td style="width:80px"><input value="${row.workVolume}" onchange="updateRow('${row.id}','workVolume',this.value)">    </td>
+                        <td><input value="${row.equipmentType}" placeholder="Тип" onchange="updateRow('${row.id}','equipmentType',this.value)">    </td>
+                        <td style="width:60px"><input value="${row.equipmentCount}" onchange="updateRow('${row.id}','equipmentCount',this.value)">    </td>
+                        <td style="width:100px"><input value="${row.equipmentNumber}" placeholder="Гос№" onchange="updateRow('${row.id}','equipmentNumber',this.value)">    </td>
+                        <td style="width:70px"><input value="${row.machineHours}" onchange="updateRow('${row.id}','machineHours',this.value)">    </td>
+                        <td style="width:60px"><input value="${row.peopleCount}" onchange="updateRow('${row.id}','peopleCount',this.value)">    </td>
+                        <td style="width:70px"><input value="${row.peopleHours}" onchange="updateRow('${row.id}','peopleHours',this.value)">    </td>
+                        <td><input value="${row.note}" placeholder="Прим." onchange="updateRow('${row.id}','note',this.value)">    </td>
                     `;
                 });
             }
