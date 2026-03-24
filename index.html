@@ -836,7 +836,10 @@
             </div>
 
             <div id="summarySection" class="section-card">
-                <div class="section-title"><span>📋 Управление сводками</span><button class="btn-success" onclick="openSummaryModal()">➕ Новая сводка</button></div>
+                <div class="section-title">
+                    <span>📋 Управление сводками</span>
+                    <button class="btn-success" id="newSummaryBtn">➕ Новая сводка</button>
+                </div>
                 <div class="filters-bar">
                     <select class="filter-select" id="summaryMasterFilter" onchange="filterSummaries()"><option value="all">Все мастера</option></select>
                     <select class="filter-select" id="summarySectionFilter" onchange="filterSummaries()"><option value="all">Все участки</option><option value="29">Участок 29</option><option value="51">Участок 51</option></select>
@@ -849,7 +852,7 @@
                 <div class="section-title"><span>📦 Склады материалов</span></div>
                 <div class="filters-bar"><select class="filter-select" id="storageMaterialFilter" onchange="filterStorage()"><option value="all">Все материалы</option></select><input type="text" class="filter-select" id="storagePiketFilter" placeholder="Пикет склада" onchange="filterStorage()"></div>
                 <div id="storageGrid" class="storage-grid"><div class="empty-state">Нет материалов</div></div>
-                <div style="margin-top:20px"><h3>История движений</h3><div class="table-container"><table class="work-table"><thead>    器<th>Дата</th><th>Материал</th><th>Тип</th><th>Объем</th><th>Пикет</th><th>Мастер</th>   </thead><tbody id="storageHistoryBody"></tbody>      </div></div>
+                <div style="margin-top:20px"><h3>История движений</h3><div class="table-container"><table class="work-table"><thead>    <th>Дата</th><th>Материал</th><th>Тип</th><th>Объем</th><th>Пикет</th><th>Мастер</th> </thead><tbody id="storageHistoryBody"></tbody>    </div></div>
             </div>
 
             <div id="employeesSection" class="section-card" style="display: none;">
@@ -866,7 +869,7 @@
                     <div class="total-block"><div class="total-title">Материалов на складе</div><div class="total-value" id="totalStorageValue">0</div></div>
                     <div class="total-block"><div class="total-title">Всего сотрудников</div><div class="total-value" id="totalEmployees">0</div></div>
                 </div>
-                <div style="margin-top:20px"><h3>Статистика по мастерам</h3><div class="table-container"><table class="work-table"><thead>    器<th>Мастер</th><th>Кол-во сводок</th><th>Объем работ</th><th>Маш-часы</th>   </thead><tbody id="mastersStatsBody"></tbody>      </div></div>
+                <div style="margin-top:20px"><h3>Статистика по мастерам</h3><div class="table-container"><table class="work-table"><thead>    <th>Мастер</th><th>Кол-во сводок</th><th>Объем работ</th><th>Маш-часы</th> </thead><tbody id="mastersStatsBody"></tbody>    </div></div>
             </div>
         </div>
     </div>
@@ -899,10 +902,10 @@
                         <th style="width: 50px;">Чел.</th>
                         <th style="width: 60px;">Чел-ч</th>
                         <th style="min-width: 100px;">Прим.</th>
-                         
+                      </tr>
                 </thead>
                 <tbody id="workBody"></tbody>
-               </table>
+            </table>
         </div>
         <div class="totals-container">
             <div class="total-block"><div class="total-title">👥 ЛЮДИ</div><div class="total-row"><span>Количество:</span><span class="total-value" id="totalPeopleCount">0</span></div><div class="total-row"><span>Человеко-часы:</span><span class="total-value" id="totalPeopleHours">0</span></div></div>
@@ -1182,22 +1185,22 @@
                         <div style="margin-bottom:12px"><strong style="font-size:13px;">${sectionName}</strong></div>
                         <input type="text" id="picket_${sectionIdx}" placeholder="ПК-ПК" style="width:100%;padding:8px;border-radius:6px;background:var(--bg-primary);border:1px solid var(--border);color:white;margin-bottom:8px;" value="${savedPicket}" onchange="savePicket(${sectionIdx}, this.value)">
                         <textarea id="workType_${sectionIdx}" placeholder="Вид работы" style="width:100%;min-height:100px;resize:vertical;background:var(--bg-primary);border:1px solid var(--border);border-radius:6px;color:white;padding:8px;margin-top:8px;">${savedWorkType}</textarea>
-                      </td>
+                       </td>
                 `;
                 
                 rows.forEach((row) => {
                     const tr = tbody.insertRow();
                     tr.innerHTML = `
-                        <td class="work-name-cell"><input value="${row.workName}" placeholder="Наименование работ" onchange="updateRow('${row.id}','workName',this.value)" style="width:100%;padding:6px;"> </td>
-                        <td style="width:60px"><input value="${row.workUnit}" onchange="updateRow('${row.id}','workUnit',this.value)"> </td>
-                        <td style="width:80px"><input value="${row.workVolume}" onchange="updateRow('${row.id}','workVolume',this.value)"> </td>
-                        <td><input value="${row.equipmentType}" placeholder="Тип" onchange="updateRow('${row.id}','equipmentType',this.value)"> </td>
-                        <td style="width:60px"><input value="${row.equipmentCount}" onchange="updateRow('${row.id}','equipmentCount',this.value)"> </td>
-                        <td style="width:100px"><input value="${row.equipmentNumber}" placeholder="Гос№" onchange="updateRow('${row.id}','equipmentNumber',this.value)"> </td>
-                        <td style="width:70px"><input value="${row.machineHours}" onchange="updateRow('${row.id}','machineHours',this.value)"> </td>
-                        <td style="width:60px"><input value="${row.peopleCount}" onchange="updateRow('${row.id}','peopleCount',this.value)"> </td>
-                        <td style="width:70px"><input value="${row.peopleHours}" onchange="updateRow('${row.id}','peopleHours',this.value)"> </td>
-                        <td><input value="${row.note}" placeholder="Прим." onchange="updateRow('${row.id}','note',this.value)"> </td>
+                        <td class="work-name-cell"><input value="${row.workName}" placeholder="Наименование работ" onchange="updateRow('${row.id}','workName',this.value)" style="width:100%;padding:6px;">  </td>
+                        <td style="width:60px"><input value="${row.workUnit}" onchange="updateRow('${row.id}','workUnit',this.value)">  </td>
+                        <td style="width:80px"><input value="${row.workVolume}" onchange="updateRow('${row.id}','workVolume',this.value)">  </td>
+                        <td><input value="${row.equipmentType}" placeholder="Тип" onchange="updateRow('${row.id}','equipmentType',this.value)">  </td>
+                        <td style="width:60px"><input value="${row.equipmentCount}" onchange="updateRow('${row.id}','equipmentCount',this.value)">  </td>
+                        <td style="width:100px"><input value="${row.equipmentNumber}" placeholder="Гос№" onchange="updateRow('${row.id}','equipmentNumber',this.value)">  </td>
+                        <td style="width:70px"><input value="${row.machineHours}" onchange="updateRow('${row.id}','machineHours',this.value)">  </td>
+                        <td style="width:60px"><input value="${row.peopleCount}" onchange="updateRow('${row.id}','peopleCount',this.value)">  </td>
+                        <td style="width:70px"><input value="${row.peopleHours}" onchange="updateRow('${row.id}','peopleHours',this.value)">  </td>
+                        <td><input value="${row.note}" placeholder="Прим." onchange="updateRow('${row.id}','note',this.value)">  </td>
                     `;
                 });
             }
@@ -1480,9 +1483,10 @@
             document.getElementById('subscribeBtn').onclick = showCompanyForm;
             document.getElementById('createCompanyBtn').onclick = createCompany;
             
-            const newSummaryBtn = document.getElementById('summarySection').querySelector('.btn-success');
+            // Привязываем кнопку "Новая сводка"
+            const newSummaryBtn = document.getElementById('newSummaryBtn');
             if (newSummaryBtn) {
-                console.log("Кнопка найдена");
+                console.log("Кнопка найдена, привязываем событие");
                 newSummaryBtn.onclick = openSummaryModal;
             } else {
                 console.error("Кнопка не найдена!");
